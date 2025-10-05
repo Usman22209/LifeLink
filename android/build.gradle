@@ -19,3 +19,24 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+// ✅ Patch to avoid Gradle packaging bug with JNI .so libs in debug/release AARs
+gradle.projectsEvaluated {
+    subprojects { subproject ->
+        if (subproject.name.contains("react-native-reanimated") ||
+            subproject.name.contains("react-native-worklets")) {
+
+            subproject.tasks.matching { it.name == "bundleDebugLocalLintAar" }.configureEach {
+                enabled = false
+            }
+            subproject.tasks.matching { it.name == "bundleReleaseLocalLintAar" }.configureEach {
+                enabled = false
+            }
+            subproject.tasks.matching { it.name == "bundleDebugAar" }.configureEach {
+                enabled = false
+            }
+            subproject.tasks.matching { it.name == "bundleReleaseAar" }.configureEach {
+                enabled = false
+            }
+        }
+    }
+}
