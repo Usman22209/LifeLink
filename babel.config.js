@@ -20,6 +20,8 @@ module.exports = {
           '@assets': './src/assets',
           '@theme': './src/shared/theme',
           '@components': './src/shared/components',
+          '@screens': './src/screens',
+          
         },
       },
     ],
