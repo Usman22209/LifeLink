@@ -13,7 +13,8 @@
       "@config/*": ["shared/config/*"],
       "@shared/*": ["shared/*"],
       "@navigation/*": ["navigation/*"],
-      "@store/*": ["store/*"]
+      "@store/*": ["store/*"],
+      "@providers/*": ["shared/providers/*"]
     },
   },
   "include": ["**/*.ts", "**/*.tsx", "index.js"],
