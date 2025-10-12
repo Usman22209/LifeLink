@@ -1,86 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import ENV from '@config/env';
-interface GoogleUser {
-  user: {
-    name?: string;
-    email?: string;
-    photo?: string;
-  };
+import { View, Text } from 'react-native'
+import React from 'react'
+import AppNavigation from '@navigation/index'
+const App = () => {
+  console.log('App Component Rendered');  
+  return (
+    <AppNavigation />
+  )
 }
 
-const GoogleLoginScreen = () => {
-  const { WEB_CLIENT_ID } = ENV
-  const [userInfo, setUserInfo] = useState<GoogleUser | null>(null);
-
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: WEB_CLIENT_ID,
-      offlineAccess: true,
-    });
-  }, []);
-
-  const signIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      const user = await GoogleSignin.signIn();
-      console.log('Google User:', user);
-      setUserInfo(user);
-    } catch (error: any) {
-      console.error('Google Sign-In Error:', error);
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      await GoogleSignin.signOut();
-      setUserInfo(null);
-    } catch (error) {
-      console.error('Google Sign-Out Error:', error);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      {userInfo ? (
-        <>
-          {userInfo.user?.photo && (
-            <Image source={{ uri: userInfo.user.photo }} style={styles.image} />
-          )}
-          <Text style={styles.text}>Welcome, {userInfo.user?.name || 'User'}</Text>
-          <Text style={styles.email}>{userInfo.user?.email}</Text>
-          <Button title="Logout" onPress={signOut} />
-        </>
-      ) : (
-        <Button title="Sign in with Google" onPress={signIn} />
-      )}
-    </View>
-  );
-};
-
-export default GoogleLoginScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  email: {
-    fontSize: 14,
-    color: 'gray',
-    marginBottom: 20,
-  },
-});
+export default App
