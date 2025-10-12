@@ -1,21 +1,3 @@
 {
-  "onboarding": {
-    "title1": "Connect Donors & Patients",
-    "desc1": "Real-time blood donation network connecting those in need with verified donors across Pakistan.",
-    "title2": "AI-Powered Recommendations",
-    "desc2": "Smart matching algorithm considers health metrics, location, and availability to find the best donor matches.",
-    "title3": "Offline Capability",
-    "desc3": "TensorFlow Lite integration enables AI predictions without internet connectivity for rural accessibility.",
-    "title4": "Localized Experience",
-    "desc4": "Full Urdu language support and designed specifically for Pakistani healthcare infrastructure.",
-    "skip": "Skip",
-    "back": "Back",
-    "continue": "Continue",
-    "getStarted": "Get Started"
-  },
-  "common": {
-    "language": "Language",
-    "english": "English",
-    "urdu": "اردو"
-  }
+ "welcome": "Welcome to LifeLink"
 }

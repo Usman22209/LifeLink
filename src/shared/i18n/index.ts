@@ -25,7 +25,6 @@ const languageDetector = {
         }
         const locales = RNLocalize.getLocales();
         if (Array.isArray(locales) && locales.length > 0) {
-          // pick languageCode (e.g., "en", "ur")
           callback(locales[0].languageCode);
         } else {
           callback('en');
@@ -45,7 +44,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
-    compatibilityJSON: 'v3',
+    compatibilityJSON: 'v4',
     ns: ['translation'],
     defaultNS: 'translation',
     interpolation: { escapeValue: false },
