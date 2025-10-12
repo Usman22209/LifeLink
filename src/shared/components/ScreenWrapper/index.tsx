@@ -1,16 +1,20 @@
 import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   View,
-  ViewStyle,
   ScrollView,
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import {useNetInfo} from '@react-native-community/netinfo';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNetInfo } from '@react-native-community/netinfo';
 import Text from '../AppText';
 import { colors } from '../../theme/colors';
+import {
+  scale,
+  verticalScale,
+  moderateScale,
+} from 'react-native-size-matters';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -27,33 +31,33 @@ interface ScreenWrapperProps {
   backgroundColor?: string;
 }
 
-const HEADER_HEIGHT = 60;
+const HEADER_HEIGHT = verticalScale(60);
 
 const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   children,
   style,
   header,
   fixedHeader = false,
-  statusBarColor = '#fff',
+  statusBarColor = colors.secondary,
   statusBarStyle = 'dark-content',
   showNetworkBanner = true,
   loading = false,
   loadingText = 'Loading...',
   safeArea = true,
   scrollable = false,
-  backgroundColor = '#fff',
+  backgroundColor = colors.white,
 }) => {
   const netInfo = useNetInfo();
+  const insets = useSafeAreaInsets(); 
   const isOffline = !netInfo.isConnected;
 
   const renderContent = () => {
     const Container = scrollable ? ScrollView : View;
-    const containerStyle = fixedHeader ? {marginTop: HEADER_HEIGHT} : {};
+    const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
     return (
       <Container
-        style={[styles.container, {backgroundColor}, containerStyle]}
+        style={[styles.container, { backgroundColor }, containerStyle]}
         contentContainerStyle={scrollable ? styles.scrollContent : undefined}>
-        {/* If header is not fixed, render it inside the scrollable content */}
         {!fixedHeader && header}
         {children}
       </Container>
@@ -65,10 +69,16 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   return (
     <>
       <StatusBar backgroundColor={statusBarColor} barStyle={statusBarStyle} />
-      <Wrapper style={[{flex: 1}, style]}>
-        {/* If fixedHeader is true, render header separately (outside of the scrollable content) */}
+      <Wrapper
+        style={[
+          styles.wrapper,
+          style,
+          { paddingTop: insets.top, backgroundColor },
+        ]}
+        edges={safeArea ? ['top', 'left', 'right', 'bottom'] : []}
+      >
         {fixedHeader && header && (
-          <View style={[styles.fixedHeaderContainer, {height: HEADER_HEIGHT}]}>
+          <View style={[styles.fixedHeaderContainer, { height: HEADER_HEIGHT }]}>
             {header}
           </View>
         )}
@@ -90,12 +100,15 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 16,
+    padding: moderateScale(16),
   },
   fixedHeaderContainer: {
     position: 'absolute',
@@ -103,20 +116,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: moderateScale(16),
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
   offlineBanner: {
-    backgroundColor: '#ff4444',
-    padding: 10,
+    backgroundColor: colors.danger,
+    padding: verticalScale(10),
     alignItems: 'center',
   },
   offlineText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: moderateScale(14),
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -125,8 +139,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 10,
-    fontSize: 16,
+    marginTop: verticalScale(10),
+    fontSize: moderateScale(16),
   },
 });
 

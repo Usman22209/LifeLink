@@ -10,6 +10,7 @@ export const colors = {
   white: '#FFFFFF',
   black: '#000000',
   gray: '#7F8C8D',
+  border: '#DDDDDD',  
 };
 export function withOpacity(color: string, alpha: number = 1): string {
   if (color.startsWith('#')) {
