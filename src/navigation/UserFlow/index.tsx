@@ -7,6 +7,12 @@ const LanguageSwitcher = () => {
 
   const switchToUrdu = () => i18n.changeLanguage('ur');
   const switchToEnglish = () => i18n.changeLanguage('en');
+  console.log("Hello")
+  console.error("Error example");
+  console.warn("Warning example");
+  console.info("Info example");
+  console.debug("Debug example");
+
 
   return (
     <View>
