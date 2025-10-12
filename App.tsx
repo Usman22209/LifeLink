@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Image, StyleSheet } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
+import ENV from '@config/env';
 interface GoogleUser {
   user: {
     name?: string;
@@ -11,11 +11,12 @@ interface GoogleUser {
 }
 
 const GoogleLoginScreen = () => {
+  const { WEB_CLIENT_ID } = ENV
   const [userInfo, setUserInfo] = useState<GoogleUser | null>(null);
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: '287582920955-nrn1ujvecn6pc6vh4c98vdl8cjpvpt4h.apps.googleusercontent.com',
+      webClientId: WEB_CLIENT_ID,
       offlineAccess: true,
     });
   }, []);
