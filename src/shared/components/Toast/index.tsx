@@ -1,89 +1,116 @@
 import React from 'react';
-import {StatusBar, Animated, Easing, StyleProp, ViewStyle} from 'react-native';
-import {showMessage} from 'react-native-flash-message';
-import AnyIcon, {Icons} from '@components/AnyIcon';
-import {colors} from '@theme/colors';
-import {fontFamily} from '@theme/fonts';
+import { View, Text, Animated, Easing, StyleSheet } from 'react-native';
+import Toast, { BaseToastProps } from 'react-native-toast-message';
+import AnyIcon, { Icons } from '@components/AnyIcon';
+import { colors } from '@theme/colors';
+import { fontFamily } from '@theme/fonts';
 
 type ToastType = 'success' | 'info' | 'warning' | 'danger';
 
-const toastConfig = {
-  animation: {
+const toastIcons: Record<ToastType, { name: string; color: string }> = {
+  success: { name: 'checkcircle', color: colors.success },
+  info: { name: 'infocirlce', color: colors.info },
+  warning: { name: 'warning', color: colors.warning },
+  danger: { name: 'closecircle', color: colors.danger },
+};
+
+const ToastView = ({
+  text1,
+  text2,
+  type,
+}: BaseToastProps & { type: ToastType }) => {
+  const iconData = toastIcons[type] || toastIcons.info;
+  const scaleAnim = new Animated.Value(0.8);
+
+  Animated.timing(scaleAnim, {
+    toValue: 1,
     duration: 400,
     easing: Easing.out(Easing.cubic),
     useNativeDriver: true,
-  },
-  style: {
-    marginTop: StatusBar.currentHeight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    flexDirection: 'row',
-    width: '90%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-};
+  }).start();
 
-const toastIcons: Record<ToastType, {name: string; color: string}> = {
-  success: {name: 'checkcircle', color: colors.success},
-  info: {name: 'infocirlce', color: colors.info},
-  warning: {name: 'warning', color: colors.warning},
-  danger: {name: 'closecircle', color: colors.danger},
-};
-
-const showToast = (message: string, type: ToastType, code?: string) => {
-  showMessage({
-    message: code ? `${message}: ${code}` : message,
-    duration: 3000,
-    type,
-    floating: true,
-    icon: () => (
+  return (
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: iconData.color },
+      ]}>
       <Animated.View
-        style={{
-          marginRight: 12,
-          transform: [
-            {
-              scale: new Animated.Value(0.8).interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.8, 1],
-              }),
-            },
-          ],
-        }}>
+        style={[
+          styles.iconWrapper,
+          { transform: [{ scale: scaleAnim }] },
+        ]}>
         <AnyIcon
           type={Icons.AntDesign}
-          name={toastIcons[type].name}
+          name={iconData.name}
           size={28}
           color={colors.white}
         />
       </Animated.View>
-    ),
-    textStyle: {
-      fontSize: 16,
-      color: colors.white,
-      textAlign: 'center',
-      textTransform: 'capitalize',
-      fontFamily: fontFamily.BOLD,
-      flexShrink: 1,
-    },
-    style: {
-      ...toastConfig.style,
-      backgroundColor: toastIcons[type].color,
-    } as StyleProp<ViewStyle>,
-  });
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{text1}</Text>
+        {text2 ? <Text style={styles.description}>{text2}</Text> : null}
+      </View>
+    </View>
+  );
 };
 
-const showSuccessToast = (message: string, code?: string) =>
-  showToast(message, 'success', code);
-const showErrorToast = (message: string) => showToast(message, 'danger');
-const showInfoToast = (message: string) => showToast(message, 'info');
-const showWarningToast = (message: string) => showToast(message, 'warning');
+export const toastConfig = {
+  success: (props: BaseToastProps) => <ToastView {...props} type="success" />,
+  info: (props: BaseToastProps) => <ToastView {...props} type="info" />,
+  warning: (props: BaseToastProps) => <ToastView {...props} type="warning" />,
+  danger: (props: BaseToastProps) => <ToastView {...props} type="danger" />,
+};
 
-export {showSuccessToast, showErrorToast, showInfoToast, showWarningToast};
+export const showSuccessToast = (message: string, description?: string) => {
+  Toast.show({ type: 'success', text1: message, text2: description });
+};
+
+export const showErrorToast = (message: string, description?: string) => {
+  Toast.show({ type: 'danger', text1: message, text2: description });
+};
+
+export const showInfoToast = (message: string, description?: string) => {
+  Toast.show({ type: 'info', text1: message, text2: description });
+};
+
+export const showWarningToast = (message: string, description?: string) => {
+  Toast.show({ type: 'warning', text1: message, text2: description });
+};
+
+const styles = StyleSheet.create({
+  container: {
+    elevation: 9999,
+    borderRadius: 25,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    alignSelf: 'center',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+  },
+  iconWrapper: {
+    marginRight: 12,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 16,
+    color: colors.white,
+    textAlign: 'left',
+    fontFamily: fontFamily.BOLD,
+  },
+  description: {
+    fontSize: 14,
+    color: colors.white,
+    fontFamily: fontFamily.REGULAR,
+    marginTop: 4,
+    opacity: 0.9,
+  },
+});
