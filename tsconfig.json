@@ -12,9 +12,10 @@
       "@services/*": ["shared/services/*"],
       "@config/*": ["shared/config/*"],
       "@shared/*": ["shared/*"],
-      "@navigation/*": ["navigation/*"]
+      "@navigation/*": ["navigation/*"],
+      "@store/*": ["store/*"]
     },
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "index.js"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

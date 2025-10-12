@@ -8,7 +8,7 @@ type CameraOptions = {
   mediaType: MediaType;
   cropping?: boolean;
   compressQuality?: number;
-  durationLimit?: number; // For video
+  durationLimit?: number;
 };
 
 type PickerOptions<T extends boolean> = {

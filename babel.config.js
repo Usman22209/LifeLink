@@ -27,6 +27,7 @@ module.exports = {
           '@config': './src/shared/config',
           '@shared': './src/shared',
           '@navigation': './src/navigation',
+          '@store': './src/store',      
         },
       },
     ],
