@@ -1,5 +1,13 @@
-import React from 'react';
-import { View, Text, Animated, Easing, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  Animated,
+  Easing,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import Toast, { BaseToastProps } from 'react-native-toast-message';
 import AnyIcon, { Icons } from '@components/AnyIcon';
 import { colors } from '@theme/colors';
@@ -14,44 +22,97 @@ const toastIcons: Record<ToastType, { name: string; color: string }> = {
   danger: { name: 'closecircle', color: colors.danger },
 };
 
+const CARD_BG = colors.white;
+const TITLE_COLOR = colors.textPrimary;
+const DESC_COLOR = colors.textSecondary;
+
 const ToastView = ({
   text1,
   text2,
   type,
-}: BaseToastProps & { type: ToastType }) => {
+  onPress,
+}: BaseToastProps & { type: ToastType; onPress?: () => void }) => {
   const iconData = toastIcons[type] || toastIcons.info;
-  const scaleAnim = new Animated.Value(0.8);
+  const translateY = useRef(new Animated.Value(-28)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
-  Animated.timing(scaleAnim, {
-    toValue: 1,
-    duration: 400,
-    easing: Easing.out(Easing.cubic),
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 320,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 240,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [translateY, opacity]);
+
+  const handleDismiss = () => {
+    // slide up then hide
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: -28,
+        duration: 200,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start(() => Toast.hide());
+  };
 
   return (
-    <View
+    <Animated.View
       style={[
-        styles.container,
-        { backgroundColor: iconData.color },
+        styles.wrapper,
+        {
+          transform: [{ translateY }],
+          opacity,
+        },
       ]}>
-      <Animated.View
-        style={[
-          styles.iconWrapper,
-          { transform: [{ scale: scaleAnim }] },
-        ]}>
-        <AnyIcon
-          type={Icons.AntDesign}
-          name={iconData.name}
-          size={28}
-          color={colors.white}
-        />
-      </Animated.View>
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{text1}</Text>
-        {text2 ? <Text style={styles.description}>{text2}</Text> : null}
-      </View>
-    </View>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={handleDismiss}
+        style={[styles.container, { backgroundColor: CARD_BG }]}>
+        <View style={[styles.accent, { backgroundColor: iconData.color }]} />
+
+        <View style={styles.iconBox}>
+          <View style={[styles.iconCircle, { backgroundColor: iconData.color }]}>
+            <AnyIcon
+              type={Icons.AntDesign}
+              name={iconData.name}
+              size={18}
+              color={colors.white}
+            />
+          </View>
+        </View>
+
+        <View style={styles.textContainer}>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {text1}
+          </Text>
+          {text2 ? (
+            <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
+              {text2}
+            </Text>
+          ) : null}
+        </View>
+
+        <TouchableOpacity onPress={handleDismiss} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+          <AnyIcon type={Icons.AntDesign} name="close" size={18} color={DESC_COLOR} />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -62,55 +123,80 @@ export const toastConfig = {
   danger: (props: BaseToastProps) => <ToastView {...props} type="danger" />,
 };
 
-export const showSuccessToast = (message: string, description?: string) => {
-  Toast.show({ type: 'success', text1: message, text2: description });
+export const showToast = (type: ToastType, title: string, description?: string, duration = 3500) => {
+  Toast.show({ type, text1: title, text2: description, visibilityTime: duration });
 };
 
-export const showErrorToast = (message: string, description?: string) => {
-  Toast.show({ type: 'danger', text1: message, text2: description });
-};
-
-export const showInfoToast = (message: string, description?: string) => {
-  Toast.show({ type: 'info', text1: message, text2: description });
-};
-
-export const showWarningToast = (message: string, description?: string) => {
-  Toast.show({ type: 'warning', text1: message, text2: description });
-};
+export const showSuccessToast = (title: string, description?: string, duration?: number) =>
+  showToast('success', title, description, duration);
+export const showErrorToast = (title: string, description?: string, duration?: number) =>
+  showToast('danger', title, description, duration);
+export const showInfoToast = (title: string, description?: string, duration?: number) =>
+  showToast('info', title, description, duration);
+export const showWarningToast = (title: string, description?: string, duration?: number) =>
+  showToast('warning', title, description, duration);
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
+    width: '100%',
+    alignItems: 'center',
+    // ensure wrapper sits above other UI
+    zIndex: 9999,
     elevation: 9999,
-    borderRadius: 25,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
+    // top spacing bias is handled by <Toast position="top" topOffset={...} />
+  },
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    alignSelf: 'center',
-    width: '90%',
+    width: '94%',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: Platform.OS === 'ios' ? 0.08 : 0.22,
+    shadowRadius: 18,
+    elevation: 8,
+    overflow: 'hidden',
   },
-  iconWrapper: {
-    marginRight: 12,
+  accent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 6,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  iconBox: {
+    marginLeft: 8,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.primary ?? '#007AFF', // fallback
   },
   textContainer: {
     flex: 1,
+    paddingRight: 8,
   },
   title: {
-    fontSize: 16,
-    color: colors.white,
-    textAlign: 'left',
+    fontSize: 15,
+    color: TITLE_COLOR,
     fontFamily: fontFamily.BOLD,
+    marginBottom: 2,
   },
   description: {
-    fontSize: 14,
-    color: colors.white,
+    fontSize: 13,
+    color: DESC_COLOR,
     fontFamily: fontFamily.REGULAR,
-    marginTop: 4,
-    opacity: 0.9,
+    lineHeight: 18,
   },
 });
