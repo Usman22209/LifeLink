@@ -1,6 +1,10 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const path = require('path');
 
+const {
+  withSentryConfig
+} = require("@sentry/react-native/metro");
+
 const projectRoot = __dirname;
 const srcRoot = path.join(projectRoot, 'src');
 
@@ -24,4 +28,4 @@ const config = {
   watchFolders: [srcRoot],
 };
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = withSentryConfig(mergeConfig(getDefaultConfig(__dirname), config));

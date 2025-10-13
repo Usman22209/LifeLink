@@ -1,0 +1,7 @@
+[defaults]
+url=https://sentry.io/
+org=usman-aj4
+project=react-native
+
+[auth]
+token=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

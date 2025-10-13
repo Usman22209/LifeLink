@@ -48,7 +48,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   backgroundColor = colors.white,
 }) => {
   const netInfo = useNetInfo();
-  const insets = useSafeAreaInsets(); 
   const isOffline = !netInfo.isConnected;
 
   const renderContent = () => {
@@ -70,24 +69,22 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
     <>
       <StatusBar backgroundColor={statusBarColor} barStyle={statusBarStyle} />
       <Wrapper
-        style={[
-          styles.wrapper,
-          style,
-          { paddingTop: insets.top, backgroundColor },
-        ]}
-        edges={safeArea ? ['top', 'left', 'right', 'bottom'] : []}
-      >
+        style={[styles.wrapper, style, { backgroundColor }]}
+        edges={safeArea ? ['top', 'left', 'right', 'bottom'] : []}>
         {fixedHeader && header && (
           <View style={[styles.fixedHeaderContainer, { height: HEADER_HEIGHT }]}>
             {header}
           </View>
         )}
+
         {showNetworkBanner && isOffline && (
           <View style={styles.offlineBanner}>
             <Text style={styles.offlineText}>No internet connection</Text>
           </View>
         )}
+
         {renderContent()}
+
         {loading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color={colors.primary} />
