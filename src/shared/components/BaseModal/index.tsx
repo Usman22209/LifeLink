@@ -1,6 +1,6 @@
-import React from 'react';
-import Modal from 'react-native-modal';
-import {View, StyleSheet} from 'react-native';
+import React from "react";
+import Modal from "react-native-modal";
+import { View, StyleSheet } from "react-native";
 
 interface BaseModalProps {
   isVisible: boolean;
@@ -8,7 +8,7 @@ interface BaseModalProps {
   children: React.ReactNode;
   animationIn?: any;
   animationOut?: any;
-  swipeDirection?: 'up' | 'down' | 'left' | 'right';
+  swipeDirection?: "up" | "down" | "left" | "right";
   backdropOpacity?: number;
 }
 
@@ -16,9 +16,9 @@ const BaseModal: React.FC<BaseModalProps> = ({
   isVisible,
   onClose,
   children,
-  animationIn = 'fadeInUp',
-  animationOut = 'fadeOutDown',
-  swipeDirection = 'down',
+  animationIn = "fadeInUp",
+  animationOut = "fadeOutDown",
+  swipeDirection = "down",
   backdropOpacity = 0.5,
 }) => {
   return (
@@ -31,7 +31,8 @@ const BaseModal: React.FC<BaseModalProps> = ({
       animationOut={animationOut}
       backdropOpacity={backdropOpacity}
       useNativeDriver
-      useNativeDriverForBackdrop>
+      useNativeDriverForBackdrop
+    >
       <View style={styles.modalContainer}>{children}</View>
     </Modal>
   );
@@ -39,10 +40,10 @@ const BaseModal: React.FC<BaseModalProps> = ({
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });
 

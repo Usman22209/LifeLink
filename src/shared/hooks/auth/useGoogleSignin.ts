@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import ENV from '@config/env';
+import { useState, useEffect } from "react";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import ENV from "@config/env";
 
 export interface GoogleUser {
   user: {
@@ -23,12 +23,14 @@ const useGoogleSignIn = () => {
 
   const signIn = async () => {
     try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      const user:any = await GoogleSignin.signIn();
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+      const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
       return user;
     } catch (error) {
-      console.error('Google Sign-In Error:', error);
+      console.error("Google Sign-In Error:", error);
       throw error;
     }
   };
@@ -38,7 +40,7 @@ const useGoogleSignIn = () => {
       await GoogleSignin.signOut();
       setUserInfo(null);
     } catch (error) {
-      console.error('Google Sign-Out Error:', error);
+      console.error("Google Sign-Out Error:", error);
       throw error;
     }
   };

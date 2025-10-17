@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,19 +7,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-} from 'react-native';
-import Toast, { BaseToastProps } from 'react-native-toast-message';
-import AnyIcon, { Icons } from '@components/AnyIcon';
-import { colors } from '@theme/colors';
-import { fontFamily } from '@theme/fonts';
+} from "react-native";
+import Toast, { BaseToastProps } from "react-native-toast-message";
+import AnyIcon, { Icons } from "@components/AnyIcon";
+import { colors } from "@theme/colors";
+import { fontFamily } from "@theme/fonts";
 
-type ToastType = 'success' | 'info' | 'warning' | 'danger';
+type ToastType = "success" | "info" | "warning" | "danger";
 
 const toastIcons: Record<ToastType, { name: string; color: string }> = {
-  success: { name: 'checkcircle', color: colors.success },
-  info: { name: 'infocirlce', color: colors.info },
-  warning: { name: 'warning', color: colors.warning },
-  danger: { name: 'closecircle', color: colors.danger },
+  success: { name: "checkcircle", color: colors.success },
+  info: { name: "infocirlce", color: colors.info },
+  warning: { name: "warning", color: colors.warning },
+  danger: { name: "closecircle", color: colors.danger },
 };
 
 const CARD_BG = colors.white;
@@ -79,15 +79,19 @@ const ToastView = ({
           transform: [{ translateY }],
           opacity,
         },
-      ]}>
+      ]}
+    >
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={handleDismiss}
-        style={[styles.container, { backgroundColor: CARD_BG }]}>
+        style={[styles.container, { backgroundColor: CARD_BG }]}
+      >
         <View style={[styles.accent, { backgroundColor: iconData.color }]} />
 
         <View style={styles.iconBox}>
-          <View style={[styles.iconCircle, { backgroundColor: iconData.color }]}>
+          <View
+            style={[styles.iconCircle, { backgroundColor: iconData.color }]}
+          >
             <AnyIcon
               type={Icons.AntDesign}
               name={iconData.name}
@@ -102,14 +106,26 @@ const ToastView = ({
             {text1}
           </Text>
           {text2 ? (
-            <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
+            <Text
+              style={styles.description}
+              numberOfLines={3}
+              ellipsizeMode="tail"
+            >
               {text2}
             </Text>
           ) : null}
         </View>
 
-        <TouchableOpacity onPress={handleDismiss} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-          <AnyIcon type={Icons.AntDesign} name="close" size={18} color={DESC_COLOR} />
+        <TouchableOpacity
+          onPress={handleDismiss}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          <AnyIcon
+            type={Icons.AntDesign}
+            name="close"
+            size={18}
+            color={DESC_COLOR}
+          />
         </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>
@@ -123,23 +139,45 @@ export const toastConfig = {
   danger: (props: BaseToastProps) => <ToastView {...props} type="danger" />,
 };
 
-export const showToast = (type: ToastType, title: string, description?: string, duration = 3500) => {
-  Toast.show({ type, text1: title, text2: description, visibilityTime: duration });
+export const showToast = (
+  type: ToastType,
+  title: string,
+  description?: string,
+  duration = 3500
+) => {
+  Toast.show({
+    type,
+    text1: title,
+    text2: description,
+    visibilityTime: duration,
+  });
 };
 
-export const showSuccessToast = (title: string, description?: string, duration?: number) =>
-  showToast('success', title, description, duration);
-export const showErrorToast = (title: string, description?: string, duration?: number) =>
-  showToast('danger', title, description, duration);
-export const showInfoToast = (title: string, description?: string, duration?: number) =>
-  showToast('info', title, description, duration);
-export const showWarningToast = (title: string, description?: string, duration?: number) =>
-  showToast('warning', title, description, duration);
+export const showSuccessToast = (
+  title: string,
+  description?: string,
+  duration?: number
+) => showToast("success", title, description, duration);
+export const showErrorToast = (
+  title: string,
+  description?: string,
+  duration?: number
+) => showToast("danger", title, description, duration);
+export const showInfoToast = (
+  title: string,
+  description?: string,
+  duration?: number
+) => showToast("info", title, description, duration);
+export const showWarningToast = (
+  title: string,
+  description?: string,
+  duration?: number
+) => showToast("warning", title, description, duration);
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     // ensure wrapper sits above other UI
     zIndex: 9999,
     elevation: 9999,
@@ -147,21 +185,21 @@ const styles = StyleSheet.create({
     // top spacing bias is handled by <Toast position="top" topOffset={...} />
   },
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '94%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "94%",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: Platform.OS === 'ios' ? 0.08 : 0.22,
+    shadowOpacity: Platform.OS === "ios" ? 0.08 : 0.22,
     shadowRadius: 18,
     elevation: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   accent: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
@@ -172,16 +210,16 @@ const styles = StyleSheet.create({
   iconBox: {
     marginLeft: 8,
     marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   iconCircle: {
     width: 42,
     height: 42,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.primary ?? '#007AFF', // fallback
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.primary ?? "#007AFF", // fallback
   },
   textContainer: {
     flex: 1,

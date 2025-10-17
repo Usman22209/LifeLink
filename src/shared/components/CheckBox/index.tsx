@@ -1,7 +1,7 @@
-import {colors} from '@theme/colors';
-import React from 'react';
-import {TouchableOpacity, StyleSheet, ViewStyle} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { colors } from "@theme/colors";
+import React from "react";
+import { TouchableOpacity, StyleSheet, ViewStyle } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 interface CheckBoxProps {
   isChecked?: boolean;
@@ -23,7 +23,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container, style]}>
       <Icon
-        name={isChecked ? 'check-box' : 'check-box-outline-blank'}
+        name={isChecked ? "check-box" : "check-box-outline-blank"}
         size={size}
         color={isChecked ? checkedColor : uncheckedColor}
       />
@@ -33,8 +33,8 @@ const CheckBox: React.FC<CheckBoxProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

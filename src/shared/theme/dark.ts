@@ -1,7 +1,7 @@
-import { colors } from './colors';
+import { colors } from "./colors";
 
 export const darkTheme = {
-  mode: 'dark',
+  mode: "dark",
   background: colors.black,
   text: colors.white,
   card: colors.gray800,

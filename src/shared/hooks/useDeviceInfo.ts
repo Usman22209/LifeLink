@@ -1,15 +1,14 @@
-
-import { useEffect, useState } from 'react';
-import DeviceInfo from 'react-native-device-info';
+import { useEffect, useState } from "react";
+import DeviceInfo from "react-native-device-info";
 
 export const useDeviceInfo = () => {
   const [deviceInfo, setDeviceInfo] = useState({
-    brand: '',
-    model: '',
-    systemName: '',
-    systemVersion: '',
-    appVersion: '',
-    deviceId: '',
+    brand: "",
+    model: "",
+    systemName: "",
+    systemVersion: "",
+    appVersion: "",
+    deviceId: "",
   });
 
   useEffect(() => {

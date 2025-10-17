@@ -1,7 +1,7 @@
-import {useState, useCallback} from 'react';
-import ImagePicker, {Image, Video} from 'react-native-image-crop-picker';
+import { useState, useCallback } from "react";
+import ImagePicker, { Image, Video } from "react-native-image-crop-picker";
 
-type MediaType = 'photo' | 'video' | 'any';
+type MediaType = "photo" | "video" | "any";
 type MediaResult = Image | Video;
 
 type CameraOptions = {
@@ -26,11 +26,11 @@ type MediaPickerResult<T extends boolean> = {
   pickFromGallery: (
     options: Pick<
       PickerOptions<T>,
-      'mediaType' | 'cropping' | 'compressQuality'
+      "mediaType" | "cropping" | "compressQuality"
     > & {
       multiple?: boolean;
       maxFiles?: number;
-    },
+    }
   ) => Promise<void>;
   clearMedia: () => void;
   selectedCount: number;
@@ -42,10 +42,10 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
   const [selectedCount, setSelectedCount] = useState(0);
 
   const handleError = useCallback((err: unknown): string => {
-    const defaultError = 'Failed to pick media';
-    if (typeof err === 'object' && err !== null) {
-      const error = err as {code?: string; message?: string};
-      if (error.code === 'E_PICKER_CANCELLED') return '';
+    const defaultError = "Failed to pick media";
+    if (typeof err === "object" && err !== null) {
+      const error = err as { code?: string; message?: string };
+      if (error.code === "E_PICKER_CANCELLED") return "";
       return error.message || defaultError;
     }
     return defaultError;
@@ -56,7 +56,7 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
       if (Array.isArray(result)) return result;
       return [result];
     },
-    [],
+    []
   );
 
   const pickFromCamera = useCallback(
@@ -78,18 +78,18 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
         if (errorMessage) setError(errorMessage);
       }
     },
-    [handleError],
+    [handleError]
   );
 
   const pickFromGallery = useCallback(
     async (
       options: Pick<
         PickerOptions<T>,
-        'mediaType' | 'cropping' | 'compressQuality'
+        "mediaType" | "cropping" | "compressQuality"
       > & {
         multiple?: boolean;
         maxFiles?: number;
-      },
+      }
     ) => {
       try {
         setError(null);
@@ -110,7 +110,7 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
         if (errorMessage) setError(errorMessage);
       }
     },
-    [handleError, processMediaResult],
+    [handleError, processMediaResult]
   );
 
   const clearMedia = useCallback(() => {
@@ -120,7 +120,7 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
   }, []);
 
   return {
-    media: media as MediaPickerResult<T>['media'],
+    media: media as MediaPickerResult<T>["media"],
     error,
     pickFromCamera,
     pickFromGallery,

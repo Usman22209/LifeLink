@@ -34,7 +34,8 @@ function AppFlashList<T>({
 }: AppFlashListProps<T>) {
   const DEFAULT_ESTIMATED_ITEM_SIZE = Math.max(80, moderateScale(120));
 
-  const finalEstimatedItemSize = estimatedItemSize ?? DEFAULT_ESTIMATED_ITEM_SIZE;
+  const finalEstimatedItemSize =
+    estimatedItemSize ?? DEFAULT_ESTIMATED_ITEM_SIZE;
 
   if (loading) {
     return (

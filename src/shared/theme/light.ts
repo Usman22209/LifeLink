@@ -1,7 +1,7 @@
-import { colors } from './colors';
+import { colors } from "./colors";
 
 export const lightTheme = {
-  mode: 'light',
+  mode: "light",
   background: colors.white,
   text: colors.black,
   card: colors.gray100,

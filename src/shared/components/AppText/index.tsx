@@ -1,9 +1,9 @@
-import React, { ReactNode, useContext } from 'react';
-import { Text as RNText, TextProps } from 'react-native';
-import { fontFamily as fm, fontSize as fs } from '@theme/fonts';
-import { ThemeContext } from '@providers/ThemeProvider';
-import { useSelector } from 'react-redux';
-import { selectIsRtl } from '@store/slices/appSlice';
+import React, { ReactNode, useContext } from "react";
+import { Text as RNText, TextProps } from "react-native";
+import { fontFamily as fm, fontSize as fs } from "@theme/fonts";
+import { ThemeContext } from "@providers/ThemeProvider";
+import { useSelector } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
 
 interface Props extends TextProps {
   children: ReactNode | undefined | any;
@@ -84,7 +84,8 @@ const Text = (props: Props) => {
   let fontFamily = fm.REGULAR;
 
   if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
-  else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
+  else if (extraLight)
+    fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
   else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
   else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
   else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;
@@ -126,8 +127,8 @@ const Text = (props: Props) => {
           fontSize,
           color: textColor,
           fontFamily,
-          textAlign: isRtl ? 'right' : 'left',
-          writingDirection: isRtl ? 'rtl' : 'ltr',
+          textAlign: isRtl ? "right" : "left",
+          writingDirection: isRtl ? "rtl" : "ltr",
         },
         props?.style,
       ]}

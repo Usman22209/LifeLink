@@ -1,20 +1,20 @@
-import React, {useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import React, { useEffect } from "react";
+import { View, StyleSheet } from "react-native";
+import Spinner from "react-native-loading-spinner-overlay";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
   withTiming,
   Easing,
-} from 'react-native-reanimated';
-import Svg, {Circle} from 'react-native-svg';
+} from "react-native-reanimated";
+import Svg, { Circle } from "react-native-svg";
 
 const AnimatedLoader = ({
   visible = true,
-  overlayColor = 'rgba(0, 0, 0, 0.7)',
-  primaryColor = '#4A90E2',
-  secondaryColor1 = '#F5A623',
+  overlayColor = "rgba(0, 0, 0, 0.7)",
+  primaryColor = "#4A90E2",
+  secondaryColor1 = "#F5A623",
   size = 180,
 }) => {
   const rotation = useSharedValue(0);
@@ -22,14 +22,14 @@ const AnimatedLoader = ({
 
   useEffect(() => {
     rotation.value = withRepeat(
-      withTiming(360, {duration: 2000, easing: Easing.linear}),
-      -1,
+      withTiming(360, { duration: 2000, easing: Easing.linear }),
+      -1
     );
 
     scale.value = withRepeat(
-      withTiming(1.08, {duration: 1200, easing: Easing.inOut(Easing.ease)}),
+      withTiming(1.08, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true,
+      true
     );
 
     return () => {
@@ -39,15 +39,15 @@ const AnimatedLoader = ({
   }, []);
 
   const rotatingStyle = useAnimatedStyle(() => ({
-    transform: [{rotate: `${rotation.value}deg`}],
+    transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
   const counterRotatingStyle = useAnimatedStyle(() => ({
-    transform: [{rotate: `${-rotation.value * 1.5}deg`}],
+    transform: [{ rotate: `${-rotation.value * 1.5}deg` }],
   }));
 
   const pulsingStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
+    transform: [{ scale: scale.value }],
   }));
 
   const innerCircumference = 2 * Math.PI * 30;
@@ -75,7 +75,8 @@ const AnimatedLoader = ({
             </Animated.View>
 
             <Animated.View
-              style={[counterRotatingStyle, StyleSheet.absoluteFill]}>
+              style={[counterRotatingStyle, StyleSheet.absoluteFill]}
+            >
               <Svg width={size} height={size} viewBox="0 0 100 100">
                 <Circle
                   cx="50"
@@ -94,7 +95,8 @@ const AnimatedLoader = ({
               width={size}
               height={size}
               viewBox="0 0 100 100"
-              style={StyleSheet.absoluteFill}>
+              style={StyleSheet.absoluteFill}
+            >
               <Circle cx="50" cy="50" r="8" fill={primaryColor} />
             </Svg>
           </Animated.View>
@@ -109,8 +111,8 @@ const styles = StyleSheet.create({
   loaderContainer: {
     padding: 25,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowOpacity: 0.3,
     shadowRadius: 10,
   },

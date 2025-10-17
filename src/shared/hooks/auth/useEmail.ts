@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import { useEffect, useState } from "react";
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 type User = FirebaseAuthTypes.User | null;
 
@@ -8,7 +8,7 @@ const useEmail = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(authUser => {
+    const unsubscribe = auth().onAuthStateChanged((authUser) => {
       setUser(authUser);
       setLoading(false);
     });
@@ -18,12 +18,12 @@ const useEmail = () => {
 
   const signUp = async (
     email: string,
-    password: string,
+    password: string
   ): Promise<FirebaseAuthTypes.User> => {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
-        password,
+        password
       );
       return userCredential.user;
     } catch (error: any) {
@@ -33,12 +33,12 @@ const useEmail = () => {
 
   const signIn = async (
     email: string,
-    password: string,
+    password: string
   ): Promise<FirebaseAuthTypes.User> => {
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
         email,
-        password,
+        password
       );
       return userCredential.user;
     } catch (error: any) {
@@ -62,7 +62,7 @@ const useEmail = () => {
     }
   };
 
-  return {user, loading, signUp, signIn, signOut, resetPassword};
+  return { user, loading, signUp, signIn, signOut, resetPassword };
 };
 
 export default useEmail;

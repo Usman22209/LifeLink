@@ -1,17 +1,17 @@
 const COLORS = {
-  red: 'color: #ff8787;',
-  orange: 'color: #ffd380;',
-  blue: 'color: #74c0fc;',
-  purple: 'color: #dab6fc;',
-  green: 'color: #69db7c;',
+  red: "color: #ff8787;",
+  orange: "color: #ffd380;",
+  blue: "color: #74c0fc;",
+  purple: "color: #dab6fc;",
+  green: "color: #69db7c;",
 };
 
 const config = {
-  logLevel: __DEV__ ? 'debug' : 'error',
+  logLevel: __DEV__ ? "debug" : "error",
   colors: true,
 };
 
-type LogLevel = 'error' | 'warn' | 'info' | 'debug';
+type LogLevel = "error" | "warn" | "info" | "debug";
 type LogFunction = (message: any, data?: any) => void;
 
 type Logger = {
@@ -23,12 +23,12 @@ type Logger = {
 };
 
 const shouldLog = (level: LogLevel): boolean => {
-  const levels: LogLevel[] = ['error', 'warn', 'info', 'debug'];
+  const levels: LogLevel[] = ["error", "warn", "info", "debug"];
   return levels.indexOf(level) <= levels.indexOf(config.logLevel as LogLevel);
 };
 
 const colorizeValue = (value: any): string => {
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     try {
       return JSON.stringify(value, null, 2);
     } catch {
@@ -51,41 +51,37 @@ const formatLog = (color: string, type: string, content: string) => {
 
 export const logger: Logger = {
   error: (error: unknown): void => {
-    if (!shouldLog('error')) return;
+    if (!shouldLog("error")) return;
     const message =
       error instanceof Error ? error.stack || error.message : String(error);
-    originalConsole.log(...formatLog(COLORS.red, 'ERROR', message));
+    originalConsole.log(...formatLog(COLORS.red, "ERROR", message));
   },
 
   warn: (message: any, data: any = {}): void => {
-    if (!shouldLog('warn')) return;
+    if (!shouldLog("warn")) return;
     originalConsole.log(
-      ...formatLog(COLORS.orange, 'WARN', `${message}\n${colorizeValue(data)}`),
+      ...formatLog(COLORS.orange, "WARN", `${message}\n${colorizeValue(data)}`)
     );
   },
 
   info: (message: any, data: any = {}): void => {
-    if (!shouldLog('info')) return;
+    if (!shouldLog("info")) return;
     originalConsole.log(
-      ...formatLog(COLORS.blue, 'INFO', `${message}\n${colorizeValue(data)}`),
+      ...formatLog(COLORS.blue, "INFO", `${message}\n${colorizeValue(data)}`)
     );
   },
 
   debug: (message: any, data: any = {}): void => {
-    if (!shouldLog('debug')) return;
+    if (!shouldLog("debug")) return;
     originalConsole.log(
-      ...formatLog(
-        COLORS.purple,
-        'DEBUG',
-        `${message}\n${colorizeValue(data)}`,
-      ),
+      ...formatLog(COLORS.purple, "DEBUG", `${message}\n${colorizeValue(data)}`)
     );
   },
 
   data: (data: unknown): void => {
-    if (!shouldLog('debug')) return;
+    if (!shouldLog("debug")) return;
     originalConsole.log(
-      ...formatLog(COLORS.green, 'DATA', colorizeValue(data)),
+      ...formatLog(COLORS.green, "DATA", colorizeValue(data))
     );
   },
 };

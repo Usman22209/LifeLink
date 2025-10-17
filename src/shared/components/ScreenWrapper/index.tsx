@@ -1,20 +1,16 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 import {
   StyleSheet,
   View,
   ScrollView,
   StatusBar,
   ActivityIndicator,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNetInfo } from '@react-native-community/netinfo';
-import Text from '../AppText';
-import {
-  scale,
-  verticalScale,
-  moderateScale,
-} from 'react-native-size-matters';
-import { ThemeContext } from '@providers/ThemeProvider';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNetInfo } from "@react-native-community/netinfo";
+import Text from "../AppText";
+import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { ThemeContext } from "@providers/ThemeProvider";
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -22,7 +18,7 @@ interface ScreenWrapperProps {
   header?: React.ReactNode;
   fixedHeader?: boolean;
   statusBarColor?: string;
-  statusBarStyle?: 'default' | 'light-content' | 'dark-content';
+  statusBarStyle?: "default" | "light-content" | "dark-content";
   showNetworkBanner?: boolean;
   loading?: boolean;
   loadingText?: string;
@@ -42,7 +38,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   statusBarStyle,
   showNetworkBanner = true,
   loading = false,
-  loadingText = 'Loading...',
+  loadingText = "Loading...",
   safeArea = true,
   scrollable = false,
   backgroundColor,
@@ -57,7 +53,9 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
   const bgColor = backgroundColor || theme.background;
   const barColor = statusBarColor || theme.background;
-  const barStyle = statusBarStyle || (theme.mode === 'dark' ? 'light-content' : 'dark-content');
+  const barStyle =
+    statusBarStyle ||
+    (theme.mode === "dark" ? "light-content" : "dark-content");
 
   return (
     <>
@@ -79,7 +77,11 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           <View
             style={[
               styles.fixedHeaderContainer,
-              { height: HEADER_HEIGHT, backgroundColor: theme.card, borderBottomColor: theme.border },
+              {
+                height: HEADER_HEIGHT,
+                backgroundColor: theme.card,
+                borderBottomColor: theme.border,
+              },
             ]}
           >
             {header}
@@ -87,13 +89,19 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         )}
 
         {showNetworkBanner && isOffline && (
-          <View style={[styles.offlineBanner, { backgroundColor: theme.primary }]}>
+          <View
+            style={[styles.offlineBanner, { backgroundColor: theme.primary }]}
+          >
             <Text style={styles.offlineText}>No internet connection</Text>
           </View>
         )}
 
         <Container
-          style={[styles.container, { backgroundColor: bgColor }, containerStyle]}
+          style={[
+            styles.container,
+            { backgroundColor: bgColor },
+            containerStyle,
+          ]}
           contentContainerStyle={scrollable ? styles.scrollContent : undefined}
         >
           {!fixedHeader && header}
@@ -101,9 +109,21 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         </Container>
 
         {loading && (
-          <View style={[styles.loadingOverlay, { backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)' }]}>
+          <View
+            style={[
+              styles.loadingOverlay,
+              {
+                backgroundColor:
+                  theme.mode === "dark"
+                    ? "rgba(0,0,0,0.6)"
+                    : "rgba(255,255,255,0.8)",
+              },
+            ]}
+          >
             <ActivityIndicator size="large" color={theme.primary} />
-            <Text style={[styles.loadingText, { color: theme.text }]}>{loadingText}</Text>
+            <Text style={[styles.loadingText, { color: theme.text }]}>
+              {loadingText}
+            </Text>
           </View>
         )}
       </View>
@@ -123,28 +143,28 @@ const styles = StyleSheet.create({
     padding: moderateScale(16),
   },
   fixedHeaderContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: moderateScale(16),
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   offlineBanner: {
     padding: verticalScale(10),
-    alignItems: 'center',
+    alignItems: "center",
   },
   offlineText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: moderateScale(14),
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: verticalScale(10),

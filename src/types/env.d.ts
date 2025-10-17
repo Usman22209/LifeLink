@@ -1,4 +1,4 @@
-declare module '@env' {
+declare module "@env" {
   export const APP_FLAVOR: string;
   export const WEB_CLIENT_ID: string;
   export const ONESIGNAL_APP_ID: string;

@@ -37,7 +37,7 @@ const AppImage: React.FC<AppImageProps> = ({
       <FastImage
         {...props}
         resizeMode={resizeMode}
-        style={[styles.image, style]} 
+        style={[styles.image, style]}
         source={useFallback && fallbackSource ? fallbackSource : source}
         onLoad={() => setLoading(false)}
         onError={handleError}

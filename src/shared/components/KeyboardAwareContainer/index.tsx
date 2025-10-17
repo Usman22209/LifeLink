@@ -1,7 +1,7 @@
-import React from 'react';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {StyleSheet, ViewStyle} from 'react-native';
-import {verticalScale, VerticalScale} from 'react-native-size-matters';
+import React from "react";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { StyleSheet, ViewStyle } from "react-native";
+import { verticalScale, VerticalScale } from "react-native-size-matters";
 
 interface KeyboardAwareContainerProps {
   children: React.ReactNode;
@@ -19,7 +19,8 @@ const KeyboardAwareContainer: React.FC<KeyboardAwareContainerProps> = ({
       showsHorizontalScrollIndicator={false}
       enableAutomaticScroll={false}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[styles.keyboardContainer, contentContainerStyle]}>
+      contentContainerStyle={[styles.keyboardContainer, contentContainerStyle]}
+    >
       {children}
     </KeyboardAwareScrollView>
   );
