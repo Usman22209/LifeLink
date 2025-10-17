@@ -1,15 +1,15 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import store from '@store/store';
-import AppNavigation from '@navigation/index';
-import '@shared/i18n';
-import OneSignalProvider from '@providers/OneSignalProvider';
-import Toast from 'react-native-toast-message';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { toastConfig } from '@components/Toast';
-import * as Sentry from '@sentry/react-native';
-import ThemeProvider from '@shared/providers/ThemeProvider';
-import ENV from '@config/env';
+import React from "react";
+import { Provider } from "react-redux";
+import store from "@store/store";
+import AppNavigation from "@navigation/index";
+import "@shared/i18n";
+import OneSignalProvider from "@providers/OneSignalProvider";
+import Toast from "react-native-toast-message";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { toastConfig } from "@components/Toast";
+import * as Sentry from "@sentry/react-native";
+import ThemeProvider from "@shared/providers/ThemeProvider";
+import ENV from "@config/env";
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
 
@@ -19,10 +19,7 @@ Sentry.init({
 
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [
-    Sentry.mobileReplayIntegration(),
-    Sentry.feedbackIntegration(),
-  ],
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
 });
 
 const App = (): React.JSX.Element => {

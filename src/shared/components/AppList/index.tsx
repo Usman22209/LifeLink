@@ -1,14 +1,7 @@
 import React from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-} from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
-import { scale, verticalScale, moderateScale } from "react-native-size-matters";
+import { verticalScale, moderateScale } from "react-native-size-matters";
 
 type AppFlashListProps<T> = FlashListProps<T> & {
   loading?: boolean;
@@ -34,8 +27,7 @@ function AppFlashList<T>({
 }: AppFlashListProps<T>) {
   const DEFAULT_ESTIMATED_ITEM_SIZE = Math.max(80, moderateScale(120));
 
-  const finalEstimatedItemSize =
-    estimatedItemSize ?? DEFAULT_ESTIMATED_ITEM_SIZE;
+  const finalEstimatedItemSize = estimatedItemSize ?? DEFAULT_ESTIMATED_ITEM_SIZE;
 
   if (loading) {
     return (

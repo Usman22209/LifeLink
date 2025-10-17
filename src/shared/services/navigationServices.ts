@@ -1,7 +1,4 @@
-import {
-  createNavigationContainerRef,
-  DrawerActions,
-} from "@react-navigation/native";
+import { createNavigationContainerRef, DrawerActions } from "@react-navigation/native";
 
 export const navigationRef = createNavigationContainerRef();
 

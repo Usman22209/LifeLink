@@ -24,19 +24,11 @@ const AnySvg: React.FC<Props> = ({
   const Tag = (Svgs as { [key: string]: React.FC<any> })[name];
   if (!Tag) return null;
 
-  const computedWidth =
-    size || (typeof width === "string" ? width : mvs(width));
-  const computedHeight =
-    size || (typeof height === "string" ? height : mvs(height));
+  const computedWidth = size || (typeof width === "string" ? width : mvs(width));
+  const computedHeight = size || (typeof height === "string" ? height : mvs(height));
 
   return (
-    <Tag
-      {...props}
-      width={computedWidth}
-      height={computedHeight}
-      style={style}
-      color={fill}
-    />
+    <Tag {...props} width={computedWidth} height={computedHeight} style={style} color={fill} />
   );
 };
 

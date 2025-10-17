@@ -8,7 +8,7 @@ const useEmail = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged((authUser) => {
+    const unsubscribe = auth().onAuthStateChanged(authUser => {
       setUser(authUser);
       setLoading(false);
     });
@@ -16,30 +16,18 @@ const useEmail = () => {
     return unsubscribe;
   }, []);
 
-  const signUp = async (
-    email: string,
-    password: string
-  ): Promise<FirebaseAuthTypes.User> => {
+  const signUp = async (email: string, password: string): Promise<FirebaseAuthTypes.User> => {
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(
-        email,
-        password
-      );
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       return userCredential.user;
     } catch (error: any) {
       throw new Error(error.message);
     }
   };
 
-  const signIn = async (
-    email: string,
-    password: string
-  ): Promise<FirebaseAuthTypes.User> => {
+  const signIn = async (email: string, password: string): Promise<FirebaseAuthTypes.User> => {
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(
-        email,
-        password
-      );
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
       return userCredential.user;
     } catch (error: any) {
       throw new Error(error.message);

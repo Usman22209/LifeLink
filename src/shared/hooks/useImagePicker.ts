@@ -24,13 +24,10 @@ type MediaPickerResult<T extends boolean> = {
   error: string | null;
   pickFromCamera: (options: CameraOptions) => Promise<void>;
   pickFromGallery: (
-    options: Pick<
-      PickerOptions<T>,
-      "mediaType" | "cropping" | "compressQuality"
-    > & {
+    options: Pick<PickerOptions<T>, "mediaType" | "cropping" | "compressQuality"> & {
       multiple?: boolean;
       maxFiles?: number;
-    }
+    },
   ) => Promise<void>;
   clearMedia: () => void;
   selectedCount: number;
@@ -51,13 +48,10 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
     return defaultError;
   }, []);
 
-  const processMediaResult = useCallback(
-    (result: MediaResult | MediaResult[]): MediaResult[] => {
-      if (Array.isArray(result)) return result;
-      return [result];
-    },
-    []
-  );
+  const processMediaResult = useCallback((result: MediaResult | MediaResult[]): MediaResult[] => {
+    if (Array.isArray(result)) return result;
+    return [result];
+  }, []);
 
   const pickFromCamera = useCallback(
     async (options: CameraOptions) => {
@@ -78,18 +72,15 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
         if (errorMessage) setError(errorMessage);
       }
     },
-    [handleError]
+    [handleError],
   );
 
   const pickFromGallery = useCallback(
     async (
-      options: Pick<
-        PickerOptions<T>,
-        "mediaType" | "cropping" | "compressQuality"
-      > & {
+      options: Pick<PickerOptions<T>, "mediaType" | "cropping" | "compressQuality"> & {
         multiple?: boolean;
         maxFiles?: number;
-      }
+      },
     ) => {
       try {
         setError(null);
@@ -110,7 +101,7 @@ const useMediaPicker = <T extends boolean = false>(): MediaPickerResult<T> => {
         if (errorMessage) setError(errorMessage);
       }
     },
-    [handleError, processMediaResult]
+    [handleError, processMediaResult],
   );
 
   const clearMedia = useCallback(() => {

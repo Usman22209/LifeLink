@@ -21,15 +21,12 @@ const AnimatedLoader = ({
   const scale = useSharedValue(1);
 
   useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 2000, easing: Easing.linear }),
-      -1
-    );
+    rotation.value = withRepeat(withTiming(360, { duration: 2000, easing: Easing.linear }), -1);
 
     scale.value = withRepeat(
       withTiming(1.08, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
       -1,
-      true
+      true,
     );
 
     return () => {
@@ -74,9 +71,7 @@ const AnimatedLoader = ({
               </Svg>
             </Animated.View>
 
-            <Animated.View
-              style={[counterRotatingStyle, StyleSheet.absoluteFill]}
-            >
+            <Animated.View style={[counterRotatingStyle, StyleSheet.absoluteFill]}>
               <Svg width={size} height={size} viewBox="0 0 100 100">
                 <Circle
                   cx="50"
@@ -91,12 +86,7 @@ const AnimatedLoader = ({
               </Svg>
             </Animated.View>
 
-            <Svg
-              width={size}
-              height={size}
-              viewBox="0 0 100 100"
-              style={StyleSheet.absoluteFill}
-            >
+            <Svg width={size} height={size} viewBox="0 0 100 100" style={StyleSheet.absoluteFill}>
               <Circle cx="50" cy="50" r="8" fill={primaryColor} />
             </Svg>
           </Animated.View>

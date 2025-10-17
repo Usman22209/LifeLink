@@ -1,7 +1,7 @@
 import React from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { StyleSheet, ViewStyle } from "react-native";
-import { verticalScale, VerticalScale } from "react-native-size-matters";
+import { verticalScale } from "react-native-size-matters";
 
 interface KeyboardAwareContainerProps {
   children: React.ReactNode;

@@ -52,36 +52,27 @@ const formatLog = (color: string, type: string, content: string) => {
 export const logger: Logger = {
   error: (error: unknown): void => {
     if (!shouldLog("error")) return;
-    const message =
-      error instanceof Error ? error.stack || error.message : String(error);
+    const message = error instanceof Error ? error.stack || error.message : String(error);
     originalConsole.log(...formatLog(COLORS.red, "ERROR", message));
   },
 
   warn: (message: any, data: any = {}): void => {
     if (!shouldLog("warn")) return;
-    originalConsole.log(
-      ...formatLog(COLORS.orange, "WARN", `${message}\n${colorizeValue(data)}`)
-    );
+    originalConsole.log(...formatLog(COLORS.orange, "WARN", `${message}\n${colorizeValue(data)}`));
   },
 
   info: (message: any, data: any = {}): void => {
     if (!shouldLog("info")) return;
-    originalConsole.log(
-      ...formatLog(COLORS.blue, "INFO", `${message}\n${colorizeValue(data)}`)
-    );
+    originalConsole.log(...formatLog(COLORS.blue, "INFO", `${message}\n${colorizeValue(data)}`));
   },
 
   debug: (message: any, data: any = {}): void => {
     if (!shouldLog("debug")) return;
-    originalConsole.log(
-      ...formatLog(COLORS.purple, "DEBUG", `${message}\n${colorizeValue(data)}`)
-    );
+    originalConsole.log(...formatLog(COLORS.purple, "DEBUG", `${message}\n${colorizeValue(data)}`));
   },
 
   data: (data: unknown): void => {
     if (!shouldLog("debug")) return;
-    originalConsole.log(
-      ...formatLog(COLORS.green, "DATA", colorizeValue(data))
-    );
+    originalConsole.log(...formatLog(COLORS.green, "DATA", colorizeValue(data)));
   },
 };

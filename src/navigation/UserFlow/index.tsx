@@ -36,9 +36,7 @@ const LanguageSwitcher = () => {
       backgroundColor={theme.background}
     >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <Text style={[styles.welcome, { color: theme.text }]}>
-          {t("welcome")}
-        </Text>
+        <Text style={[styles.welcome, { color: theme.text }]}>{t("welcome")}</Text>
         <AppImage
           source={{
             uri: "https://avatars.githubusercontent.com/u/166890135?v=4",

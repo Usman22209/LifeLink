@@ -84,8 +84,7 @@ const Text = (props: Props) => {
   let fontFamily = fm.REGULAR;
 
   if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
-  else if (extraLight)
-    fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
+  else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
   else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
   else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
   else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;

@@ -1,13 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  Animated,
-  Easing,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { View, Text, Animated, Easing, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
@@ -89,15 +81,8 @@ const ToastView = ({
         <View style={[styles.accent, { backgroundColor: iconData.color }]} />
 
         <View style={styles.iconBox}>
-          <View
-            style={[styles.iconCircle, { backgroundColor: iconData.color }]}
-          >
-            <AnyIcon
-              type={Icons.AntDesign}
-              name={iconData.name}
-              size={18}
-              color={colors.white}
-            />
+          <View style={[styles.iconCircle, { backgroundColor: iconData.color }]}>
+            <AnyIcon type={Icons.AntDesign} name={iconData.name} size={18} color={colors.white} />
           </View>
         </View>
 
@@ -106,11 +91,7 @@ const ToastView = ({
             {text1}
           </Text>
           {text2 ? (
-            <Text
-              style={styles.description}
-              numberOfLines={3}
-              ellipsizeMode="tail"
-            >
+            <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
               {text2}
             </Text>
           ) : null}
@@ -120,12 +101,7 @@ const ToastView = ({
           onPress={handleDismiss}
           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
         >
-          <AnyIcon
-            type={Icons.AntDesign}
-            name="close"
-            size={18}
-            color={DESC_COLOR}
-          />
+          <AnyIcon type={Icons.AntDesign} name="close" size={18} color={DESC_COLOR} />
         </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>
@@ -143,7 +119,7 @@ export const showToast = (
   type: ToastType,
   title: string,
   description?: string,
-  duration = 3500
+  duration = 3500,
 ) => {
   Toast.show({
     type,
@@ -153,26 +129,14 @@ export const showToast = (
   });
 };
 
-export const showSuccessToast = (
-  title: string,
-  description?: string,
-  duration?: number
-) => showToast("success", title, description, duration);
-export const showErrorToast = (
-  title: string,
-  description?: string,
-  duration?: number
-) => showToast("danger", title, description, duration);
-export const showInfoToast = (
-  title: string,
-  description?: string,
-  duration?: number
-) => showToast("info", title, description, duration);
-export const showWarningToast = (
-  title: string,
-  description?: string,
-  duration?: number
-) => showToast("warning", title, description, duration);
+export const showSuccessToast = (title: string, description?: string, duration?: number) =>
+  showToast("success", title, description, duration);
+export const showErrorToast = (title: string, description?: string, duration?: number) =>
+  showToast("danger", title, description, duration);
+export const showInfoToast = (title: string, description?: string, duration?: number) =>
+  showToast("info", title, description, duration);
+export const showWarningToast = (title: string, description?: string, duration?: number) =>
+  showToast("warning", title, description, duration);
 
 const styles = StyleSheet.create({
   wrapper: {

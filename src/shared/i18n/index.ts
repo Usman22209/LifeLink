@@ -18,7 +18,7 @@ const languageDetector = {
   async: true,
   detect: (callback: (lng: string) => void) => {
     AsyncStorage.getItem(LANGUAGE_STORAGE_KEY)
-      .then((storedLang) => {
+      .then(storedLang => {
         if (storedLang) {
           callback(storedLang);
           return;

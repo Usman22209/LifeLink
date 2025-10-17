@@ -22,7 +22,7 @@ export function withOpacity(color: string, alpha: number = 1): string {
     if (hex.length === 3) {
       hex = hex
         .split("")
-        .map((c) => c + c)
+        .map(c => c + c)
         .join("");
     }
 
