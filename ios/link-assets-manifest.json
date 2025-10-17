@@ -2,24 +2,24 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "src/assets/fonts/PoppinsBlack.ttf",
-      "sha1": "645e04c53c6b5b35bce654a811ebce16af8aa721"
+      "path": "src/assets/fonts/Lateef-Bold.ttf",
+      "sha1": "4d8aa555b0e60afccd4c6812358d3b7a0cdba41b"
+    },
+    {
+      "path": "src/assets/fonts/Lateef-Medium.ttf",
+      "sha1": "5c361d4aeda47545d036cf66d755f42ee66fab40"
+    },
+    {
+      "path": "src/assets/fonts/Lateef-Regular.ttf",
+      "sha1": "03c0eac0760825497babdfc0c29ab6a3832acbf4"
+    },
+    {
+      "path": "src/assets/fonts/Lateef-SemiBold.ttf",
+      "sha1": "e1ad717472d1b93ad415fad51fa07a88fd3c3fea"
     },
     {
       "path": "src/assets/fonts/PoppinsBold.ttf",
       "sha1": "875cf0cecd647bcf22e79d633d868c1b1ec98dfa"
-    },
-    {
-      "path": "src/assets/fonts/PoppinsExtraBold.ttf",
-      "sha1": "4b5c0750f073abd576413a0898d3b95adaf199c8"
-    },
-    {
-      "path": "src/assets/fonts/PoppinsExtraLight.ttf",
-      "sha1": "85af6582a7e6155917c605f9d3fed68c02b23b06"
-    },
-    {
-      "path": "src/assets/fonts/PoppinsLight.ttf",
-      "sha1": "e247a92158e112f8bf7b638c8d95381d66b00dbb"
     },
     {
       "path": "src/assets/fonts/PoppinsMedium.ttf",
@@ -32,10 +32,6 @@
     {
       "path": "src/assets/fonts/PoppinsSemiBold.ttf",
       "sha1": "8a4ace9392d06bcb7f8ea2f5169b07e4c383a90d"
-    },
-    {
-      "path": "src/assets/fonts/PoppinsThin.ttf",
-      "sha1": "09ba4dcd5509c8085bf88c665dcc51cbdfced27b"
     }
   ]
 }

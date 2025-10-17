@@ -49,15 +49,14 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>PoppinsBlack.ttf</string>
 		<string>PoppinsBold.ttf</string>
-		<string>PoppinsExtraBold.ttf</string>
-		<string>PoppinsExtraLight.ttf</string>
-		<string>PoppinsLight.ttf</string>
 		<string>PoppinsMedium.ttf</string>
 		<string>PoppinsRegular.ttf</string>
 		<string>PoppinsSemiBold.ttf</string>
-		<string>PoppinsThin.ttf</string>
+		<string>Lateef-Bold.ttf</string>
+		<string>Lateef-Medium.ttf</string>
+		<string>Lateef-Regular.ttf</string>
+		<string>Lateef-SemiBold.ttf</string>
 	</array>
 </dict>
 </plist>

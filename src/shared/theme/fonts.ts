@@ -1,15 +1,16 @@
-import {moderateScale} from 'react-native-size-matters';
+import { moderateScale } from 'react-native-size-matters';
 
 export const fontFamily = {
   BOLD: 'PoppinsBold',
   MEDIUM: 'PoppinsMedium',
   SEMIBOLD: 'PoppinsSemiBold',
-  LIGHT: 'PoppinsLight',
   REGULAR: 'PoppinsRegular',
-  THIN: 'PoppinsThin',
-  EXTRABOLD: 'PoppinsExtraBold',
-  EXTRALIGHT: 'PoppinsExtraLight',
-  BLACK: 'Poppins-Black',
+};
+export const fontFamilyUrdu = {
+  BOLD: 'Lateef-Bold',
+  MEDIUM: 'Lateef-Medium',
+  SEMIBOLD: 'Lateef-SemiBold',
+  REGULAR: 'Lateef-Regular',
 };
 
 export const fontSize = {
