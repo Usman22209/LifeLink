@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,15 +6,15 @@ import {
   StatusBar,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNetInfo } from '@react-native-community/netinfo';
 import Text from '../AppText';
-import { colors } from '../../theme/colors';
 import {
   scale,
   verticalScale,
   moderateScale,
 } from 'react-native-size-matters';
+import { ThemeContext } from '@providers/ThemeProvider';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -38,60 +38,75 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   style,
   header,
   fixedHeader = false,
-  statusBarColor = colors.secondary,
-  statusBarStyle = 'dark-content',
+  statusBarColor,
+  statusBarStyle,
   showNetworkBanner = true,
   loading = false,
   loadingText = 'Loading...',
   safeArea = true,
   scrollable = false,
-  backgroundColor = colors.white,
+  backgroundColor,
 }) => {
+  const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
   const isOffline = !netInfo.isConnected;
+  const theme = useContext(ThemeContext);
 
-  const renderContent = () => {
-    const Container = scrollable ? ScrollView : View;
-    const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
-    return (
-      <Container
-        style={[styles.container, { backgroundColor }, containerStyle]}
-        contentContainerStyle={scrollable ? styles.scrollContent : undefined}>
-        {!fixedHeader && header}
-        {children}
-      </Container>
-    );
-  };
+  const Container = scrollable ? ScrollView : View;
+  const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
 
-  const Wrapper = safeArea ? SafeAreaView : View;
+  const bgColor = backgroundColor || theme.background;
+  const barColor = statusBarColor || theme.background;
+  const barStyle = statusBarStyle || (theme.mode === 'dark' ? 'light-content' : 'dark-content');
 
   return (
     <>
-      <StatusBar backgroundColor={statusBarColor} barStyle={statusBarStyle} />
-      <Wrapper
-        style={[styles.wrapper, style, { backgroundColor }]}
-        edges={safeArea ? ['top', 'left', 'right', 'bottom'] : []}>
+      <StatusBar backgroundColor={barColor} barStyle={barStyle} />
+      <View
+        style={[
+          styles.wrapper,
+          style,
+          {
+            backgroundColor: bgColor,
+            paddingTop: safeArea ? insets.top : 0,
+            paddingBottom: safeArea ? insets.bottom : 0,
+            paddingLeft: safeArea ? insets.left : 0,
+            paddingRight: safeArea ? insets.right : 0,
+          },
+        ]}
+      >
         {fixedHeader && header && (
-          <View style={[styles.fixedHeaderContainer, { height: HEADER_HEIGHT }]}>
+          <View
+            style={[
+              styles.fixedHeaderContainer,
+              { height: HEADER_HEIGHT, backgroundColor: theme.card, borderBottomColor: theme.border },
+            ]}
+          >
             {header}
           </View>
         )}
 
         {showNetworkBanner && isOffline && (
-          <View style={styles.offlineBanner}>
+          <View style={[styles.offlineBanner, { backgroundColor: theme.primary }]}>
             <Text style={styles.offlineText}>No internet connection</Text>
           </View>
         )}
 
-        {renderContent()}
+        <Container
+          style={[styles.container, { backgroundColor: bgColor }, containerStyle]}
+          contentContainerStyle={scrollable ? styles.scrollContent : undefined}
+        >
+          {!fixedHeader && header}
+          {children}
+        </Container>
 
         {loading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>{loadingText}</Text>
+          <View style={[styles.loadingOverlay, { backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)' }]}>
+            <ActivityIndicator size="large" color={theme.primary} />
+            <Text style={[styles.loadingText, { color: theme.text }]}>{loadingText}</Text>
           </View>
         )}
-      </Wrapper>
+      </View>
     </>
   );
 };
@@ -113,14 +128,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: colors.white,
     justifyContent: 'center',
     paddingHorizontal: moderateScale(16),
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
   },
   offlineBanner: {
-    backgroundColor: colors.danger,
     padding: verticalScale(10),
     alignItems: 'center',
   },
@@ -131,7 +143,6 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },

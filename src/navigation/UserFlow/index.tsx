@@ -1,33 +1,64 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import i18n from '@shared/i18n';
-import { colors } from '@theme/colors';
 import Text from '@components/AppText';
 import ScreenWrapper from '@components/ScreenWrapper';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleTheme } from '@store/slices/themeSlice';
+import { ThemeContext } from '@providers/ThemeProvider';
+import { RootState } from '@store/store';
+import { setLanguage } from '@store/slices/appSlice';
 
 const LanguageSwitcher = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const theme = useContext(ThemeContext);
+  const mode = useSelector((state: RootState) => state.theme.mode);
 
-  const switchToUrdu = () => i18n.changeLanguage('ur');
-  const switchToEnglish = () => i18n.changeLanguage('en');
+  const switchLanguage = async (lang: 'en' | 'ur') => {
+    await i18n.changeLanguage(lang);
+    dispatch(setLanguage(lang));
+  };
+
+  useEffect(() => {
+    const discoInterval = setInterval(() => {
+      // dispatch(toggleTheme());
+    }, 200);
+    return () => clearInterval(discoInterval);
+  }, [dispatch]);
 
   return (
     <ScreenWrapper
-      statusBarColor={colors.white}
-      statusBarStyle="dark-content"
+      statusBarColor={theme.background}
+      statusBarStyle={mode === 'dark' ? 'light-content' : 'dark-content'}
       scrollable={false}
-      backgroundColor={colors.white}
+      backgroundColor={theme.background}
     >
-      <View style={styles.container}>
-        <Text style={styles.welcome}>{t('welcome')}</Text>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.welcome, { color: theme.text }]}>{t('welcome')}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={switchToEnglish}>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.primary }]}
+          onPress={() => switchLanguage('en')}
+        >
           <Text style={styles.buttonText}>English</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={switchToUrdu}>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.primary }]}
+          onPress={() => switchLanguage('ur')}
+        >
           <Text style={styles.buttonText}>Urdu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.card }]}
+          onPress={() => dispatch(toggleTheme())}
+        >
+          <Text style={[styles.buttonText, { color: theme.text }]}>
+            Switch to {mode === 'light' ? 'Dark' : 'Light'} Mode
+          </Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>
@@ -44,20 +75,18 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 18,
     marginBottom: 20,
-    color: colors.black,
   },
   button: {
-    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 10,
     marginVertical: 8,
-    minWidth: 120,
+    minWidth: 160,
     alignItems: 'center',
   },
   buttonText: {
-    color: colors.white,
     fontSize: 16,
+    color: 'white',
   },
 });
 
