@@ -1,4 +1,3 @@
-// hooks/useGoogleSignIn.ts
 import { useState, useEffect } from 'react';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import ENV from '@config/env';
