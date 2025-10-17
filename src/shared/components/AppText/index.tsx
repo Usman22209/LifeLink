@@ -3,15 +3,21 @@ import { Text as RNText, TextProps } from 'react-native';
 import { fontFamily as fm, fontSize as fs, fontFamilyUrdu } from '@theme/fonts';
 import { ThemeContext } from '@providers/ThemeProvider';
 import { useSelector } from 'react-redux';
-import { selectLanguage, selectIsRtl } from '@store/slices/appSlice';
+import { selectIsRtl } from '@store/slices/appSlice';
 
 interface Props extends TextProps {
   children: ReactNode | undefined | any;
   color?: string;
-  bold?: boolean;
+  thin?: boolean;
+  extraLight?: boolean;
+  light?: boolean;
   regular?: boolean;
   medium?: boolean;
   semiBold?: boolean;
+  bold?: boolean;
+  extraBold?: boolean;
+  black?: boolean;
+  italic?: boolean;
   FONT_48?: boolean;
   FONT_44?: boolean;
   FONT_40?: boolean;
@@ -38,10 +44,16 @@ interface Props extends TextProps {
 const Text = (props: Props) => {
   const {
     children,
-    bold,
+    thin,
+    extraLight,
+    light,
     regular,
     medium,
     semiBold,
+    bold,
+    extraBold,
+    black,
+    italic,
     color,
     FONT_48,
     FONT_44,
@@ -67,16 +79,22 @@ const Text = (props: Props) => {
   } = props;
 
   const theme = useContext(ThemeContext);
-  const language = useSelector(selectLanguage);
   const isRtl = useSelector(selectIsRtl);
 
   const urduFont = fontFamilyUrdu;
   const engFont = fm;
 
   let fontFamily = isRtl ? urduFont.REGULAR : engFont.REGULAR;
-  if (bold) fontFamily = isRtl ? urduFont.BOLD : engFont.BOLD;
-  if (medium) fontFamily = isRtl ? urduFont.MEDIUM : engFont.MEDIUM;
-  if (semiBold) fontFamily = isRtl ? urduFont.SEMIBOLD : engFont.SEMIBOLD;
+
+  if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
+  else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
+  else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
+  else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
+  else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;
+  else if (semiBold) fontFamily = italic ? fm.SEMIBOLD_ITALIC : fm.SEMIBOLD;
+  else if (bold) fontFamily = italic ? fm.BOLD_ITALIC : fm.BOLD;
+  else if (extraBold) fontFamily = italic ? fm.EXTRABOLD_ITALIC : fm.EXTRABOLD;
+  else if (black) fontFamily = italic ? fm.BLACK_ITALIC : fm.BLACK;
 
   let fontSize = fs.FONT_14;
   if (FONT_48) fontSize = fs.FONT_48;
