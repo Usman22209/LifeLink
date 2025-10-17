@@ -1,5 +1,6 @@
 export const colors = {
   primary: '#FF0000',
+  darkPrimary: '#CC0000',
   secondary: '#E5E5E5',
   textPrimary: '#333333',
   textSecondary: '#666666',
@@ -7,18 +8,22 @@ export const colors = {
   danger: '#E74C3C',
   warning: '#F39C12',
   info: '#2980B9',
-
   white: '#FFFFFF',
   black: '#000000',
-  gray: '#7F8C8D',
-  border: '#DDDDDD',  
+  gray100: '#F5F5F5',
+  gray300: '#CCCCCC',
+  gray600: '#666666',
+  gray800: '#222222',
 };
 export function withOpacity(color: string, alpha: number = 1): string {
   if (color.startsWith('#')) {
     let hex = color.replace(/^#/, '');
 
     if (hex.length === 3) {
-      hex = hex.split('').map(c => c + c).join('');
+      hex = hex
+        .split('')
+        .map(c => c + c)
+        .join('');
     }
 
     if (hex.length === 8) {

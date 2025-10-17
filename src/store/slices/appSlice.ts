@@ -22,4 +22,6 @@ const appSlice = createSlice({
 });
 
 export const { setLanguage } = appSlice.actions;
+export const selectLanguage = (state: { app: AppState }) => state.app.language;           
+export const selectIsRtl = (state: { app: AppState }) => state.app.isRtl;   
 export default appSlice.reducer;

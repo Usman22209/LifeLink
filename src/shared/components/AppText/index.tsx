@@ -1,7 +1,9 @@
-import React, {ReactNode} from 'react';
-import {Text as RNText, TextProps} from 'react-native';
-import {fontFamily as fm, fontSize as fs} from '@theme/fonts';
-import {colors} from '@theme/colors';
+import React, { ReactNode, useContext } from 'react';
+import { Text as RNText, TextProps } from 'react-native';
+import { fontFamily as fm, fontSize as fs, fontFamilyUrdu } from '@theme/fonts';
+import { ThemeContext } from '@providers/ThemeProvider';
+import { useSelector } from 'react-redux';
+import { selectLanguage, selectIsRtl } from '@store/slices/appSlice';
 
 interface Props extends TextProps {
   children: ReactNode | undefined | any;
@@ -10,10 +12,6 @@ interface Props extends TextProps {
   regular?: boolean;
   medium?: boolean;
   semiBold?: boolean;
-  light?: boolean;
-  extraBold?: boolean;
-  extraLight?: boolean;
-  black?: boolean;
   FONT_48?: boolean;
   FONT_44?: boolean;
   FONT_40?: boolean;
@@ -44,11 +42,7 @@ const Text = (props: Props) => {
     regular,
     medium,
     semiBold,
-    light,
-    extraBold,
-    extraLight,
-    black,
-    color = colors.black,
+    color,
     FONT_48,
     FONT_44,
     FONT_40,
@@ -72,39 +66,42 @@ const Text = (props: Props) => {
     FONT_6,
   } = props;
 
-  let fontFamily = fm.REGULAR;
+  const theme = useContext(ThemeContext);
+  const language = useSelector(selectLanguage);
+  const isRtl = useSelector(selectIsRtl);
 
-  if (bold) fontFamily = fm.BOLD;
-  if (light) fontFamily = fm.LIGHT;
-  if (medium) fontFamily = fm.MEDIUM;
-  if (semiBold) fontFamily = fm.SEMIBOLD;
-  if (extraBold) fontFamily = fm.EXTRABOLD;
-  if (extraLight) fontFamily = fm.EXTRALIGHT;
-  if (black) fontFamily = fm.BLACK;
+  const urduFont = fontFamilyUrdu;
+  const engFont = fm;
+
+  let fontFamily = isRtl ? urduFont.REGULAR : engFont.REGULAR;
+  if (bold) fontFamily = isRtl ? urduFont.BOLD : engFont.BOLD;
+  if (medium) fontFamily = isRtl ? urduFont.MEDIUM : engFont.MEDIUM;
+  if (semiBold) fontFamily = isRtl ? urduFont.SEMIBOLD : engFont.SEMIBOLD;
 
   let fontSize = fs.FONT_14;
-
   if (FONT_48) fontSize = fs.FONT_48;
-  if (FONT_44) fontSize = fs.FONT_44;
-  if (FONT_40) fontSize = fs.FONT_40;
-  if (FONT_38) fontSize = fs.FONT_38;
-  if (FONT_36) fontSize = fs.FONT_36;
-  if (FONT_34) fontSize = fs.FONT_34;
-  if (FONT_32) fontSize = fs.FONT_32;
-  if (FONT_30) fontSize = fs.FONT_30;
-  if (FONT_28) fontSize = fs.FONT_28;
-  if (FONT_26) fontSize = fs.FONT_26;
-  if (FONT_24) fontSize = fs.FONT_24;
-  if (FONT_22) fontSize = fs.FONT_22;
-  if (FONT_20) fontSize = fs.FONT_20;
-  if (FONT_18) fontSize = fs.FONT_18;
-  if (FONT_16) fontSize = fs.FONT_16;
-  if (FONT_14) fontSize = fs.FONT_14;
-  if (FONT_12) fontSize = fs.FONT_12;
-  if (FONT_10) fontSize = fs.FONT_10;
-  if (FONT_9) fontSize = fs.FONT_9;
-  if (FONT_8) fontSize = fs.FONT_8;
-  if (FONT_6) fontSize = fs.FONT_6;
+  else if (FONT_44) fontSize = fs.FONT_44;
+  else if (FONT_40) fontSize = fs.FONT_40;
+  else if (FONT_38) fontSize = fs.FONT_38;
+  else if (FONT_36) fontSize = fs.FONT_36;
+  else if (FONT_34) fontSize = fs.FONT_34;
+  else if (FONT_32) fontSize = fs.FONT_32;
+  else if (FONT_30) fontSize = fs.FONT_30;
+  else if (FONT_28) fontSize = fs.FONT_28;
+  else if (FONT_26) fontSize = fs.FONT_26;
+  else if (FONT_24) fontSize = fs.FONT_24;
+  else if (FONT_22) fontSize = fs.FONT_22;
+  else if (FONT_20) fontSize = fs.FONT_20;
+  else if (FONT_18) fontSize = fs.FONT_18;
+  else if (FONT_16) fontSize = fs.FONT_16;
+  else if (FONT_14) fontSize = fs.FONT_14;
+  else if (FONT_12) fontSize = fs.FONT_12;
+  else if (FONT_10) fontSize = fs.FONT_10;
+  else if (FONT_9) fontSize = fs.FONT_9;
+  else if (FONT_8) fontSize = fs.FONT_8;
+  else if (FONT_6) fontSize = fs.FONT_6;
+
+  const textColor = color ?? theme.text;
 
   return (
     <RNText
@@ -112,11 +109,14 @@ const Text = (props: Props) => {
       style={[
         {
           fontSize,
-          color: color ? color : colors.secondary,
+          color: textColor,
           fontFamily,
+          textAlign: isRtl ? 'right' : 'left',
+          writingDirection: isRtl ? 'rtl' : 'ltr',
         },
         props?.style,
-      ]}>
+      ]}
+    >
       {children}
     </RNText>
   );
