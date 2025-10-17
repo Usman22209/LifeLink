@@ -12,44 +12,36 @@ const AppImage: React.FC<AppImageProps> = ({
   style,
   placeholder,
   fallbackSource,
+  resizeMode = FastImage.resizeMode.cover,
   ...props
 }) => {
   const [loading, setLoading] = useState(true);
   const [useFallback, setUseFallback] = useState(false);
 
-  const handleError = () => {
-    console.log("❌ Image load failed");
-    if (fallbackSource) {
-      setUseFallback(true); // switch to fallback
-    }
+  const handleError = (err?: any) => {
+    console.warn("❌ Image load failed", err);
+    if (fallbackSource) setUseFallback(true);
     setLoading(false);
   };
 
   return (
     <View style={[styles.container, style]}>
-      {loading && (
-        placeholder ?? (
+      {loading &&
+        (placeholder ?? (
           <ActivityIndicator
             style={StyleSheet.absoluteFillObject}
             color="#999"
           />
-        )
-      )}
+        ))}
 
       <FastImage
         {...props}
-        style={[StyleSheet.absoluteFill, style]}
+        resizeMode={resizeMode}
+        style={[styles.image, style]} 
         source={useFallback && fallbackSource ? fallbackSource : source}
-        onLoadEnd={() => {
-          console.log("✅ Loaded");
-          setLoading(false);
-        }}
+        onLoad={() => setLoading(false)}
         onError={handleError}
       />
-
-      {useFallback === false && !loading && !fallbackSource && (
-        <View style={[StyleSheet.absoluteFill, styles.errorBg]} />
-      )}
     </View>
   );
 };
@@ -59,8 +51,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#f0f0f0",
   },
-  errorBg: {
-    backgroundColor: "#d3d3d3",
+  image: {
+    width: "100%",
+    height: "100%",
   },
 });
 

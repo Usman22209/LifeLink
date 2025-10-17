@@ -9,7 +9,8 @@ import { toggleTheme } from '@store/slices/themeSlice';
 import { ThemeContext } from '@providers/ThemeProvider';
 import { RootState } from '@store/store';
 import { setLanguage } from '@store/slices/appSlice';
-
+import AppImage from '@components/AppImage';
+import FastImage from 'react-native-fast-image';
 const LanguageSwitcher = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -37,6 +38,11 @@ const LanguageSwitcher = () => {
     >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <Text style={[styles.welcome, { color: theme.text }]}>{t('welcome')}</Text>
+        <AppImage
+          source={{ uri: "https://avatars.githubusercontent.com/u/166890135?v=4" }}
+
+          style={{ width: 200, height: 35, borderRadius: 50 }}
+        />
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: theme.primary }]}
