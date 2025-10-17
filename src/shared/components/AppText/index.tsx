@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from 'react';
 import { Text as RNText, TextProps } from 'react-native';
-import { fontFamily as fm, fontSize as fs, fontFamilyUrdu } from '@theme/fonts';
+import { fontFamily as fm, fontSize as fs } from '@theme/fonts';
 import { ThemeContext } from '@providers/ThemeProvider';
 import { useSelector } from 'react-redux';
 import { selectIsRtl } from '@store/slices/appSlice';
@@ -81,10 +81,7 @@ const Text = (props: Props) => {
   const theme = useContext(ThemeContext);
   const isRtl = useSelector(selectIsRtl);
 
-  const urduFont = fontFamilyUrdu;
-  const engFont = fm;
-
-  let fontFamily = isRtl ? urduFont.REGULAR : engFont.REGULAR;
+  let fontFamily = fm.REGULAR;
 
   if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
   else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;

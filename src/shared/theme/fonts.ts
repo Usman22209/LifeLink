@@ -21,13 +21,6 @@ export const fontFamily = {
   THIN_ITALIC: 'Montserrat-ThinItalic',
 };
 
-export const fontFamilyUrdu = {
-  BOLD: 'Lateef-Bold',
-  MEDIUM: 'Lateef-Medium',
-  SEMIBOLD: 'Lateef-SemiBold',
-  REGULAR: 'Lateef-Regular',
-};
-
 export const fontSize = {
   FONT_48: moderateScale(48),
   FONT_44: moderateScale(44),
