@@ -8,27 +8,21 @@ import Toast from 'react-native-toast-message';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { toastConfig } from '@components/Toast';
 import * as Sentry from '@sentry/react-native';
-
+import ThemeProvider from '@shared/providers/ThemeProvider';
+import ENV from '@config/env';
 Sentry.init({
-  dsn: 'https://be46759d06dff53be9d88089bb307b19@o4510177765556224.ingest.de.sentry.io/4510177777156176',
+  dsn: ENV.SENTRY_DSN,
 
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
-  // Enable Logs
   enableLogs: true,
 
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [
     Sentry.mobileReplayIntegration(),
     Sentry.feedbackIntegration(),
   ],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
 });
 
 const App = (): React.JSX.Element => {
@@ -36,8 +30,10 @@ const App = (): React.JSX.Element => {
     <SafeAreaProvider>
       <Provider store={store}>
         <OneSignalProvider>
-          <AppNavigation />
-          <Toast config={toastConfig} position="top" topOffset={10} />
+          <ThemeProvider>
+            <AppNavigation />
+            <Toast config={toastConfig} position="top" topOffset={10} />
+          </ThemeProvider>
         </OneSignalProvider>
       </Provider>
     </SafeAreaProvider>
