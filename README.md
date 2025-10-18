@@ -1,7 +1,3 @@
-Perfect — here’s your **LifeLink** README rewritten in the *same format* as the default React Native template (so it still looks clean and standard), but customized for your **LifeLink project** with proper context, features, and instructions 👇
-
----
-
 This is the **LifeLink** project — an AI-powered cross-platform blood donation app built with [**React Native**](https://reactnative.dev), using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 It connects **donors**, **patients**, and **blood banks** through real-time updates and AI-based donor recommendations.
 
