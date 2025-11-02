@@ -7,6 +7,7 @@ interface KeyboardAwareContainerProps {
   children: React.ReactNode;
   contentContainerStyle?: ViewStyle;
 }
+
 const KeyboardAwareContainer: React.FC<KeyboardAwareContainerProps> = ({
   children,
   contentContainerStyle,
@@ -15,11 +16,13 @@ const KeyboardAwareContainer: React.FC<KeyboardAwareContainerProps> = ({
     <KeyboardAwareScrollView
       enableOnAndroid={true}
       showsVerticalScrollIndicator={false}
-      automaticallyAdjustKeyboardInsets={true}
       showsHorizontalScrollIndicator={false}
-      enableAutomaticScroll={false}
+      automaticallyAdjustContentInsets={false}
+      enableAutomaticScroll={true}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={[styles.keyboardContainer, contentContainerStyle]}
+      alwaysBounceHorizontal={false}
+      horizontal={false}
     >
       {children}
     </KeyboardAwareScrollView>

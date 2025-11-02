@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNetInfo } from "@react-native-community/netinfo";
-import Text from "../AppText";
+import Text from "@components/AppText";
 import { verticalScale, moderateScale } from "react-native-size-matters";
 import { ThemeContext } from "@providers/ThemeProvider";
 
@@ -133,7 +133,9 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
         <Container
           style={scrollable ? undefined : viewContainerStyle}
-          contentContainerStyle={scrollable ? scrollContentContainerStyle : undefined}
+          contentContainerStyle={
+            scrollable ? scrollContentContainerStyle : undefined
+          }
         >
           {!fixedHeader && header}
           {children}
@@ -171,7 +173,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: moderateScale(16),
+    paddingVertical: moderateScale(16),
+    paddingHorizontal: moderateScale(20),
   },
   centeredContent: {
     flex: 1,
