@@ -1,23 +1,33 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Video from 'react-native-video';
-import { splash } from '@assets/videos';
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import { UserStackParamList } from 'types/navigation';
-import { ROUTES } from '@utils/Routes';
-import ThemeProvider from '@shared/providers/ThemeProvider';
-type SplashScreenNavigationProp = StackNavigationProp<UserStackParamList, typeof ROUTES.SPLASH>;
+import React, { useContext } from "react";
+import { StyleSheet } from "react-native";
+import Video from "react-native-video";
+import { splash } from "@assets/videos";
+import { useNavigation } from "@react-navigation/native";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { UserStackParamList } from "types/navigation";
+import { ROUTES } from "@utils/Routes";
+import { ThemeContext } from "@providers/ThemeProvider";
+import ScreenWrapper from "@components/ScreenWrapper";
 
-export default function SplashScreen() {
+type SplashScreenNavigationProp = StackNavigationProp<
+    UserStackParamList,
+    typeof ROUTES.SPLASH
+>;
+
+const SplashScreen = () => {
     const navigation = useNavigation<SplashScreenNavigationProp>();
+    const theme = useContext(ThemeContext);
 
     const handleEnd = () => {
         navigation.replace(ROUTES.AUTH_FLOW);
     };
 
     return (
-        <View style={styles.container}>
+        <ScreenWrapper
+            scrollable={false}
+            showNetworkBanner={false}
+            backgroundColor={theme.background}
+        >
             <Video
                 source={splash}
                 style={styles.video}
@@ -27,11 +37,14 @@ export default function SplashScreen() {
                 playInBackground={false}
                 playWhenInactive={false}
             />
-        </View>
+        </ScreenWrapper>
     );
-}
+};
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: 'white' },
-    video: { flex: 1 },
+    video: {
+        flex: 1,
+    },
 });
+
+export default SplashScreen;
