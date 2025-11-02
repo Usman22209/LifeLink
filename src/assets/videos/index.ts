@@ -1,1 +1,1 @@
-export const splash = require('./splash.mp4');
+export const splash = require("./splash.mp4");

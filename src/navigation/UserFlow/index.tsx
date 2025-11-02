@@ -1,10 +1,10 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import SplashScreen from '@screens/Common/SplashScreen';
-import AuthFlow from './Auth';
-import MainFlow from './Main';
-import { ROUTES } from '@utils/Routes';
-import { UserStackParamList } from 'types/navigation';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import SplashScreen from "@screens/Common/SplashScreen";
+import AuthFlow from "./Auth";
+import MainFlow from "./Main";
+import { ROUTES } from "@utils/Routes";
+import { UserStackParamList } from "types/navigation";
 
 const Stack = createStackNavigator<UserStackParamList>();
 

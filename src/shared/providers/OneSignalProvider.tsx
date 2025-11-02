@@ -11,15 +11,18 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     OneSignal.initialize(ONESIGNAL_APP_ID);
     OneSignal.Notifications.requestPermission(false);
 
-    OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
-      event.notification.display();
-      const title = event.notification.title || "New Notification";
-      const description = event.notification.body || "";
-      showInfoToast(title, description);
-      console.log("Notification received in foreground:", event.notification);
-    });
+    OneSignal.Notifications.addEventListener(
+      "foregroundWillDisplay",
+      (event) => {
+        event.notification.display();
+        const title = event.notification.title || "New Notification";
+        const description = event.notification.body || "";
+        showInfoToast(title, description);
+        console.log("Notification received in foreground:", event.notification);
+      },
+    );
 
-    OneSignal.Notifications.addEventListener("click", event => {
+    OneSignal.Notifications.addEventListener("click", (event) => {
       console.log("Notification opened:", event.notification);
     });
   }, []);

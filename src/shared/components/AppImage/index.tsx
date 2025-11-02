@@ -27,7 +27,12 @@ const AppImage: React.FC<AppImageProps> = ({
   return (
     <View style={[styles.container, style]}>
       {loading &&
-        (placeholder ?? <ActivityIndicator style={StyleSheet.absoluteFillObject} color="#999" />)}
+        (placeholder ?? (
+          <ActivityIndicator
+            style={StyleSheet.absoluteFillObject}
+            color="#999"
+          />
+        ))}
 
       <FastImage
         {...props}

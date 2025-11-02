@@ -1,5 +1,16 @@
 export const ROUTES = {
-  SPLASH: 'Splash',
-  AUTH_FLOW: 'AuthFlow',
-  MAIN_FLOW: 'MainFlow',
+  // Root Flow
+  SPLASH: "Splash",
+  AUTH_FLOW: "AuthFlow",
+  MAIN_FLOW: "MainFlow",
+
+  // Auth
+  LOGIN: "Login",
+  REGISTER: "Register",
+  FORGOT_PASSWORD: "ForgotPassword",
+
+  // Main
+  HOME: "Home",
+  PROFILE: "Profile",
+  SETTINGS: "Settings",
 } as const;
