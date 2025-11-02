@@ -9,31 +9,24 @@ const defaultConfig = getDefaultConfig(__dirname);
 
 // ✅ Extend the asset resolver to include `.tflite`
 const assetExts = defaultConfig.resolver.assetExts
-  ? defaultConfig.resolver.assetExts.concat(["tflite"])
+  ? defaultConfig.resolver.assetExts.filter(ext => ext !== "svg").concat(["tflite"])
   : ["tflite"];
 
 const sourceExts = defaultConfig.resolver.sourceExts || [];
 
 const config = {
   transformer: {
-    // You can keep other transformers like SVG here if you have them
     babelTransformerPath: require.resolve("react-native-svg-transformer"),
-    svgo: {
-      plugins: [
-        {
-          name: "preset-default",
-          params: {
-            overrides: {
-              convertColors: {
-                currentColor: true,
-              },
-            },
-          },
-        },
-      ],
-    },
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
   },
   resolver: {
+    assetExts, // ✅ Add .tflite here, exclude SVG
+    sourceExts: [...sourceExts, "svg"], // Keep SVG + JS/TS
     extraNodeModules: {
       "@assets": path.join(srcRoot, "assets"),
       "@theme": path.join(srcRoot, "shared", "theme"),
@@ -48,10 +41,10 @@ const config = {
       "@store": path.join(srcRoot, "store"),
       "@providers": path.join(srcRoot, "shared", "providers"),
     },
-    assetExts, // ✅ Add .tflite here
-    sourceExts: [...sourceExts, "svg"], // Keep SVG + JS/TS
   },
   watchFolders: [srcRoot],
 };
 
-module.exports = withSentryConfig(mergeConfig(defaultConfig, config));
+// Merge with default config and wrap with Sentry
+const mergedConfig = mergeConfig(defaultConfig, config);
+module.exports = withSentryConfig(mergedConfig);

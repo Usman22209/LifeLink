@@ -49,7 +49,6 @@ const AppImage: React.FC<AppImageProps> = ({
 const styles = StyleSheet.create({
   container: {
     overflow: "hidden",
-    backgroundColor: "#f0f0f0",
   },
   image: {
     width: "100%",
