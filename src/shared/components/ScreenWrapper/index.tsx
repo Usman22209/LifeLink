@@ -25,6 +25,9 @@ interface ScreenWrapperProps {
   safeArea?: boolean;
   scrollable?: boolean;
   backgroundColor?: string;
+  centerContent?: boolean;
+  centerHorizontal?: boolean;
+  centerVertical?: boolean;
 }
 
 const HEADER_HEIGHT = verticalScale(60);
@@ -42,6 +45,9 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   safeArea = true,
   scrollable = false,
   backgroundColor,
+  centerContent = false,
+  centerHorizontal = false,
+  centerVertical = false,
 }) => {
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
@@ -49,13 +55,42 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const theme = useContext(ThemeContext);
 
   const Container = scrollable ? ScrollView : View;
+
+  const getCenteringStyles = () => {
+    if (centerContent) {
+      return styles.centeredContent;
+    }
+
+    const centeringStyles: any = {};
+    if (centerHorizontal) {
+      centeringStyles.justifyContent = "center";
+    }
+    if (centerVertical) {
+      centeringStyles.alignItems = "center";
+    }
+    return centeringStyles;
+  };
+
   const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
+  const centeringStyles = getCenteringStyles();
 
   const bgColor = backgroundColor || theme.background;
   const barColor = statusBarColor || theme.background;
   const barStyle =
     statusBarStyle ||
     (theme.mode === "dark" ? "light-content" : "dark-content");
+
+  const scrollContentContainerStyle = [
+    scrollable && styles.scrollContent,
+    scrollable && centeringStyles,
+  ];
+
+  const viewContainerStyle = [
+    styles.container,
+    { backgroundColor: bgColor },
+    containerStyle,
+    !scrollable && centeringStyles,
+  ];
 
   return (
     <>
@@ -97,12 +132,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         )}
 
         <Container
-          style={[
-            styles.container,
-            { backgroundColor: bgColor },
-            containerStyle,
-          ]}
-          contentContainerStyle={scrollable ? styles.scrollContent : undefined}
+          style={scrollable ? undefined : viewContainerStyle}
+          contentContainerStyle={scrollable ? scrollContentContainerStyle : undefined}
         >
           {!fixedHeader && header}
           {children}
@@ -141,6 +172,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: moderateScale(16),
+  },
+  centeredContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   fixedHeaderContainer: {
     position: "absolute",
