@@ -9,6 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
 import * as Sentry from "@sentry/react-native";
 import ThemeProvider from "@shared/providers/ThemeProvider";
+import { NavigationContainer } from "@react-navigation/native";
 import ENV from "@config/env";
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
@@ -28,8 +29,10 @@ const App = (): React.JSX.Element => {
       <Provider store={store}>
         <OneSignalProvider>
           <ThemeProvider>
-            <AppNavigation />
-            <Toast config={toastConfig} position="top" topOffset={10} />
+            <NavigationContainer>
+              <AppNavigation />
+              <Toast config={toastConfig} position="top" topOffset={10} />
+            </NavigationContainer>
           </ThemeProvider>
         </OneSignalProvider>
       </Provider>
