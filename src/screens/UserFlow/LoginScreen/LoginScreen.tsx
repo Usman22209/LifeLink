@@ -4,17 +4,19 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import { ThemeContext } from "@providers/ThemeProvider";
-import { colors } from "@theme/colors";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
-import AnyIcon, { Icons } from "@components/AnyIcon";
+import { Icons } from "@components/AnyIcon";
 import AnySvg from "@components/AnySvg";
 import KeyboardAwareContainer from "@components/KeyboardAwareContainer";
 import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
+import { selectIsLightMode } from "@store/slices/themeSlice";
+import { useSelector } from "react-redux";
 
 const LoginScreen = () => {
   const theme = useContext(ThemeContext);
+  const isLightMode = useSelector(selectIsLightMode)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,7 +38,7 @@ const LoginScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={AppImages.AppLogoHorizontal}
+            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -99,10 +101,8 @@ const LoginScreen = () => {
             activeOpacity={0.85}
           >
             <View
-              style={[
-                styles.googleIconWrapper,
-                { backgroundColor: colors.white, borderColor: theme.border },
-              ]}
+              style={
+                styles.googleIconWrapper}
             >
               <AnySvg
                 name="google"

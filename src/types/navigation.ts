@@ -7,7 +7,7 @@ export type UserStackParamList = {
 
 export type AuthStackParamList = {
   [ROUTES.LOGIN]: undefined;
-  [ROUTES.REGISTER]: undefined;
+  [ROUTES.SIGNUP]: undefined;
   [ROUTES.FORGOT_PASSWORD]: undefined;
 };
 

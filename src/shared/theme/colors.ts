@@ -1,20 +1,33 @@
 export const colors = {
-  primary: "#FF0000",
-  darkPrimary: "#CC0000",
-  secondary: "#E5E5E5",
-  textPrimary: "#333333",
-  textSecondary: "#666666",
-  success: "#27AE60",
-  danger: "#E74C3C",
-  warning: "#F39C12",
-  info: "#2980B9",
+  /* ===== BRAND RED ===== */
+  primary: "#E53935",        // Light mode primary (softer, premium red)
+  primaryDark: "#bc2929",    // Dark mode primary (brighter, readable)
+  primaryMuted: "#B71C1C",   // Pressed / disabled states
+
+  /* ===== BACKGROUNDS ===== */
   white: "#FFFFFF",
-  black: "#000000",
-  gray100: "#F5F5F5",
-  gray300: "#CCCCCC",
-  gray600: "#666666",
-  gray800: "#222222",
+  black: "#0F0F0F",          // Not pure black (reduces eye strain)
+
+  /* ===== TEXT ===== */
+  textPrimary: "#1C1C1E",    // iOS-like neutral black
+  textSecondary: "#6E6E73",
+
+  textPrimaryDark: "#F2F2F7",
+  textSecondaryDark: "#A1A1A6",
+
+  /* ===== SURFACES ===== */
+  gray100: "#F5F5F7",
+  gray300: "#D1D1D6",
+  gray600: "#636366",
+  gray800: "#1C1C1E",
+
+  /* ===== STATES ===== */
+  success: "#2ECC71",
+  danger: "#FF5C5C",         // Coral red (visible on dark)
+  warning: "#F5A623",
+  info: "#4A90E2",
 };
+
 export function withOpacity(color: string, alpha: number = 1): string {
   if (color.startsWith("#")) {
     let hex = color.replace(/^#/, "");
