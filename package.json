@@ -10,7 +10,7 @@
     "start": "react-native start",
     "test": "jest",
     "clean": "cd android && ./gradlew clean && cd ..",
-    "prettier:fix": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "build": "cd android && ./gradlew build && cd ..",
     "debug": "cd android && ./gradlew assembleDebug && cd ..",
     "release": "cd android && ./gradlew assembleRelease && cd ..",

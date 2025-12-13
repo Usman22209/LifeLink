@@ -9,4 +9,5 @@ export const lightTheme = {
   border: colors.gray300,
   primary: colors.primary,
   placeholder: withOpacity(colors.textSecondary, 0.6),
+  error: colors.danger,
 };

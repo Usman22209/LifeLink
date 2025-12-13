@@ -9,4 +9,5 @@ export const darkTheme = {
   border: colors.gray600,
   primary: colors.darkPrimary,
   placeholder: withOpacity(colors.white, 0.4),
+  error: colors.danger,
 };
