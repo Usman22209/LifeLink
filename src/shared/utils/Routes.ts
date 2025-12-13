@@ -1,6 +1,5 @@
 export const ROUTES = {
   // Root Flow
-  SPLASH: "Splash",
   AUTH_FLOW: "AuthFlow",
   MAIN_FLOW: "MainFlow",
 

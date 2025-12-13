@@ -13,11 +13,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import ENV from "@config/env";
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
-
   sendDefaultPii: true,
-
   enableLogs: true,
-
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
