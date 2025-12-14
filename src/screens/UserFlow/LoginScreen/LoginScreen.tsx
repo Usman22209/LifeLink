@@ -18,6 +18,8 @@ import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
 import { useLogin } from "@shared/query/auth/useLogin";
+import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
+import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -31,6 +33,8 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const loginMutation = useLogin();
+  const googleLoginMutation = useGoogleLogin();
+  const { signIn } = useGoogleSignIn();
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -40,8 +44,15 @@ const LoginScreen = () => {
     loginMutation.mutate({ email, password });
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login");
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signIn();
+      const idToken = result.data?.idToken;
+      console.log("Google ID Token:", idToken);
+      googleLoginMutation.mutate({ idToken });
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
   };
 
   return (

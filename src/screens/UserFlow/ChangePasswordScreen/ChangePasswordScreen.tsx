@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import { ThemeContext } from "@providers/ThemeProvider";
@@ -24,15 +24,12 @@ type ChangePasswordScreenNavigationProp = StackNavigationProp<
   typeof ROUTES.CHANGE_PASSWORD
 >;
 
-interface ChangePasswordScreenProps {
-  routes: {
-    params: {
-      accessToken: string;
-    };
-  };
-}
+type ChangePasswordScreenProps = StackScreenProps<
+  AuthStackParamList,
+  typeof ROUTES.CHANGE_PASSWORD
+>;
 
-const ChangePasswordScreen = ({ routes }: ChangePasswordScreenProps) => {
+const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
   const theme = useContext(ThemeContext);
 
@@ -42,7 +39,7 @@ const ChangePasswordScreen = ({ routes }: ChangePasswordScreenProps) => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useChangePasswordForm();
-  const { accessToken } = routes.params;
+  const { accessToken } = route.params;
 
   const handleChangePassword = (data: ChangePasswordFormValues) => {
     // TODO: Make API call to change password with data.newPassword

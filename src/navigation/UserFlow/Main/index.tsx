@@ -1,12 +1,17 @@
-import { View, Text } from "react-native";
 import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { ROUTES } from "@utils/Routes";
+import HomeScreen from "@screens/Main/HomeScreen";
+import ProfileScreen from "@screens/Main/ProfileScreen";
+import type { MainStackParamList } from "types/navigation";
 
-const index = () => {
-  return (
-    <View>
-      <Text>index</Text>
-    </View>
-  );
-};
+const Stack = createStackNavigator<MainStackParamList>();
 
-export default index;
+const MainFlow = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name={ROUTES.HOME} component={HomeScreen} />
+    <Stack.Screen name={ROUTES.PROFILE} component={ProfileScreen} />
+  </Stack.Navigator>
+);
+
+export default MainFlow;
