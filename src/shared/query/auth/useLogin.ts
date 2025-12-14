@@ -3,18 +3,21 @@ import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import { AUTH_SERVICE } from "@api/service/auth.service";
 import { setAuth } from "@store/slices/authSlice";
-import { logger } from "@utils/logger";
+
 interface LoginPayload {
   email: string;
   password: string;
 }
 
 interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
+  success: boolean;
+  message: string;
+  session: {
+    access_token: string;
+    user: {
+      id: string;
+      email: string;
+    };
   };
 }
 
@@ -27,14 +30,21 @@ export const useLogin = () => {
     mutationFn: (data: LoginPayload) => AUTH_SERVICE.login(data),
 
     onSuccess: (response) => {
-      const { token, user } = response.data as LoginResponse;
+      // ✅ FULL AXIOS RESPONSE
+      console.log("LOGIN FULL RESPONSE:", response);
 
-      // Cache data
+      // ✅ ONLY BACKEND DATA
+      console.log("LOGIN RESPONSE DATA:", response.data);
+
+      const { session } = response.data as LoginResponse;
+      const { access_token, user } = session;
+
+      // Cache
       queryClient.setQueryData(["user"], user);
-      queryClient.setQueryData(["token"], token);
+      queryClient.setQueryData(["token"], access_token);
 
       // Redux
-      dispatch(setAuth({ token, user }));
+      dispatch(setAuth({ token: access_token, user: { id: user.id, name: user.email, email: user.email } }));
 
       Toast.show({
         type: "success",
@@ -43,7 +53,12 @@ export const useLogin = () => {
     },
 
     onError: (error: any) => {
-      logger.error(`Login error: ${JSON.stringify(error)}`);
+      console.error("LOGIN ERROR FULL:", error);
+
+      console.error("LOGIN ERROR RESPONSE:", error?.response);
+      console.error("LOGIN ERROR DATA:", error?.response?.data);
+      console.error("LOGIN ERROR STATUS:", error?.response?.status);
+
       Toast.show({
         type: "error",
         text2:
