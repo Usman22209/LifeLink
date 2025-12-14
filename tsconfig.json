@@ -14,7 +14,8 @@
       "@shared/*": ["shared/*"],
       "@navigation/*": ["navigation/*"],
       "@store/*": ["store/*"],
-      "@providers/*": ["shared/providers/*"]
+      "@providers/*": ["shared/providers/*"],
+      "@api/*": ["shared/api/*"]      
     },
   },
   "include": ["**/*.ts", "**/*.tsx", "index.js"],

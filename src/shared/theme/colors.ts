@@ -1,15 +1,15 @@
 export const colors = {
   /* ===== BRAND RED ===== */
-  primary: "#E53935",        // Light mode primary (softer, premium red)
-  primaryDark: "#bc2929",    // Dark mode primary (brighter, readable)
-  primaryMuted: "#B71C1C",   // Pressed / disabled states
+  primary: "#E53935", // Light mode primary (softer, premium red)
+  primaryDark: "#bc2929", // Dark mode primary (brighter, readable)
+  primaryMuted: "#B71C1C", // Pressed / disabled states
 
   /* ===== BACKGROUNDS ===== */
   white: "#FFFFFF",
-  black: "#0F0F0F",          // Not pure black (reduces eye strain)
+  black: "#0F0F0F", // Not pure black (reduces eye strain)
 
   /* ===== TEXT ===== */
-  textPrimary: "#1C1C1E",    // iOS-like neutral black
+  textPrimary: "#1C1C1E", // iOS-like neutral black
   textSecondary: "#6E6E73",
 
   textPrimaryDark: "#F2F2F7",
@@ -23,7 +23,7 @@ export const colors = {
 
   /* ===== STATES ===== */
   success: "#2ECC71",
-  danger: "#FF5C5C",         // Coral red (visible on dark)
+  danger: "#FF5C5C", // Coral red (visible on dark)
   warning: "#F5A623",
   info: "#4A90E2",
 };

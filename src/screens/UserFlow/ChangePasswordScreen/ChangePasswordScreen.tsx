@@ -35,14 +35,14 @@ interface ChangePasswordScreenProps {
 const ChangePasswordScreen = ({ routes }: ChangePasswordScreenProps) => {
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  
+
   const isLightMode = useSelector(selectIsLightMode);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useChangePasswordForm();
-  const {accessToken} = routes.params;
+  const { accessToken } = routes.params;
 
   const handleChangePassword = (data: ChangePasswordFormValues) => {
     // TODO: Make API call to change password with data.newPassword

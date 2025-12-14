@@ -18,12 +18,15 @@ import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
 
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.LOGIN>;
+type LoginScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  typeof ROUTES.LOGIN
+>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode)
+  const isLightMode = useSelector(selectIsLightMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -45,7 +48,11 @@ const LoginScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
+            source={
+              isLightMode
+                ? AppImages.AppLogoHorizontal
+                : AppImages.DarkAppLogoHorizontal
+            }
             style={styles.logo}
             resizeMode="contain"
           />
@@ -72,7 +79,11 @@ const LoginScreen = () => {
             secureText={true}
           />
 
-          <TouchableOpacity style={styles.forgotContainer} activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
+          <TouchableOpacity
+            style={styles.forgotContainer}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
+          >
             <Text medium FONT_14 style={{ color: theme.primary }}>
               Forgot Password?
             </Text>
@@ -107,10 +118,7 @@ const LoginScreen = () => {
             ]}
             activeOpacity={0.85}
           >
-            <View
-              style={
-                styles.googleIconWrapper}
-            >
+            <View style={styles.googleIconWrapper}>
               <AnySvg
                 name="google"
                 width={moderateScale(24)}
@@ -130,7 +138,10 @@ const LoginScreen = () => {
             <Text FONT_14 style={{ color: theme.textSecondary }}>
               Don't have an account?{" "}
             </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.SIGNUP)}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate(ROUTES.SIGNUP)}
+            >
               <Text bold FONT_14 style={{ color: theme.primary }}>
                 Sign Up
               </Text>
