@@ -4,6 +4,7 @@ import { ROUTES } from "@utils/Routes";
 import LoginScreen from "@screens/UserFlow/LoginScreen";
 import SignupScreen from "@screens/UserFlow/SignupScreen";
 import ForgotPasswordScreen from "@screens/UserFlow/ForgotPasswordScreen/ForgotPasswordScreen";
+import ChangePasswordScreen from "@screens/UserFlow/ChangePasswordScreen";
 import type { AuthStackParamList } from "types/navigation";
 
 const Stack = createStackNavigator<AuthStackParamList>();
@@ -15,6 +16,10 @@ const AuthFlow = () => (
     <Stack.Screen
       name={ROUTES.FORGOT_PASSWORD}
       component={ForgotPasswordScreen}
+    />
+    <Stack.Screen
+      name={ROUTES.CHANGE_PASSWORD}
+      component={ChangePasswordScreen}
     />
   </Stack.Navigator>
 );
