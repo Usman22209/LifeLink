@@ -32,16 +32,16 @@ const LoginScreen = () => {
   const isLightMode = useSelector(selectIsLightMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loginMutation = useLogin();
-  const googleLoginMutation = useGoogleLogin();
+  const { mutate: loginMutate, isPending: loginPending } = useLogin();
+  const { mutate: googleLoginMutate, isPending: googleLoginPending } = useGoogleLogin();
   const { signIn } = useGoogleSignIn();
 
   const handleLogin = () => {
     if (!email || !password) {
-      // Perhaps show toast for validation
+
       return;
     }
-    loginMutation.mutate({ email, password });
+    loginMutate({ email, password });
   };
 
   const handleGoogleLogin = async () => {
@@ -49,7 +49,7 @@ const LoginScreen = () => {
       const result = await signIn();
       const idToken = result.data?.idToken;
       console.log("Google ID Token:", idToken);
-      googleLoginMutation.mutate({ idToken });
+      googleLoginMutate({ idToken });
     } catch (error) {
       console.error("Google sign-in failed:", error);
     }
@@ -109,7 +109,7 @@ const LoginScreen = () => {
           <AppButton
             title="Login"
             onPress={handleLogin}
-            loading={loginMutation.isPending}
+            loading={loginPending}
             style={{ marginTop: verticalScale(12) }}
           />
 
@@ -135,6 +135,7 @@ const LoginScreen = () => {
               },
             ]}
             activeOpacity={0.85}
+            disabled={googleLoginPending}
           >
             <View style={styles.googleIconWrapper}>
               <AnySvg
@@ -148,7 +149,7 @@ const LoginScreen = () => {
               FONT_14
               style={[styles.googleText, { color: theme.text }]}
             >
-              Continue with Google
+              {googleLoginPending ? "Loading..." : "Continue with Google"}
             </Text>
           </TouchableOpacity>
 
