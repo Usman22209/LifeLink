@@ -17,6 +17,7 @@ import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
+import { useLogin } from "@shared/query/auth/useLogin";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -29,9 +30,14 @@ const LoginScreen = () => {
   const isLightMode = useSelector(selectIsLightMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const loginMutation = useLogin();
 
   const handleLogin = () => {
-    console.log("Login with:", email, password);
+    if (!email || !password) {
+      // Perhaps show toast for validation
+      return;
+    }
+    loginMutation.mutate({ email, password });
   };
 
   const handleGoogleLogin = () => {
@@ -92,6 +98,7 @@ const LoginScreen = () => {
           <AppButton
             title="Login"
             onPress={handleLogin}
+            loading={loginMutation.isPending}
             style={{ marginTop: verticalScale(12) }}
           />
 

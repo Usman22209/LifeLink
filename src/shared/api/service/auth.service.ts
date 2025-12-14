@@ -1,7 +1,7 @@
 import HTTP_CLIENT from "../controller/HTTP_CLIENT";
 import { API_CONFIG } from "../config";
 export const AUTH_SERVICE = {
-  login: (data: { username: string; password: string }) => {
+  login: (data: { email: string; password: string }) => {
     const url = API_CONFIG.AUTH.login;
     return HTTP_CLIENT.post(url, data);
   },

@@ -23,6 +23,7 @@ module.exports = {
           "@store": "./src/store",
           "@providers": "./src/shared/providers",
           "@api": "./src/shared/api", 
+          "@query": "./src/shared/query"
         },
       },
     ],
