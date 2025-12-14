@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import { ThemeContext } from "@providers/ThemeProvider";
@@ -13,8 +15,13 @@ import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
+import { ROUTES } from "@utils/Routes";
+import type { AuthStackParamList } from "types/navigation";
+
+type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.LOGIN>;
 
 const LoginScreen = () => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const theme = useContext(ThemeContext);
   const isLightMode = useSelector(selectIsLightMode)
   const [email, setEmail] = useState("");
@@ -65,7 +72,7 @@ const LoginScreen = () => {
             secureText={true}
           />
 
-          <TouchableOpacity style={styles.forgotContainer} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.forgotContainer} activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
             <Text medium FONT_14 style={{ color: theme.primary }}>
               Forgot Password?
             </Text>
@@ -123,7 +130,7 @@ const LoginScreen = () => {
             <Text FONT_14 style={{ color: theme.textSecondary }}>
               Don't have an account?{" "}
             </Text>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.SIGNUP)}>
               <Text bold FONT_14 style={{ color: theme.primary }}>
                 Sign Up
               </Text>
