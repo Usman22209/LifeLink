@@ -10,7 +10,7 @@ import type { AuthStackParamList } from "types/navigation";
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthFlow = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Navigator screenOptions={{ headerShown: false }} >
     <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
     <Stack.Screen name={ROUTES.SIGNUP} component={SignupScreen} />
     <Stack.Screen

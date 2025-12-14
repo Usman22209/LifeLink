@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { scale, moderateScale, verticalScale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import Text from "@components/AppText";
@@ -16,17 +16,26 @@ import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
+import { useForgotPasswordForm } from "@shared/forms/hooks/useForgotPasswordForm";
+import type { ForgotPasswordFormValues } from "@shared/forms/schemas/forgotPassword.schema";
 
-type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.FORGOT_PASSWORD>;
+type ForgotPasswordScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  typeof ROUTES.FORGOT_PASSWORD
+>;
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode)
-  const [email, setEmail] = useState("");
+  const isLightMode = useSelector(selectIsLightMode);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForgotPasswordForm();
 
-  const handleResetPassword = () => {
-    console.log("Reset password for:", email);
+  const handleResetPassword = (data: ForgotPasswordFormValues) => {
+    console.log("Reset password for:", data.email);
   };
 
   return (
@@ -39,40 +48,43 @@ const ForgotPasswordScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
+            source={
+              isLightMode
+                ? AppImages.AppLogoHorizontal
+                : AppImages.DarkAppLogoHorizontal
+            }
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
         <View style={styles.formContainer}>
-          <Text
-            bold
-            FONT_18
-            style={[styles.title, { color: theme.text }]}
-          >
+          <Text bold FONT_18 style={[styles.title, { color: theme.text }]}>
             Forgot Password?
           </Text>
           <Text
             FONT_14
             style={[styles.subtitle, { color: theme.textSecondary }]}
           >
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address and we'll send you a link to reset your
+            password.
           </Text>
 
           <AppInput
+            name="email"
+            control={control}
             label="Email"
             iconType={Icons.Feather}
             iconName="mail"
             placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
             keyboardType="email-address"
+            error={errors.email?.message}
           />
 
           <AppButton
             title="Send Reset Link"
-            onPress={handleResetPassword}
+            onPress={handleSubmit(handleResetPassword)}
+            loading={isSubmitting}
             style={{ marginTop: verticalScale(12) }}
           />
 
@@ -80,7 +92,10 @@ const ForgotPasswordScreen = () => {
             <Text FONT_14 style={{ color: theme.textSecondary }}>
               Remember your password?{" "}
             </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.LOGIN)}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate(ROUTES.LOGIN)}
+            >
               <Text bold FONT_14 style={{ color: theme.primary }}>
                 Login
               </Text>

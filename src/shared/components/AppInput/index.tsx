@@ -11,6 +11,7 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { ThemeContext } from "@providers/ThemeProvider";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
+import { Control, Controller } from "react-hook-form";
 
 interface AppInputProps extends TextInputProps {
   label?: string;
@@ -23,6 +24,8 @@ interface AppInputProps extends TextInputProps {
   error?: string;
   inputStyle?: TextInputProps["style"];
   containerStyle?: ViewStyle;
+  control?: Control<any>;
+  name?: string;
 }
 
 const AppInput: React.FC<AppInputProps> = ({
@@ -37,11 +40,30 @@ const AppInput: React.FC<AppInputProps> = ({
   inputStyle,
   containerStyle,
   keyboardType,
+  control,
+  name,
   ...props
 }) => {
   const theme = useContext(ThemeContext);
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const renderInput = (fieldProps?: any) => (
+    <TextInput
+      {...props}
+      {...fieldProps}
+      value={fieldProps?.value ?? value}
+      onChangeText={fieldProps?.onChange ?? onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor={theme.placeholder}
+      keyboardType={keyboardType}
+      autoCapitalize="none"
+      secureTextEntry={secureText ? !showPassword : false}
+      style={[styles.input, { color: theme.text }, inputStyle]}
+      onFocus={() => setFocused(true)}
+      onBlur={fieldProps?.onBlur ?? (() => setFocused(false))}
+    />
+  );
 
   return (
     <View style={{ marginBottom: verticalScale(12) }}>
@@ -76,19 +98,17 @@ const AppInput: React.FC<AppInputProps> = ({
             />
           )}
 
-          <TextInput
-            {...props}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            placeholderTextColor={theme.placeholder}
-            keyboardType={keyboardType}
-            autoCapitalize="none"
-            secureTextEntry={secureText ? !showPassword : false}
-            style={[styles.input, { color: theme.text }, inputStyle]}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
+          {control && name ? (
+            <Controller
+              name={name}
+              control={control}
+              render={({ field: { onChange, onBlur, value } }) =>
+                renderInput({ onChange, onBlur, value })
+              }
+            />
+          ) : (
+            renderInput()
+          )}
 
           {secureText && (
             <TouchableOpacity

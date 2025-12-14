@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
@@ -17,19 +17,26 @@ import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
+import { useSignupForm } from "@shared/forms/hooks/useSignupForm";
+import type { SignupFormValues } from "@shared/forms/schemas/signup.schema";
 
-type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.SIGNUP>;
+type SignupScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  typeof ROUTES.SIGNUP
+>;
 
 const SignupScreen = () => {
   const navigation = useNavigation<SignupScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode)
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const isLightMode = useSelector(selectIsLightMode);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useSignupForm();
 
-  const handleSignup = () => {
-    console.log("Signup with:", email, password, confirmPassword);
+  const handleSignup = (data: SignupFormValues) => {
+    console.log("Signup with:", data);
   };
 
   const handleGoogleSignup = () => {
@@ -46,7 +53,11 @@ const SignupScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
+            source={
+              isLightMode
+                ? AppImages.AppLogoHorizontal
+                : AppImages.DarkAppLogoHorizontal
+            }
             style={styles.logo}
             resizeMode="contain"
           />
@@ -54,38 +65,42 @@ const SignupScreen = () => {
 
         <View style={styles.formContainer}>
           <AppInput
+            name="email"
+            control={control}
             label="Email"
             iconType={Icons.Feather}
             iconName="mail"
             placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
             keyboardType="email-address"
+            error={errors.email?.message}
           />
 
           <AppInput
+            name="password"
+            control={control}
             label="Password"
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
             placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
             secureText={true}
+            error={errors.password?.message}
           />
 
           <AppInput
+            name="confirmPassword"
+            control={control}
             label="Confirm Password"
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
             placeholder="Confirm your password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
             secureText={true}
+            error={errors.confirmPassword?.message}
           />
 
           <AppButton
             title="Sign Up"
-            onPress={handleSignup}
+            onPress={handleSubmit(handleSignup)}
+            loading={isSubmitting}
             style={{ marginTop: verticalScale(12) }}
           />
 
@@ -112,10 +127,7 @@ const SignupScreen = () => {
             ]}
             activeOpacity={0.85}
           >
-            <View
-              style={
-                styles.googleIconWrapper}
-            >
+            <View style={styles.googleIconWrapper}>
               <AnySvg
                 name="google"
                 width={moderateScale(24)}
@@ -135,7 +147,10 @@ const SignupScreen = () => {
             <Text FONT_14 style={{ color: theme.textSecondary }}>
               Already have an account?{" "}
             </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.LOGIN)}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate(ROUTES.LOGIN)}
+            >
               <Text bold FONT_14 style={{ color: theme.primary }}>
                 Login
               </Text>

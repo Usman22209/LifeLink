@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { scale, moderateScale, verticalScale } from "react-native-size-matters";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useContext } from "react";
+import { View, StyleSheet } from "react-native";
+import { scale, verticalScale } from "react-native-size-matters";
+import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp } from "@react-navigation/native";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import { ThemeContext } from "@providers/ThemeProvider";
@@ -17,33 +16,38 @@ import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "types/navigation";
+import { useChangePasswordForm } from "@shared/forms/hooks/useChangePasswordForm";
+import type { ChangePasswordFormValues } from "@shared/forms/schemas/changePassword.schema";
 
-type ChangePasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.CHANGE_PASSWORD>;
-type ChangePasswordScreenRouteProp = RouteProp<AuthStackParamList, typeof ROUTES.CHANGE_PASSWORD>;
+type ChangePasswordScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  typeof ROUTES.CHANGE_PASSWORD
+>;
 
-const ChangePasswordScreen = () => {
+interface ChangePasswordScreenProps {
+  routes: {
+    params: {
+      accessToken: string;
+    };
+  };
+}
+
+const ChangePasswordScreen = ({ routes }: ChangePasswordScreenProps) => {
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
-  const route = useRoute<ChangePasswordScreenRouteProp>();
-  const { accessToken } = route.params;
   const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode)
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  
+  const isLightMode = useSelector(selectIsLightMode);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useChangePasswordForm();
+  const {accessToken} = routes.params;
 
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      // TODO: Show error message
-      console.log("Passwords do not match");
-      return;
-    }
-    if (newPassword.length < 6) {
-      // TODO: Show error message
-      console.log("Password too short");
-      return;
-    }
-    console.log("Change password with token:", accessToken, "new password:", newPassword, "confirm:", confirmPassword);
-    // TODO: Make API call to change password
-    // After successful password change, navigate to login
+  const handleChangePassword = (data: ChangePasswordFormValues) => {
+    // TODO: Make API call to change password with data.newPassword
+    console.log("Change password:", data);
+
     navigation.navigate(ROUTES.LOGIN);
   };
 
@@ -57,18 +61,18 @@ const ChangePasswordScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
+            source={
+              isLightMode
+                ? AppImages.AppLogoHorizontal
+                : AppImages.DarkAppLogoHorizontal
+            }
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
         <View style={styles.formContainer}>
-          <Text
-            bold
-            FONT_18
-            style={[styles.title, { color: theme.text }]}
-          >
+          <Text bold FONT_18 style={[styles.title, { color: theme.text }]}>
             Change Password
           </Text>
           <Text
@@ -79,28 +83,31 @@ const ChangePasswordScreen = () => {
           </Text>
 
           <AppInput
+            name="newPassword"
+            control={control}
             label="New Password"
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
             placeholder="Enter your new password"
-            value={newPassword}
-            onChangeText={setNewPassword}
             secureText={true}
+            error={errors.newPassword?.message}
           />
 
           <AppInput
+            name="confirmPassword"
+            control={control}
             label="Confirm Password"
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
             placeholder="Confirm your new password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
             secureText={true}
+            error={errors.confirmPassword?.message}
           />
 
           <AppButton
             title="Change Password"
-            onPress={handleChangePassword}
+            onPress={handleSubmit(handleChangePassword)}
+            loading={isSubmitting}
             style={{ marginTop: verticalScale(12) }}
           />
         </View>
@@ -117,6 +124,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: scale(16),
+    marginTop: verticalScale(-50),
   },
   logoContainer: { alignItems: "center", marginBottom: verticalScale(6) },
   logo: { width: scale(250), height: verticalScale(180) },
