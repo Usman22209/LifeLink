@@ -10,7 +10,7 @@ import AppButton from "@components/AppButton";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
-import type { MainStackParamList } from "types/navigation";
+import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 type HomeScreenNavigationProp = StackNavigationProp<
   MainStackParamList,

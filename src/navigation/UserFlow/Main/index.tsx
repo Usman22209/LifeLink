@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { ROUTES } from "@utils/Routes";
 import HomeScreen from "@screens/Main/HomeScreen";
 import ProfileScreen from "@screens/Main/ProfileScreen";
-import type { MainStackParamList } from "types/navigation";
+import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 const Stack = createStackNavigator<MainStackParamList>();
 
