@@ -5,7 +5,7 @@ import LoginScreen from "@screens/UserFlow/LoginScreen";
 import SignupScreen from "@screens/UserFlow/SignupScreen";
 import ForgotPasswordScreen from "@screens/UserFlow/ForgotPasswordScreen/ForgotPasswordScreen";
 import ChangePasswordScreen from "@screens/UserFlow/ChangePasswordScreen";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 const Stack = createStackNavigator<AuthStackParamList>();
 

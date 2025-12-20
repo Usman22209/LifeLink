@@ -15,7 +15,7 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useChangePasswordForm } from "@shared/forms/hooks/useChangePasswordForm";
 import type { ChangePasswordFormValues } from "@shared/forms/schemas/changePassword.schema";
 
