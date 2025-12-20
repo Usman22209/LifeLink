@@ -13,20 +13,7 @@ import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { Control, Controller } from "react-hook-form";
 
-interface AppInputProps extends TextInputProps {
-  label?: string;
-  value?: string;
-  iconType?: any;
-  iconName?: string;
-  placeholder?: string;
-  secureText?: boolean;
-  onChangeText?: (text: string) => void;
-  error?: string;
-  inputStyle?: TextInputProps["style"];
-  containerStyle?: ViewStyle;
-  control?: Control<any>;
-  name?: string;
-}
+import { AppInputProps } from "@shared/interfaces/components/app-input.interface";
 
 const AppInput: React.FC<AppInputProps> = ({
   label,
