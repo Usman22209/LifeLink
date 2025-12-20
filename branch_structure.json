@@ -1,0 +1,45 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "Auth-apis",
+    "Project-Upgrade",
+    "app-polish",
+    "deep-linking",
+    "dev-ui",
+    "feature-blood-request",
+    "ios-fixes",
+    "ios-integration",
+    "main",
+    "onboarding-screen",
+    "performance",
+    "performance_fixes"
+  ],
+  "parent": {
+    "Auth-apis": "main",
+    "Project-Upgrade": "main",
+    "app-polish": "main",
+    "deep-linking": "main",
+    "dev-ui": "main",
+    "feature-blood-request": "main",
+    "ios-fixes": "main",
+    "ios-integration": "main",
+    "main": null,
+    "onboarding-screen": "main",
+    "performance": "main",
+    "performance_fixes": "main"
+  },
+  "order": [
+    "main",
+    "Auth-apis",
+    "Project-Upgrade",
+    "app-polish",
+    "deep-linking",
+    "dev-ui",
+    "feature-blood-request",
+    "ios-fixes",
+    "ios-integration",
+    "onboarding-screen",
+    "performance",
+    "performance_fixes"
+  ]
+}

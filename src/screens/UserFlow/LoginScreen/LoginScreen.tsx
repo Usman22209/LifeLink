@@ -16,7 +16,7 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useLogin } from "@shared/query/auth/useLogin";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
@@ -38,7 +38,6 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     if (!email || !password) {
-
       return;
     }
     loginMutate({ email, password });

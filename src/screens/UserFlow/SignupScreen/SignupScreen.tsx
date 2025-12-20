@@ -16,7 +16,7 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSignupForm } from "@shared/forms/hooks/useSignupForm";
 import type { SignupFormValues } from "@shared/forms/schemas/signup.schema";
 import { useSignup } from "@shared/query/auth/useSignup";
