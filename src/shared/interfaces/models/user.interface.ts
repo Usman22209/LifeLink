@@ -6,5 +6,6 @@ export interface User {
 
 export interface AuthState {
   token: string | null;
+  sessionId: string | null;
   user: User | null;
 }
