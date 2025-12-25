@@ -7,6 +7,7 @@ const API_CONFIG = {
     login: "auth/login",
     googleLogin: "auth/google-login",
     forgotPassword: "auth/forgot-password",
+    resetPassword: "auth/reset-password",
     logout: "auth/logout",
   },
 };

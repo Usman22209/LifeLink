@@ -13,8 +13,19 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
 HTTP_CLIENT.interceptors.request.use(
   (config) => {
     const { token, sessionId } = store.getState().auth;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     if (sessionId) config.headers["x-session-id"] = sessionId;
+    
+    // Debug logging
+    console.log('--- API Request ---');
+    console.log('URL:', config.baseURL ? config.baseURL + config.url : config.url);
+    console.log('Method:', config.method?.toUpperCase());
+    console.log('Headers:', config.headers);
+    console.log('Data:', config.data);
+    console.log('-------------------');
+
     return config;
   },
   (error) => Promise.reject(error),

@@ -4,7 +4,7 @@ import { ROUTES } from "@utils/Routes";
 import LoginScreen from "@screens/UserFlow/LoginScreen";
 import SignupScreen from "@screens/UserFlow/SignupScreen";
 import ForgotPasswordScreen from "@screens/UserFlow/ForgotPasswordScreen/ForgotPasswordScreen";
-import ChangePasswordScreen from "@screens/UserFlow/ChangePasswordScreen";
+import ResetPasswordScreen from "@screens/UserFlow/ResetPasswordScreen";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 const Stack = createStackNavigator<AuthStackParamList>();
@@ -18,8 +18,8 @@ const AuthFlow = () => (
       component={ForgotPasswordScreen}
     />
     <Stack.Screen
-      name={ROUTES.CHANGE_PASSWORD}
-      component={ChangePasswordScreen}
+      name={ROUTES.RESET_PASSWORD}
+      component={ResetPasswordScreen}
     />
   </Stack.Navigator>
 );

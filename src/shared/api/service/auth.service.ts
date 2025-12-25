@@ -17,6 +17,12 @@ export const AUTH_SERVICE = {
     const url = API_CONFIG.AUTH.googleLogin;  
     return HTTP_CLIENT.post(url, data); 
   },
+  resetPassword: (data: { password: string }, token: string) => {
+    const url = API_CONFIG.AUTH.resetPassword;
+    return HTTP_CLIENT.patch(url, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
   logout: () => {
     const url = API_CONFIG.AUTH.logout;
     return HTTP_CLIENT.post(url);

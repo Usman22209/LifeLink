@@ -9,19 +9,50 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
 import * as Sentry from "@sentry/react-native";
 import ThemeProvider from "@shared/providers/ThemeProvider";
-import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  LinkingOptions,
+  getStateFromPath,
+} from "@react-navigation/native";
+import { Linking } from "react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@query/queryClient";
-import ENV from "@config/env";
 import { ROUTES } from "@utils/Routes";
+import ENV from "@config/env";
+import { queryClient } from "@shared/query/queryClient";
 
 const linking: LinkingOptions<any> = {
-  prefixes: ['lifelink://'],
+  prefixes: ["lifelink://"],
+  async getInitialURL() {
+    const url = await Linking.getInitialURL();
+    console.log("Deep link received (initial):", url);
+    return url;
+  },
+  subscribe(listener) {
+    const onReceiveURL = ({ url }: { url: string }) => {
+      console.log("Deep link received (subscribe):", url);
+      listener(url);
+    };
+
+    const eventListenerSubscription = Linking.addEventListener(
+      "url",
+      onReceiveURL,
+    );
+
+    return () => {
+      eventListenerSubscription.remove();
+    };
+  },
+  getStateFromPath(path, config) {
+    // Supabase/GoTrue sends tokens in fragments (#)
+    // We convert it to a query string (?) so React Navigation parses it into params
+    const normalizedPath = path.includes("#") ? path.replace("#", "?") : path;
+    return getStateFromPath(normalizedPath, config);
+  },
   config: {
     screens: {
       [ROUTES.AUTH_FLOW]: {
         screens: {
-          [ROUTES.CHANGE_PASSWORD]: 'auth/ChangePassword',
+          [ROUTES.RESET_PASSWORD]: "auth/ResetPassword",
         },
       },
     },

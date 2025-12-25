@@ -16,21 +16,23 @@ import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
-import { useChangePasswordForm } from "@shared/forms/hooks/useChangePasswordForm";
-import type { ChangePasswordFormValues } from "@shared/forms/schemas/changePassword.schema";
+import { useResetPasswordForm } from "@shared/forms/hooks/useResetPasswordForm";
+import type { ResetPasswordFormValues } from "@shared/forms/schemas/resetPassword.schema";
+import { AUTH_SERVICE } from "@shared/api/service/auth.service";
+import Toast from "react-native-toast-message";
 
-type ChangePasswordScreenNavigationProp = StackNavigationProp<
+type ResetPasswordScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
-  typeof ROUTES.CHANGE_PASSWORD
+  typeof ROUTES.RESET_PASSWORD
 >;
 
-type ChangePasswordScreenProps = StackScreenProps<
+type ResetPasswordScreenProps = StackScreenProps<
   AuthStackParamList,
-  typeof ROUTES.CHANGE_PASSWORD
+  typeof ROUTES.RESET_PASSWORD
 >;
 
-const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
-  const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
+const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
+  const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const theme = useContext(ThemeContext);
 
   const isLightMode = useSelector(selectIsLightMode);
@@ -38,20 +40,51 @@ const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useChangePasswordForm();
+  } = useResetPasswordForm();
 
-  // Handle both accessToken (direct navigation) and token (from deep link query param)
-  const accessToken = route.params?.accessToken || route.params?.token;
+  // Handle both accessToken (direct navigation) and access_token (from deep link hash/query param)
+  const accessToken =
+    route.params?.accessToken ||
+    route.params?.access_token ||
+    route.params?.token;
 
   // Log the token for verification during testing
-  console.log('ChangePasswordScreen - accessToken:', accessToken);
-  console.log('ChangePasswordScreen - route.params:', route.params);
+  console.log("ResetPasswordScreen - accessToken:", accessToken);
 
-  const handleChangePassword = (data: ChangePasswordFormValues) => {
-    // TODO: Make API call to change password with data.newPassword
-    console.log("Change password:", data);
+  const handleResetPassword = async (data: ResetPasswordFormValues) => {
+    if (!accessToken) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Invalid or missing recovery token.",
+      });
+      return;
+    }
 
-    navigation.navigate(ROUTES.LOGIN);
+    try {
+      const response = await AUTH_SERVICE.resetPassword(
+        { password: data.newPassword },
+        accessToken,
+      );
+
+      if (response.data.success) {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Password has been reset successfully.",
+        });
+        navigation.navigate(ROUTES.LOGIN);
+      }
+    } catch (error: any) {
+      console.error("Reset Password Error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error?.response?.data?.message ||
+          "Failed to reset password. Please try again.",
+      });
+    }
   };
 
   return (
@@ -76,7 +109,7 @@ const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
 
         <View style={styles.formContainer}>
           <Text bold FONT_18 style={[styles.title, { color: theme.text }]}>
-            Change Password
+            Reset Password
           </Text>
           <Text
             FONT_14
@@ -108,8 +141,8 @@ const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
           />
 
           <AppButton
-            title="Change Password"
-            onPress={handleSubmit(handleChangePassword)}
+            title="Reset Password"
+            onPress={handleSubmit(handleResetPassword)}
             loading={isSubmitting}
             style={{ marginTop: verticalScale(12) }}
           />
@@ -119,7 +152,7 @@ const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
   );
 };
 
-export default ChangePasswordScreen;
+export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
   wrapper: { flex: 1 },

@@ -18,7 +18,7 @@ import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useForgotPasswordForm } from "@shared/forms/hooks/useForgotPasswordForm";
 import type { ForgotPasswordFormValues } from "@shared/forms/schemas/forgotPassword.schema";
-
+import { useForgotPassword } from "@query/auth/useForgotPassword";
 type ForgotPasswordScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
   typeof ROUTES.FORGOT_PASSWORD
@@ -31,11 +31,13 @@ const ForgotPasswordScreen = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForgotPasswordForm();
 
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
+
   const handleResetPassword = (data: ForgotPasswordFormValues) => {
-    console.log("Reset password for:", data.email);
+    forgotPassword(data);
   };
 
   return (
@@ -84,7 +86,7 @@ const ForgotPasswordScreen = () => {
           <AppButton
             title="Send Reset Link"
             onPress={handleSubmit(handleResetPassword)}
-            loading={isSubmitting}
+            loading={isPending}
             style={{ marginTop: verticalScale(12) }}
           />
 
