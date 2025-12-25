@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import { ThemeContext } from "@providers/ThemeProvider";
@@ -15,7 +15,7 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useChangePasswordForm } from "@shared/forms/hooks/useChangePasswordForm";
 import type { ChangePasswordFormValues } from "@shared/forms/schemas/changePassword.schema";
 
@@ -24,25 +24,28 @@ type ChangePasswordScreenNavigationProp = StackNavigationProp<
   typeof ROUTES.CHANGE_PASSWORD
 >;
 
-interface ChangePasswordScreenProps {
-  routes: {
-    params: {
-      accessToken: string;
-    };
-  };
-}
+type ChangePasswordScreenProps = StackScreenProps<
+  AuthStackParamList,
+  typeof ROUTES.CHANGE_PASSWORD
+>;
 
-const ChangePasswordScreen = ({ routes }: ChangePasswordScreenProps) => {
+const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
   const navigation = useNavigation<ChangePasswordScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  
+
   const isLightMode = useSelector(selectIsLightMode);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useChangePasswordForm();
-  const {accessToken} = routes.params;
+
+  // Handle both accessToken (direct navigation) and token (from deep link query param)
+  const accessToken = route.params?.accessToken || route.params?.token;
+
+  // Log the token for verification during testing
+  console.log('ChangePasswordScreen - accessToken:', accessToken);
+  console.log('ChangePasswordScreen - route.params:', route.params);
 
   const handleChangePassword = (data: ChangePasswordFormValues) => {
     // TODO: Make API call to change password with data.newPassword

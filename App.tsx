@@ -9,8 +9,25 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
 import * as Sentry from "@sentry/react-native";
 import ThemeProvider from "@shared/providers/ThemeProvider";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@query/queryClient";
 import ENV from "@config/env";
+import { ROUTES } from "@utils/Routes";
+
+const linking: LinkingOptions<any> = {
+  prefixes: ['lifelink://'],
+  config: {
+    screens: {
+      [ROUTES.AUTH_FLOW]: {
+        screens: {
+          [ROUTES.CHANGE_PASSWORD]: 'auth/ChangePassword',
+        },
+      },
+    },
+  },
+};
+
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
   sendDefaultPii: true,
@@ -24,14 +41,16 @@ const App = (): React.JSX.Element => {
   return (
     <SafeAreaProvider>
       <Provider store={store}>
-        <OneSignalProvider>
-          <ThemeProvider>
-            <NavigationContainer>
-              <AppNavigation />
-              <Toast config={toastConfig} position="top" topOffset={10} />
-            </NavigationContainer>
-          </ThemeProvider>
-        </OneSignalProvider>
+        <QueryClientProvider client={queryClient}>
+          <OneSignalProvider>
+            <ThemeProvider>
+              <NavigationContainer linking={linking}>
+                <AppNavigation />
+                <Toast config={toastConfig} position="top" topOffset={10} />
+              </NavigationContainer>
+            </ThemeProvider>
+          </OneSignalProvider>
+        </QueryClientProvider>
       </Provider>
     </SafeAreaProvider>
   );

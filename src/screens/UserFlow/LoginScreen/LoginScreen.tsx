@@ -16,23 +16,42 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+import { useLogin } from "@shared/query/auth/useLogin";
+import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
+import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
 
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, typeof ROUTES.LOGIN>;
+type LoginScreenNavigationProp = StackNavigationProp<
+  AuthStackParamList,
+  typeof ROUTES.LOGIN
+>;
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode)
+  const isLightMode = useSelector(selectIsLightMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { mutate: loginMutate, isPending: loginPending } = useLogin();
+  const { mutate: googleLoginMutate, isPending: googleLoginPending } = useGoogleLogin();
+  const { signIn } = useGoogleSignIn();
 
   const handleLogin = () => {
-    console.log("Login with:", email, password);
+    if (!email || !password) {
+      return;
+    }
+    loginMutate({ email, password });
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login");
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signIn();
+      const idToken = result.data?.idToken;
+      console.log("Google ID Token:", idToken);
+      googleLoginMutate({ idToken });
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
   };
 
   return (
@@ -45,7 +64,11 @@ const LoginScreen = () => {
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={isLightMode ? AppImages.AppLogoHorizontal : AppImages.DarkAppLogoHorizontal}
+            source={
+              isLightMode
+                ? AppImages.AppLogoHorizontal
+                : AppImages.DarkAppLogoHorizontal
+            }
             style={styles.logo}
             resizeMode="contain"
           />
@@ -72,7 +95,11 @@ const LoginScreen = () => {
             secureText={true}
           />
 
-          <TouchableOpacity style={styles.forgotContainer} activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}>
+          <TouchableOpacity
+            style={styles.forgotContainer}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
+          >
             <Text medium FONT_14 style={{ color: theme.primary }}>
               Forgot Password?
             </Text>
@@ -81,6 +108,7 @@ const LoginScreen = () => {
           <AppButton
             title="Login"
             onPress={handleLogin}
+            loading={loginPending}
             style={{ marginTop: verticalScale(12) }}
           />
 
@@ -106,11 +134,9 @@ const LoginScreen = () => {
               },
             ]}
             activeOpacity={0.85}
+            disabled={googleLoginPending}
           >
-            <View
-              style={
-                styles.googleIconWrapper}
-            >
+            <View style={styles.googleIconWrapper}>
               <AnySvg
                 name="google"
                 width={moderateScale(24)}
@@ -122,7 +148,7 @@ const LoginScreen = () => {
               FONT_14
               style={[styles.googleText, { color: theme.text }]}
             >
-              Continue with Google
+              {googleLoginPending ? "Loading..." : "Continue with Google"}
             </Text>
           </TouchableOpacity>
 
@@ -130,7 +156,10 @@ const LoginScreen = () => {
             <Text FONT_14 style={{ color: theme.textSecondary }}>
               Don't have an account?{" "}
             </Text>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.SIGNUP)}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate(ROUTES.SIGNUP)}
+            >
               <Text bold FONT_14 style={{ color: theme.primary }}>
                 Sign Up
               </Text>

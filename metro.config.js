@@ -40,6 +40,8 @@ const config = {
       "@navigation": path.join(srcRoot, "navigation"),
       "@store": path.join(srcRoot, "store"),
       "@providers": path.join(srcRoot, "shared", "providers"),
+      "@api": path.join(srcRoot, "shared", "api"),
+      "@query": path.join(srcRoot, "shared", "query")
     },
   },
   watchFolders: [srcRoot],

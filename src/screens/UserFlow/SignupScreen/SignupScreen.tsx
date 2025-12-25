@@ -16,9 +16,12 @@ import AppButton from "@components/AppButton";
 import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSignupForm } from "@shared/forms/hooks/useSignupForm";
 import type { SignupFormValues } from "@shared/forms/schemas/signup.schema";
+import { useSignup } from "@shared/query/auth/useSignup";
+import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
+import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
 
 type SignupScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -32,15 +35,25 @@ const SignupScreen = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useSignupForm();
+  const { mutate: signupMutate, isPending: signupPending } = useSignup();
+  const { mutate: googleLoginMutate, isPending: googleLoginPending } = useGoogleLogin();
+  const { signIn } = useGoogleSignIn();
 
   const handleSignup = (data: SignupFormValues) => {
-    console.log("Signup with:", data);
+    signupMutate({ email: data.email, password: data.password });
   };
 
-  const handleGoogleSignup = () => {
-    console.log("Google signup");
+  const handleGoogleSignup = async () => {
+    try {
+      const result = await signIn();
+      const idToken = result?.data?.idToken;
+      console.log("Google ID Token:", idToken);
+      googleLoginMutate({ idToken });
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+    }
   };
 
   return (
@@ -100,7 +113,7 @@ const SignupScreen = () => {
           <AppButton
             title="Sign Up"
             onPress={handleSubmit(handleSignup)}
-            loading={isSubmitting}
+            loading={signupPending}
             style={{ marginTop: verticalScale(12) }}
           />
 
@@ -126,6 +139,7 @@ const SignupScreen = () => {
               },
             ]}
             activeOpacity={0.85}
+            disabled={googleLoginPending}
           >
             <View style={styles.googleIconWrapper}>
               <AnySvg
@@ -139,7 +153,7 @@ const SignupScreen = () => {
               FONT_14
               style={[styles.googleText, { color: theme.text }]}
             >
-              Continue with Google
+              {googleLoginPending ? "Loading..." : "Continue with Google"}
             </Text>
           </TouchableOpacity>
 

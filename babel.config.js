@@ -22,6 +22,8 @@ module.exports = {
           "@navigation": "./src/navigation",
           "@store": "./src/store",
           "@providers": "./src/shared/providers",
+          "@api": "./src/shared/api", 
+          "@query": "./src/shared/query"
         },
       },
     ],

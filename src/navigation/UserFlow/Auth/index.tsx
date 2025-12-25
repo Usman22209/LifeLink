@@ -5,12 +5,12 @@ import LoginScreen from "@screens/UserFlow/LoginScreen";
 import SignupScreen from "@screens/UserFlow/SignupScreen";
 import ForgotPasswordScreen from "@screens/UserFlow/ForgotPasswordScreen/ForgotPasswordScreen";
 import ChangePasswordScreen from "@screens/UserFlow/ChangePasswordScreen";
-import type { AuthStackParamList } from "types/navigation";
+import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthFlow = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }} >
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
     <Stack.Screen name={ROUTES.SIGNUP} component={SignupScreen} />
     <Stack.Screen

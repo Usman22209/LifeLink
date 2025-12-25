@@ -9,7 +9,7 @@ export type AuthStackParamList = {
   [ROUTES.LOGIN]: undefined;
   [ROUTES.SIGNUP]: undefined;
   [ROUTES.FORGOT_PASSWORD]: undefined;
-  [ROUTES.CHANGE_PASSWORD]: { accessToken: string };
+  [ROUTES.CHANGE_PASSWORD]: { accessToken?: string; token?: string };
 };
 
 export type MainStackParamList = {

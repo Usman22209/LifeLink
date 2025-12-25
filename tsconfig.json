@@ -1,6 +1,7 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
+    "esModuleInterop": true,
     "baseUrl": "./src",
      "paths": {
       "@assets/*": ["assets/*"],
@@ -14,7 +15,9 @@
       "@shared/*": ["shared/*"],
       "@navigation/*": ["navigation/*"],
       "@store/*": ["store/*"],
-      "@providers/*": ["shared/providers/*"]
+      "@providers/*": ["shared/providers/*"],
+      "@api/*": ["shared/api/*"],
+      "@query/*": ["shared/query/*"]
     },
   },
   "include": ["**/*.ts", "**/*.tsx", "index.js"],
