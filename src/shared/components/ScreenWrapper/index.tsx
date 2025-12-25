@@ -75,10 +75,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const centeringStyles = getCenteringStyles();
 
   const bgColor = backgroundColor || theme.background;
-  const barColor = statusBarColor || theme.background;
-  const barStyle =
-    statusBarStyle ||
-    (theme.mode === "dark" ? "light-content" : "dark-content");
+  const barColor = statusBarColor || theme.primary;
+  const barStyle = statusBarStyle || "light-content";
 
   const scrollContentContainerStyle = [
     scrollable && styles.scrollContent,

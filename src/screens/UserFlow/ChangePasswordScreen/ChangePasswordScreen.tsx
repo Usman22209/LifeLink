@@ -39,7 +39,13 @@ const ChangePasswordScreen = ({ route }: ChangePasswordScreenProps) => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useChangePasswordForm();
-  const { accessToken } = route.params;
+
+  // Handle both accessToken (direct navigation) and token (from deep link query param)
+  const accessToken = route.params?.accessToken || route.params?.token;
+
+  // Log the token for verification during testing
+  console.log('ChangePasswordScreen - accessToken:', accessToken);
+  console.log('ChangePasswordScreen - route.params:', route.params);
 
   const handleChangePassword = (data: ChangePasswordFormValues) => {
     // TODO: Make API call to change password with data.newPassword
