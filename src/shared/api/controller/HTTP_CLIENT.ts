@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { API_CONFIG } from "../config";
 import store from "@store/store";
+import { updateToken } from "@store/slices/authSlice";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -19,7 +20,13 @@ HTTP_CLIENT.interceptors.request.use(
 );
 
 HTTP_CLIENT.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const newToken = response.headers["x-access-token"];
+    if (newToken) {
+      store.dispatch(updateToken(newToken));
+    }
+    return response;
+  },
   (error) => Promise.reject(error),
 );
 

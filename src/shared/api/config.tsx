@@ -6,6 +6,7 @@ const API_CONFIG = {
     signup: "auth/signup",
     login: "auth/login",
     googleLogin: "auth/google-login",
+    logout: "auth/logout",
   },
 };
 export { API_CONFIG };

@@ -12,5 +12,9 @@ export const AUTH_SERVICE = {
   googleLogin: (data: { idToken: string }) => {   
     const url = API_CONFIG.AUTH.googleLogin;  
     return HTTP_CLIENT.post(url, data); 
-  }
+  },
+  logout: () => {
+    const url = API_CONFIG.AUTH.logout;
+    return HTTP_CLIENT.post(url);
+  },
 };
