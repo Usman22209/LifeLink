@@ -14,10 +14,13 @@ interface LoginResponse {
   message: string;
   session: {
     access_token: string;
-    user: {
-      id: string;
-      email: string;
-    };
+    session_id: string;
+    expires_at: number;
+  };
+  user: {
+    id: string;
+    email: string;
+    email_confirmed_at?: string;
   };
 }
 
@@ -30,21 +33,21 @@ export const useLogin = () => {
     mutationFn: (data: LoginPayload) => AUTH_SERVICE.login(data),
 
     onSuccess: (response) => {
-      // ✅ FULL AXIOS RESPONSE
-      console.log("LOGIN FULL RESPONSE:", response);
-
-      // ✅ ONLY BACKEND DATA
-      console.log("LOGIN RESPONSE DATA:", response.data);
-
-      const { session } = response.data as LoginResponse;
-      const { access_token, user } = session;
+      const { session, user } = response.data as LoginResponse;
+      const { access_token, session_id } = session;
 
       // Cache
       queryClient.setQueryData(["user"], user);
       queryClient.setQueryData(["token"], access_token);
 
       // Redux
-      dispatch(setAuth({ token: access_token, user: { id: user.id, name: user.email, email: user.email } }));
+      dispatch(
+        setAuth({
+          token: access_token,
+          sessionId: session_id,
+          user: { id: user.id, name: user.email, email: user.email },
+        }),
+      );
 
       Toast.show({
         type: "success",
@@ -53,12 +56,6 @@ export const useLogin = () => {
     },
 
     onError: (error: any) => {
-      console.error("LOGIN ERROR FULL:", error);
-
-      console.error("LOGIN ERROR RESPONSE:", error?.response);
-      console.error("LOGIN ERROR DATA:", error?.response?.data);
-      console.error("LOGIN ERROR STATUS:", error?.response?.status);
-
       Toast.show({
         type: "error",
         text2:

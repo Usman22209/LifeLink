@@ -13,10 +13,13 @@ interface GoogleLoginResponse {
   message: string;
   session: {
     access_token: string;
-    user: {
-      id: string;
-      email: string;
-    };
+    session_id: string;
+    expires_at: number;
+  };
+  user: {
+    id: string;
+    email: string;
+    email_confirmed_at?: string;
   };
 }
 
@@ -29,15 +32,21 @@ export const useGoogleLogin = () => {
     mutationFn: (data: GoogleLoginPayload) => AUTH_SERVICE.googleLogin(data),
 
     onSuccess: (response) => {
-      const { session } = response.data as GoogleLoginResponse;
-      const { access_token, user } = session;
+      const { session, user } = response.data as GoogleLoginResponse;
+      const { access_token, session_id } = session;
 
       // Cache data
       queryClient.setQueryData(["user"], user);
       queryClient.setQueryData(["token"], access_token);
 
       // Redux
-      dispatch(setAuth({ token: access_token, user: { id: user.id, name: user.email, email: user.email } }));
+      dispatch(
+        setAuth({
+          token: access_token,
+          sessionId: session_id,
+          user: { id: user.id, name: user.email, email: user.email },
+        }),
+      );
 
       Toast.show({
         type: "success",
