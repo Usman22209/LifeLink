@@ -9,6 +9,10 @@ export const AUTH_SERVICE = {
     const url = API_CONFIG.AUTH.signup;
     return HTTP_CLIENT.post(url, data);
   },
+  forgotPassword: (data: { email: string }) => {
+    const url = API_CONFIG.AUTH.forgotPassword;
+    return HTTP_CLIENT.post(url, data);
+  },
   googleLogin: (data: { idToken: string }) => {   
     const url = API_CONFIG.AUTH.googleLogin;  
     return HTTP_CLIENT.post(url, data); 
