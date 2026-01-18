@@ -3,8 +3,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User, AuthState } from "@shared/interfaces/models/user.interface";
 
 const initialState: AuthState = {
-  token: null,
-  sessionId: null,
+  accessToken: null,
+  refreshToken: null,
+  expiresAt: null,
   user: null,
 };
 
@@ -14,24 +15,31 @@ const authSlice = createSlice({
   reducers: {
     setAuth: (
       state,
-      action: PayloadAction<{ token: string; sessionId?: string; user: User }>,
+      action: PayloadAction<{
+        accessToken: string;
+        refreshToken: string;
+        expiresAt: number;
+        user: User;
+      }>,
     ) => {
-      state.token = action.payload.token;
-      state.sessionId = action.payload.sessionId || null;
+      state.accessToken = action.payload.accessToken;
+      state.refreshToken = action.payload.refreshToken;
+      state.expiresAt = action.payload.expiresAt;
       state.user = action.payload.user;
     },
-    updateToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
+    updateAccessToken: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload;
     },
     logout: (state) => {
-      state.token = null;
-      state.sessionId = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.expiresAt = null;
       state.user = null;
     },
   },
 });
 
-export const { setAuth, logout, updateToken } = authSlice.actions;
-export const selectToken = (state: { auth: AuthState }) => state.auth.token;
+export const { setAuth, logout, updateAccessToken } = authSlice.actions;
+export const selectAccessToken = (state: { auth: AuthState }) => state.auth.accessToken;
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export default authSlice.reducer;

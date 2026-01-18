@@ -14,13 +14,12 @@ interface LoginResponse {
   message: string;
   session: {
     access_token: string;
-    session_id: string;
+    refresh_token: string;
     expires_at: number;
   };
   user: {
     id: string;
     email: string;
-    email_confirmed_at?: string;
   };
 }
 
@@ -34,23 +33,25 @@ export const useLogin = () => {
 
     onSuccess: (response) => {
       const { session, user } = response.data as LoginResponse;
-      const { access_token, session_id } = session;
+      const { access_token, refresh_token, expires_at } = session;
 
       // Cache
       queryClient.setQueryData(["user"], user);
-      queryClient.setQueryData(["token"], access_token);
+      queryClient.setQueryData(["accessToken"], access_token);
 
       // Redux
       dispatch(
         setAuth({
-          token: access_token,
-          sessionId: session_id,
-          user: { id: user.id, name: user.email, email: user.email },
+          accessToken: access_token,
+          refreshToken: refresh_token,
+          expiresAt: expires_at,
+          user: user,
         }),
       );
 
       Toast.show({
         type: "success",
+        text1: "Welcome Back",
         text2: "Login successful",
       });
     },

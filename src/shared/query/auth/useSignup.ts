@@ -10,6 +10,10 @@ interface SignupPayload {
 interface SignupResponse {
   success: boolean;
   message: string;
+  user: {
+    id: string;
+    email: string;
+  };
 }
 
 export const useSignup = () => {

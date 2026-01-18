@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { API_CONFIG } from "../config";
 import store from "@store/store";
-import { logout, updateToken } from "@store/slices/authSlice";
+import { logout, updateAccessToken } from "@store/slices/authSlice";
+import { supabase } from "@shared/config/supabase";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -12,12 +13,11 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
 
 HTTP_CLIENT.interceptors.request.use(
   (config) => {
-    const { token, sessionId } = store.getState().auth;
-    if (token && !config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const { accessToken } = store.getState().auth;
+    if (accessToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    if (sessionId) config.headers["x-session-id"] = sessionId;
-    
+
     // Debug logging
     console.log('--- API Request ---');
     console.log('URL:', config.baseURL ? config.baseURL + config.url : config.url);
@@ -33,16 +33,35 @@ HTTP_CLIENT.interceptors.request.use(
 
 HTTP_CLIENT.interceptors.response.use(
   (response) => {
-    const newToken = response.headers["x-access-token"];
-    if (newToken) {
-      store.dispatch(updateToken(newToken));
-    }
     return response;
   },
-  (error) => {
-    if (error?.response?.status === 401) {
-      store.dispatch(logout());
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Handle 401 Unauthorized (Token expired)
+    if (error?.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const { data, error: refreshError } = await supabase.auth.refreshSession();
+
+        if (refreshError || !data.session) {
+          store.dispatch(logout());
+          return Promise.reject(error);
+        }
+
+        const { access_token } = data.session;
+        store.dispatch(updateAccessToken(access_token));
+
+        // Update authorization header and retry
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return HTTP_CLIENT(originalRequest);
+      } catch (refreshErr) {
+        store.dispatch(logout());
+        return Promise.reject(refreshErr);
+      }
     }
+
     return Promise.reject(error);
   },
 );

@@ -1,11 +1,11 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
 }
 
 export interface AuthState {
-  token: string | null;
-  sessionId: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  expiresAt: number | null;
   user: User | null;
 }

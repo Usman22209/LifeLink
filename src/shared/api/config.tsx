@@ -10,5 +10,9 @@ const API_CONFIG = {
     resetPassword: "auth/reset-password",
     logout: "auth/logout",
   },
+  FILE: {
+    upload: "file/upload",
+    delete: "file/delete",
+  },
 };
 export { API_CONFIG };

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { API_CONFIG } from "../config";
 import store from "@store/store";
-import { logout, updateToken } from "@store/slices/authSlice";
+import { logout } from "@store/slices/authSlice";
 
 const HTTP_CLIENT_UPLOAD: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -12,9 +12,8 @@ const HTTP_CLIENT_UPLOAD: AxiosInstance = axios.create({
 
 HTTP_CLIENT_UPLOAD.interceptors.request.use(
   (config) => {
-    const { token, sessionId } = store.getState().auth;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    if (sessionId) config.headers["x-session-id"] = sessionId;
+    const { accessToken } = store.getState().auth;
+    if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
     return config;
   },
   (error) => Promise.reject(error),
@@ -22,10 +21,6 @@ HTTP_CLIENT_UPLOAD.interceptors.request.use(
 
 HTTP_CLIENT_UPLOAD.interceptors.response.use(
   (response) => {
-    const newToken = response.headers["x-access-token"];
-    if (newToken) {
-      store.dispatch(updateToken(newToken));
-    }
     return response;
   },
   (error) => {

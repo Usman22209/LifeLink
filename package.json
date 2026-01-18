@@ -15,7 +15,10 @@
     "debug": "cd android && ./gradlew assembleDebug && cd ..",
     "release": "cd android && ./gradlew assembleRelease && cd ..",
     "android:fast": "npx react-native run-android --active-arch-only",
-    "android:install": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk"
+    "android:install": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
+    "sentry:remove": "powershell -Command \"Remove-Item Env:SENTRY_AUTH_TOKEN -ErrorAction SilentlyContinue\"",
+    "sentry:set": "powershell -Command \"$Env:SENTRY_AUTH_TOKEN='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'; setx SENTRY_AUTH_TOKEN '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'\"",
+    "sentry:refresh": "npm run sentry:remove && npm run sentry:set"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
