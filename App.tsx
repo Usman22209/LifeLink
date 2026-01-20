@@ -42,8 +42,6 @@ const linking: LinkingOptions<any> = {
     };
   },
   getStateFromPath(path, config) {
-    // Supabase/GoTrue sends tokens in fragments (#)
-    // We convert it to a query string (?) so React Navigation parses it into params
     const normalizedPath = path.includes("#") ? path.replace("#", "?") : path;
     return getStateFromPath(normalizedPath, config);
   },

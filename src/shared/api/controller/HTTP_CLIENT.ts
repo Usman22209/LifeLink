@@ -20,7 +20,6 @@ HTTP_CLIENT.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    // Debug logging
     console.log("--- API Request ---");
     console.log(
       "URL:",
@@ -43,7 +42,6 @@ HTTP_CLIENT.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized (Token expired)
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -71,7 +69,6 @@ HTTP_CLIENT.interceptors.response.use(
           await tokenStorage.setRefreshToken(new_refresh_token);
         }
 
-        // Update authorization header and retry
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return HTTP_CLIENT(originalRequest);
       } catch (refreshErr) {
