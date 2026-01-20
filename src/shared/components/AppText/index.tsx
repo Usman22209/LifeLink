@@ -1,7 +1,7 @@
-import React, { ReactNode, useContext } from "react";
+import React, { ReactNode } from "react";
 import { Text as RNText, TextProps } from "react-native";
 import { fontFamily as fm, fontSize as fs } from "@theme/fonts";
-import { ThemeContext } from "@providers/ThemeProvider";
+import { colors } from "@theme/colors";
 import { useSelector } from "react-redux";
 import { selectIsRtl } from "@store/slices/appSlice";
 
@@ -78,7 +78,6 @@ const Text = (props: Props) => {
     FONT_6,
   } = props;
 
-  const theme = useContext(ThemeContext);
   const isRtl = useSelector(selectIsRtl);
 
   let fontFamily = fm.REGULAR;
@@ -117,7 +116,7 @@ const Text = (props: Props) => {
   else if (FONT_8) fontSize = fs.FONT_8;
   else if (FONT_6) fontSize = fs.FONT_6;
 
-  const textColor = color ?? theme.text;
+  const textColor = color ?? colors.text;
 
   return (
     <RNText

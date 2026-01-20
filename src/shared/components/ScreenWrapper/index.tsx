@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNetInfo } from "@react-native-community/netinfo";
 import Text from "@components/AppText";
 import { verticalScale, moderateScale } from "react-native-size-matters";
-import { ThemeContext } from "@providers/ThemeProvider";
+import { colors } from "@theme/colors";
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -52,7 +52,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
   const isOffline = !netInfo.isConnected;
-  const theme = useContext(ThemeContext);
 
   const Container = scrollable ? ScrollView : View;
 
@@ -74,8 +73,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
   const centeringStyles = getCenteringStyles();
 
-  const bgColor = backgroundColor || theme.background;
-  const barColor = statusBarColor || theme.primary;
+  const bgColor = backgroundColor || colors.background;
+  const barColor = statusBarColor || colors.primary;
   const barStyle = statusBarStyle || "light-content";
 
   const scrollContentContainerStyle = [
@@ -112,8 +111,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
               styles.fixedHeaderContainer,
               {
                 height: HEADER_HEIGHT,
-                backgroundColor: theme.card,
-                borderBottomColor: theme.border,
+                backgroundColor: colors.card,
+                borderBottomColor: colors.border,
               },
             ]}
           >
@@ -123,7 +122,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
         {showNetworkBanner && isOffline && (
           <View
-            style={[styles.offlineBanner, { backgroundColor: theme.primary }]}
+            style={[styles.offlineBanner, { backgroundColor: colors.primary }]}
           >
             <Text style={styles.offlineText}>No internet connection</Text>
           </View>
@@ -144,15 +143,12 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
             style={[
               styles.loadingOverlay,
               {
-                backgroundColor:
-                  theme.mode === "dark"
-                    ? "rgba(0,0,0,0.6)"
-                    : "rgba(255,255,255,0.8)",
+                backgroundColor: "rgba(255,255,255,0.8)",
               },
             ]}
           >
-            <ActivityIndicator size="large" color={theme.primary} />
-            <Text style={[styles.loadingText, { color: theme.text }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.text }]}>
               {loadingText}
             </Text>
           </View>

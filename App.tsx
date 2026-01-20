@@ -8,7 +8,6 @@ import Toast from "react-native-toast-message";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
 import * as Sentry from "@sentry/react-native";
-import ThemeProvider from "@shared/providers/ThemeProvider";
 import {
   NavigationContainer,
   LinkingOptions,
@@ -74,12 +73,10 @@ const App = (): React.JSX.Element => {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <OneSignalProvider>
-            <ThemeProvider>
-              <NavigationContainer linking={linking}>
-                <AppNavigation />
-                <Toast config={toastConfig} position="top" topOffset={10} />
-              </NavigationContainer>
-            </ThemeProvider>
+            <NavigationContainer linking={linking}>
+              <AppNavigation />
+              <Toast config={toastConfig} position="top" topOffset={10} />
+            </NavigationContainer>
           </OneSignalProvider>
         </QueryClientProvider>
       </Provider>

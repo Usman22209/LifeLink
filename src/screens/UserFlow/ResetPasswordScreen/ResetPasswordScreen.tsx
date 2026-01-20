@@ -1,20 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
-import { ThemeContext } from "@providers/ThemeProvider";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
 import { Icons } from "@components/AnyIcon";
 import KeyboardAwareContainer from "@components/KeyboardAwareContainer";
 import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
-import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
+import { colors } from "@theme/colors";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useResetPasswordForm } from "@shared/forms/hooks/useResetPasswordForm";
 import type { ResetPasswordFormValues } from "@shared/forms/schemas/resetPassword.schema";
@@ -33,9 +32,7 @@ type ResetPasswordScreenProps = StackScreenProps<
 
 const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
-  const theme = useContext(ThemeContext);
 
-  const isLightMode = useSelector(selectIsLightMode);
   const {
     control,
     handleSubmit,
@@ -98,30 +95,26 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
   return (
     <ScreenWrapper
       scrollable={false}
-      backgroundColor={theme.background}
+      backgroundColor={colors.background}
       safeArea
       style={styles.wrapper}
     >
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={
-              isLightMode
-                ? AppImages.AppLogoHorizontal
-                : AppImages.DarkAppLogoHorizontal
-            }
+            source={AppImages.AppLogoHorizontal}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
         <View style={styles.formContainer}>
-          <Text bold FONT_18 style={[styles.title, { color: theme.text }]}>
+          <Text bold FONT_18 style={[styles.title, { color: colors.text }]}>
             Reset Password
           </Text>
           <Text
             FONT_14
-            style={[styles.subtitle, { color: theme.textSecondary }]}
+            style={[styles.subtitle, { color: colors.textSecondary }]}
           >
             Enter your new password below.
           </Text>

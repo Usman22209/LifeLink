@@ -1,24 +1,23 @@
-import React, { useContext } from "react";
+import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
-import { ThemeContext } from "@providers/ThemeProvider";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
 import { Icons } from "@components/AnyIcon";
 import KeyboardAwareContainer from "@components/KeyboardAwareContainer";
 import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
-import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
+import { colors } from "@theme/colors";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useForgotPasswordForm } from "@shared/forms/hooks/useForgotPasswordForm";
-import type { ForgotPasswordFormValues } from "@shared/forms/schemas/forgotPassword.schema";
 import { useForgotPassword } from "@query/auth/useForgotPassword";
+
 type ForgotPasswordScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
   typeof ROUTES.FORGOT_PASSWORD
@@ -26,8 +25,6 @@ type ForgotPasswordScreenNavigationProp = StackNavigationProp<
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
-  const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode);
   const {
     control,
     handleSubmit,
@@ -36,37 +33,33 @@ const ForgotPasswordScreen = () => {
 
   const { mutate: forgotPassword, isPending } = useForgotPassword();
 
-  const handleResetPassword = (data: ForgotPasswordFormValues) => {
+  const handleResetPassword = (data: any) => {
     forgotPassword(data);
   };
 
   return (
     <ScreenWrapper
       scrollable={false}
-      backgroundColor={theme.background}
+      backgroundColor={colors.background}
       safeArea
       style={styles.wrapper}
     >
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={
-              isLightMode
-                ? AppImages.AppLogoHorizontal
-                : AppImages.DarkAppLogoHorizontal
-            }
+            source={AppImages.AppLogoHorizontal}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
         <View style={styles.formContainer}>
-          <Text bold FONT_18 style={[styles.title, { color: theme.text }]}>
+          <Text bold FONT_18 style={[styles.title, { color: colors.text }]}>
             Forgot Password?
           </Text>
           <Text
             FONT_14
-            style={[styles.subtitle, { color: theme.textSecondary }]}
+            style={[styles.subtitle, { color: colors.textSecondary }]}
           >
             Enter your email address and we'll send you a link to reset your
             password.
@@ -91,14 +84,14 @@ const ForgotPasswordScreen = () => {
           />
 
           <View style={styles.footer}>
-            <Text FONT_14 style={{ color: theme.textSecondary }}>
+            <Text FONT_14 style={{ color: colors.textSecondary }}>
               Remember your password?{" "}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => navigation.navigate(ROUTES.LOGIN)}
             >
-              <Text bold FONT_14 style={{ color: theme.primary }}>
+              <Text bold FONT_14 style={{ color: colors.primary }}>
                 Login
               </Text>
             </TouchableOpacity>

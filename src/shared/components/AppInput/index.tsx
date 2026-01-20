@@ -1,17 +1,15 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   TextInput,
   View,
-  TextInputProps,
-  ViewStyle,
   TouchableOpacity,
 } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
-import { ThemeContext } from "@providers/ThemeProvider";
+import { colors } from "@theme/colors";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
-import { Control, Controller } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 import { AppInputProps } from "@shared/interfaces/components/app-input.interface";
 
@@ -31,7 +29,6 @@ const AppInput: React.FC<AppInputProps> = ({
   name,
   ...props
 }) => {
-  const theme = useContext(ThemeContext);
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -42,11 +39,11 @@ const AppInput: React.FC<AppInputProps> = ({
       value={fieldProps?.value ?? value}
       onChangeText={fieldProps?.onChange ?? onChangeText}
       placeholder={placeholder}
-      placeholderTextColor={theme.placeholder}
+      placeholderTextColor={colors.placeholder}
       keyboardType={keyboardType}
       autoCapitalize="none"
       secureTextEntry={secureText ? !showPassword : false}
-      style={[styles.input, { color: theme.text }, inputStyle]}
+      style={[styles.input, { color: colors.text }, inputStyle]}
       onFocus={() => setFocused(true)}
       onBlur={fieldProps?.onBlur ?? (() => setFocused(false))}
     />
@@ -55,7 +52,7 @@ const AppInput: React.FC<AppInputProps> = ({
   return (
     <View style={{ marginBottom: verticalScale(12) }}>
       {label && (
-        <Text semiBold FONT_14 style={[styles.label, { color: theme.text }]}>
+        <Text semiBold FONT_14 style={[styles.label, { color: colors.text }]}>
           {label}
         </Text>
       )}
@@ -65,11 +62,11 @@ const AppInput: React.FC<AppInputProps> = ({
           styles.container,
           {
             borderColor: error
-              ? theme.error
+              ? colors.error
               : focused
-                ? theme.primary
-                : theme.border,
-            backgroundColor: theme.card,
+                ? colors.primary
+                : colors.border,
+            backgroundColor: colors.card,
           },
           containerStyle,
         ]}
@@ -80,7 +77,7 @@ const AppInput: React.FC<AppInputProps> = ({
               type={iconType}
               name={iconName}
               size={moderateScale(18)}
-              color={focused ? theme.primary : theme.textSecondary}
+              color={focused ? colors.primary : colors.textSecondary}
               style={styles.icon}
             />
           )}
@@ -107,7 +104,7 @@ const AppInput: React.FC<AppInputProps> = ({
                 type={Icons.MaterialCommunityIcons}
                 name={showPassword ? "eye-outline" : "eye-off-outline"}
                 size={moderateScale(18)}
-                color={theme.textSecondary}
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           )}
@@ -115,7 +112,7 @@ const AppInput: React.FC<AppInputProps> = ({
       </View>
 
       {error && (
-        <Text FONT_12 style={[styles.errorText, { color: theme.error }]}>
+        <Text FONT_12 style={[styles.errorText, { color: colors.error }]}>
           {error}
         </Text>
       )}

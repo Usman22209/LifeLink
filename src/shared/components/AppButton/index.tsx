@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   TouchableOpacity,
   StyleSheet,
@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { scale, verticalScale, moderateScale } from "react-native-size-matters";
-import { ThemeContext } from "@providers/ThemeProvider";
 import Text from "@components/AppText";
 import { colors } from "@theme/colors";
 
@@ -42,8 +41,6 @@ const AppButton: React.FC<AppButtonProps> = ({
   disabled = false,
   loading = false,
 }) => {
-  const theme = useContext(ThemeContext);
-
   return (
     <TouchableOpacity
       activeOpacity={0.85}
@@ -52,7 +49,7 @@ const AppButton: React.FC<AppButtonProps> = ({
       style={[
         styles.button,
         {
-          backgroundColor: backgroundColor ?? theme.primary,
+          backgroundColor: backgroundColor ?? colors.primary,
           marginBottom,
         },
         isNotFull && styles.autoWidth,

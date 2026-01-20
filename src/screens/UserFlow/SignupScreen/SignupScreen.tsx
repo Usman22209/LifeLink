@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
-import { ThemeContext } from "@providers/ThemeProvider";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
 import { Icons } from "@components/AnyIcon";
@@ -13,7 +12,6 @@ import AnySvg from "@components/AnySvg";
 import KeyboardAwareContainer from "@components/KeyboardAwareContainer";
 import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
-import { selectIsLightMode } from "@store/slices/themeSlice";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
@@ -22,6 +20,7 @@ import type { SignupFormValues } from "@shared/forms/schemas/signup.schema";
 import { useSignup } from "@shared/query/auth/useSignup";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
+import { colors } from "@theme/colors";
 
 type SignupScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -30,8 +29,6 @@ type SignupScreenNavigationProp = StackNavigationProp<
 
 const SignupScreen = () => {
   const navigation = useNavigation<SignupScreenNavigationProp>();
-  const theme = useContext(ThemeContext);
-  const isLightMode = useSelector(selectIsLightMode);
   const {
     control,
     handleSubmit,
@@ -59,18 +56,14 @@ const SignupScreen = () => {
   return (
     <ScreenWrapper
       scrollable={false}
-      backgroundColor={theme.background}
+      backgroundColor={colors.background}
       safeArea
       style={styles.wrapper}
     >
       <KeyboardAwareContainer contentContainerStyle={styles.keyboardContent}>
         <View style={styles.logoContainer}>
           <AppImage
-            source={
-              isLightMode
-                ? AppImages.AppLogoHorizontal
-                : AppImages.DarkAppLogoHorizontal
-            }
+            source={AppImages.AppLogoHorizontal}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -118,15 +111,15 @@ const SignupScreen = () => {
           />
 
           <View style={styles.dividerContainer}>
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
             <Text
               medium
               FONT_12
-              style={[styles.dividerText, { color: theme.textSecondary }]}
+              style={[styles.dividerText, { color: colors.textSecondary }]}
             >
               OR
             </Text>
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
           </View>
 
           <TouchableOpacity
@@ -134,8 +127,8 @@ const SignupScreen = () => {
             style={[
               styles.googleButton,
               {
-                backgroundColor: theme.background,
-                borderColor: theme.border,
+                backgroundColor: colors.background,
+                borderColor: colors.border,
               },
             ]}
             activeOpacity={0.85}
@@ -151,21 +144,21 @@ const SignupScreen = () => {
             <Text
               semiBold
               FONT_14
-              style={[styles.googleText, { color: theme.text }]}
+              style={[styles.googleText, { color: colors.text }]}
             >
               {googleLoginPending ? "Loading..." : "Continue with Google"}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text FONT_14 style={{ color: theme.textSecondary }}>
+            <Text FONT_14 style={{ color: colors.textSecondary }}>
               Already have an account?{" "}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => navigation.navigate(ROUTES.LOGIN)}
             >
-              <Text bold FONT_14 style={{ color: theme.primary }}>
+              <Text bold FONT_14 style={{ color: colors.primary }}>
                 Login
               </Text>
             </TouchableOpacity>

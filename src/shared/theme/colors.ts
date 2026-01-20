@@ -1,4 +1,13 @@
 export const colors = {
+  /* ===== COMMON TOKENS ===== */
+  background: "#FFFFFF",
+  card: "#F5F5F7",
+  border: "#D1D1D6",
+  text: "#1C1C1E",
+  textSecondary: "#6E6E73",
+  error: "#FF5C5C",
+  placeholder: "rgba(110, 110, 115, 0.6)",
+
   /* ===== BRAND RED ===== */
   primary: "#E53935", // Light mode primary (softer, premium red)
   primaryDark: "#bc2929", // Dark mode primary (brighter, readable)
@@ -7,13 +16,6 @@ export const colors = {
   /* ===== BACKGROUNDS ===== */
   white: "#FFFFFF",
   black: "#0F0F0F", // Not pure black (reduces eye strain)
-
-  /* ===== TEXT ===== */
-  textPrimary: "#1C1C1E", // iOS-like neutral black
-  textSecondary: "#6E6E73",
-
-  textPrimaryDark: "#F2F2F7",
-  textSecondaryDark: "#A1A1A6",
 
   /* ===== SURFACES ===== */
   gray100: "#F5F5F7",
