@@ -42,8 +42,11 @@ const HomeScreen = () => {
           Welcome Home
         </Text>
         {user && (
-          <Text FONT_16 style={{ color: theme.textSecondary, marginBottom: verticalScale(20) }}>
-            Hello, {user.name}!
+          <Text
+            FONT_16
+            style={{ color: theme.textSecondary, marginBottom: verticalScale(20) }}
+          >
+            Hello, {user.name || user.email}!
           </Text>
         )}
         <AppButton

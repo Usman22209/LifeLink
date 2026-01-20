@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(16),
     paddingTop: verticalScale(40),
   },
-  logoContainer: { alignItems: "center", marginBottom: verticalScale(20) },
+  logoContainer: { alignItems: "center" },
   logo: { width: scale(250), height: verticalScale(180) },
   formContainer: { width: "100%", paddingHorizontal: 0 },
   title: {

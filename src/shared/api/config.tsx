@@ -1,5 +1,5 @@
 
-const API_URL = "http://192.168.0.101:3001";
+const API_URL = "http://192.168.18.54:3001";
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
