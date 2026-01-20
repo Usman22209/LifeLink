@@ -10,7 +10,6 @@ export const colors = {
 
   /* ===== BRAND RED ===== */
   primary: "#E53935", // Light mode primary (softer, premium red)
-  primaryDark: "#bc2929", // Dark mode primary (brighter, readable)
   primaryMuted: "#B71C1C", // Pressed / disabled states
 
   /* ===== BACKGROUNDS ===== */

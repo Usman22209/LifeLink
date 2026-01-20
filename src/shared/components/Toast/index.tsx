@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Toast, { BaseToastProps } from "react-native-toast-message";
 import AnyIcon, { Icons } from "@components/AnyIcon";
-import { colors } from "@theme/colors";
+import { colors, withOpacity } from "@theme/colors";
 import { fontFamily } from "@theme/fonts";
 
 type ToastType = "success" | "info" | "warning" | "danger";
@@ -22,10 +22,6 @@ const toastIcons: Record<ToastType, { name: string; color: string }> = {
   danger: { name: "closecircle", color: colors.danger },
 };
 
-const CARD_BG = colors.white;
-const TITLE_COLOR = colors.textPrimary;
-const DESC_COLOR = colors.textSecondary;
-
 const ToastView = ({
   text1,
   text2,
@@ -33,39 +29,36 @@ const ToastView = ({
   onPress,
 }: BaseToastProps & { type: ToastType; onPress?: () => void }) => {
   const iconData = toastIcons[type] || toastIcons.info;
-  const translateY = useRef(new Animated.Value(-28)).current;
+  const translateY = useRef(new Animated.Value(-20)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(translateY, {
         toValue: 0,
-        duration: 320,
-        easing: Easing.out(Easing.cubic),
+        duration: 400,
+        easing: Easing.out(Easing.back(1)),
         useNativeDriver: true,
       }),
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 240,
-        easing: Easing.linear,
+        duration: 300,
         useNativeDriver: true,
       }),
     ]).start();
   }, [translateY, opacity]);
 
   const handleDismiss = () => {
-    // slide up then hide
     Animated.parallel([
       Animated.timing(translateY, {
-        toValue: -28,
-        duration: 200,
-        easing: Easing.in(Easing.cubic),
+        toValue: -20,
+        duration: 250,
+        easing: Easing.in(Easing.quad),
         useNativeDriver: true,
       }),
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 180,
-        easing: Easing.linear,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start(() => Toast.hide());
@@ -83,50 +76,50 @@ const ToastView = ({
     >
       <TouchableOpacity
         activeOpacity={0.9}
-        onPress={handleDismiss}
-        style={[styles.container, { backgroundColor: CARD_BG }]}
+        onPress={onPress || handleDismiss}
+        style={styles.container}
       >
         <View style={[styles.accent, { backgroundColor: iconData.color }]} />
 
-        <View style={styles.iconBox}>
+        <View style={styles.contentRow}>
           <View
-            style={[styles.iconCircle, { backgroundColor: iconData.color }]}
+            style={[
+              styles.iconCircle,
+              { backgroundColor: withOpacity(iconData.color, 0.12) },
+            ]}
           >
             <AnyIcon
               type={Icons.AntDesign}
               name={iconData.name}
-              size={18}
-              color={colors.white}
+              size={20}
+              color={iconData.color}
             />
           </View>
-        </View>
 
-        <View style={styles.textContainer}>
-          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-            {text1}
-          </Text>
-          {text2 ? (
-            <Text
-              style={styles.description}
-              numberOfLines={3}
-              ellipsizeMode="tail"
-            >
-              {text2}
+          <View style={styles.textContainer}>
+            <Text style={styles.title} numberOfLines={1}>
+              {text1}
             </Text>
-          ) : null}
-        </View>
+            {text2 ? (
+              <Text style={styles.description} numberOfLines={2}>
+                {text2}
+              </Text>
+            ) : null}
+          </View>
 
-        <TouchableOpacity
-          onPress={handleDismiss}
-          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-        >
-          <AnyIcon
-            type={Icons.AntDesign}
-            name="close"
-            size={18}
-            color={DESC_COLOR}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleDismiss}
+            style={styles.closeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <AnyIcon
+              type={Icons.AntDesign}
+              name="close"
+              size={16}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -143,7 +136,7 @@ export const showToast = (
   type: ToastType,
   title: string,
   description?: string,
-  duration = 3500,
+  duration = 4000,
 ) => {
   Toast.show({
     type,
@@ -178,63 +171,67 @@ const styles = StyleSheet.create({
   wrapper: {
     width: "100%",
     alignItems: "center",
-    // ensure wrapper sits above other UI
     zIndex: 9999,
     elevation: 9999,
-    paddingHorizontal: 8,
-    // top spacing bias is handled by <Toast position="top" topOffset={...} />
+    paddingHorizontal: 16,
   },
   container: {
+    width: "100%",
+    backgroundColor: colors.white,
+    borderRadius: 16,
     flexDirection: "row",
-    alignItems: "center",
-    width: "94%",
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: Platform.OS === "ios" ? 0.08 : 0.22,
-    shadowRadius: 18,
-    elevation: 8,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.05)",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   accent: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
     width: 6,
-    borderTopLeftRadius: 12,
-    borderBottomLeftRadius: 12,
+    height: "100%",
   },
-  iconBox: {
-    marginLeft: 8,
-    marginRight: 10,
-    justifyContent: "center",
+  contentRow: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   iconCircle: {
-    width: 42,
-    height: 42,
+    width: 36,
+    height: 36,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.primary ?? "#007AFF", // fallback
   },
   textContainer: {
     flex: 1,
-    paddingRight: 8,
+    marginLeft: 14,
+    marginRight: 8,
   },
   title: {
     fontSize: 15,
-    color: TITLE_COLOR,
+    color: colors.text,
     fontFamily: fontFamily.BOLD,
-    marginBottom: 2,
+    lineHeight: 20,
   },
   description: {
     fontSize: 13,
-    color: DESC_COLOR,
-    fontFamily: fontFamily.REGULAR,
+    color: colors.textSecondary,
+    fontFamily: fontFamily.MEDIUM,
     lineHeight: 18,
+    marginTop: 2,
+  },
+  closeButton: {
+    padding: 2,
   },
 });
