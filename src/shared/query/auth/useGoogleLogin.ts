@@ -35,14 +35,11 @@ export const useGoogleLogin = () => {
       const { session, user } = response.data as GoogleLoginResponse;
       const { access_token, refresh_token, expires_at } = session;
 
-      // Secure Storage
       await tokenStorage.setRefreshToken(refresh_token);
 
-      // Cache data
       queryClient.setQueryData(["user"], user);
       queryClient.setQueryData(["accessToken"], access_token);
 
-      // Redux
       dispatch(
         setAuth({
           accessToken: access_token,

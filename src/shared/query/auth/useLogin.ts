@@ -36,14 +36,11 @@ export const useLogin = () => {
       const { session, user } = response.data as LoginResponse;
       const { access_token, refresh_token, expires_at } = session;
 
-      // Secure Storage
       await tokenStorage.setRefreshToken(refresh_token);
 
-      // Cache
       queryClient.setQueryData(["user"], user);
       queryClient.setQueryData(["accessToken"], access_token);
 
-      // Redux
       dispatch(
         setAuth({
           accessToken: access_token,

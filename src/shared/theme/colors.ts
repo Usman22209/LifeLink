@@ -1,5 +1,4 @@
 export const colors = {
-  /* ===== COMMON TOKENS ===== */
   background: "#FFFFFF",
   card: "#F5F5F7",
   border: "#D1D1D6",
@@ -8,23 +7,19 @@ export const colors = {
   error: "#FF5C5C",
   placeholder: "rgba(110, 110, 115, 0.6)",
 
-  /* ===== BRAND RED ===== */
-  primary: "#E53935", // Light mode primary (softer, premium red)
-  primaryMuted: "#B71C1C", // Pressed / disabled states
+  primary: "#E53935",
+  primaryMuted: "#B71C1C",
 
-  /* ===== BACKGROUNDS ===== */
   white: "#FFFFFF",
-  black: "#0F0F0F", // Not pure black (reduces eye strain)
+  black: "#0F0F0F",
 
-  /* ===== SURFACES ===== */
   gray100: "#F5F5F7",
   gray300: "#D1D1D6",
   gray600: "#636366",
   gray800: "#1C1C1E",
 
-  /* ===== STATES ===== */
   success: "#2ECC71",
-  danger: "#FF5C5C", // Coral red (visible on dark)
+  danger: "#FF5C5C",
   warning: "#F5A623",
   info: "#4A90E2",
 };
