@@ -39,13 +39,12 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
     formState: { errors, isSubmitting },
   } = useResetPasswordForm();
 
-  // Handle both accessToken (direct navigation) and access_token (from deep link hash/query param)
+
   const accessToken =
     route.params?.accessToken ||
     route.params?.access_token ||
     route.params?.token;
 
-  // Log the token for verification during testing
   console.log("ResetPasswordScreen - accessToken:", accessToken);
 
   const handleResetPassword = async (data: ResetPasswordFormValues) => {
