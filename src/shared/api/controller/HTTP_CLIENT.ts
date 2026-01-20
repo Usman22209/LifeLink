@@ -9,6 +9,7 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000,
 });
 
 HTTP_CLIENT.interceptors.request.use(
