@@ -3,6 +3,7 @@ import { API_CONFIG } from "../config";
 import store from "@store/store";
 import { logout, updateAccessToken } from "@store/slices/authSlice";
 import { supabase } from "@shared/config/supabase";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -20,12 +21,15 @@ HTTP_CLIENT.interceptors.request.use(
     }
 
     // Debug logging
-    console.log('--- API Request ---');
-    console.log('URL:', config.baseURL ? config.baseURL + config.url : config.url);
-    console.log('Method:', config.method?.toUpperCase());
-    console.log('Headers:', config.headers);
-    console.log('Data:', config.data);
-    console.log('-------------------');
+    console.log("--- API Request ---");
+    console.log(
+      "URL:",
+      config.baseURL ? config.baseURL + config.url : config.url,
+    );
+    console.log("Method:", config.method?.toUpperCase());
+    console.log("Headers:", config.headers);
+    console.log("Data:", config.data);
+    console.log("-------------------");
 
     return config;
   },
@@ -44,21 +48,35 @@ HTTP_CLIENT.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const { data, error: refreshError } = await supabase.auth.refreshSession();
+        const refreshToken = await tokenStorage.getRefreshToken();
 
-        if (refreshError || !data.session) {
+        if (!refreshToken) {
           store.dispatch(logout());
           return Promise.reject(error);
         }
 
-        const { access_token } = data.session;
+        const { data, error: refreshError } =
+          await supabase.auth.refreshSession();
+
+        if (refreshError || !data.session) {
+          store.dispatch(logout());
+          await tokenStorage.clearToken();
+          return Promise.reject(error);
+        }
+
+        const { access_token, refresh_token: new_refresh_token } = data.session;
         store.dispatch(updateAccessToken(access_token));
+
+        if (new_refresh_token) {
+          await tokenStorage.setRefreshToken(new_refresh_token);
+        }
 
         // Update authorization header and retry
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return HTTP_CLIENT(originalRequest);
       } catch (refreshErr) {
         store.dispatch(logout());
+        await tokenStorage.clearToken();
         return Promise.reject(refreshErr);
       }
     }

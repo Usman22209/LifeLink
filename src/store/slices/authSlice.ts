@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { User, AuthState } from "@shared/interfaces/models/user.interface";
+import { RootState } from "@store/store";
 
 const initialState: AuthState = {
   accessToken: null,
-  refreshToken: null,
   expiresAt: null,
   user: null,
 };
@@ -17,13 +16,11 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{
         accessToken: string;
-        refreshToken: string;
         expiresAt: number;
         user: User;
       }>,
     ) => {
       state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
       state.expiresAt = action.payload.expiresAt;
       state.user = action.payload.user;
     },
@@ -32,7 +29,6 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.accessToken = null;
-      state.refreshToken = null;
       state.expiresAt = null;
       state.user = null;
     },
@@ -40,6 +36,6 @@ const authSlice = createSlice({
 });
 
 export const { setAuth, logout, updateAccessToken } = authSlice.actions;
-export const selectToken = (state: { auth: AuthState }) => state.auth.accessToken;
-export const selectUser = (state: { auth: AuthState }) => state.auth.user;
+export const selectToken = (state: RootState) => state.auth.accessToken;
+export const selectUser = (state: RootState) => state.auth.user;
 export default authSlice.reducer;

@@ -3,6 +3,7 @@ import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import { AUTH_SERVICE } from "@api/service/auth.service";
 import { setAuth } from "@store/slices/authSlice";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
 interface LoginPayload {
   email: string;
@@ -31,9 +32,12 @@ export const useLogin = () => {
     mutationKey: ["login"],
     mutationFn: (data: LoginPayload) => AUTH_SERVICE.login(data),
 
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       const { session, user } = response.data as LoginResponse;
       const { access_token, refresh_token, expires_at } = session;
+
+      // Secure Storage
+      await tokenStorage.setRefreshToken(refresh_token);
 
       // Cache
       queryClient.setQueryData(["user"], user);
@@ -43,7 +47,6 @@ export const useLogin = () => {
       dispatch(
         setAuth({
           accessToken: access_token,
-          refreshToken: refresh_token,
           expiresAt: expires_at,
           user: user,
         }),

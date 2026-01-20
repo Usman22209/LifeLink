@@ -6,7 +6,6 @@ export interface User {
 
 export interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   expiresAt: number | null;
   user: User | null;
 }

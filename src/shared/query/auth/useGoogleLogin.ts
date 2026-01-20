@@ -3,6 +3,7 @@ import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import { AUTH_SERVICE } from "../../api/service/auth.service";
 import { setAuth } from "../../../store/slices/authSlice";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
 interface GoogleLoginPayload {
   idToken: string;
@@ -30,9 +31,12 @@ export const useGoogleLogin = () => {
     mutationKey: ["googleLogin"],
     mutationFn: (data: GoogleLoginPayload) => AUTH_SERVICE.googleLogin(data),
 
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       const { session, user } = response.data as GoogleLoginResponse;
       const { access_token, refresh_token, expires_at } = session;
+
+      // Secure Storage
+      await tokenStorage.setRefreshToken(refresh_token);
 
       // Cache data
       queryClient.setQueryData(["user"], user);
@@ -42,7 +46,6 @@ export const useGoogleLogin = () => {
       dispatch(
         setAuth({
           accessToken: access_token,
-          refreshToken: refresh_token,
           expiresAt: expires_at,
           user: user,
         }),

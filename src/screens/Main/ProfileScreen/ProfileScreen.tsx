@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 type ProfileScreenNavigationProp = StackNavigationProp<
@@ -22,7 +23,8 @@ const ProfileScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await tokenStorage.clearToken();
     dispatch(logout());
   };
 
