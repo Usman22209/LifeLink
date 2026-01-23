@@ -3,8 +3,9 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
+import useTranslation from "@shared/hooks/useTranslation";
+import Text from "@components/AppText";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
 import { Icons } from "@components/AnyIcon";
@@ -27,6 +28,7 @@ type LoginScreenNavigationProp = StackNavigationProp<
 
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { mutate: loginMutate, isPending: loginPending } = useLogin();
@@ -69,20 +71,20 @@ const LoginScreen = () => {
 
         <View style={styles.formContainer}>
           <AppInput
-            label="Email"
+            label={t("login.email")}
             iconType={Icons.Feather}
             iconName="mail"
-            placeholder="Enter your email"
+            placeholder={t("login.emailPlaceholder")}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
           />
 
           <AppInput
-            label="Password"
+            label={t("login.password")}
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
-            placeholder="Enter your password"
+            placeholder={t("login.passwordPlaceholder")}
             value={password}
             onChangeText={setPassword}
             secureText={true}
@@ -94,12 +96,12 @@ const LoginScreen = () => {
             onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
           >
             <Text medium FONT_14 style={{ color: colors.primary }}>
-              Forgot Password?
+              {t("login.forgotPassword")}
             </Text>
           </TouchableOpacity>
 
           <AppButton
-            title="Login"
+            title={t("login.loginButton")}
             onPress={handleLogin}
             loading={loginPending}
             style={{ marginTop: verticalScale(12) }}
@@ -112,7 +114,7 @@ const LoginScreen = () => {
               FONT_12
               style={[styles.dividerText, { color: colors.textSecondary }]}
             >
-              OR
+              {t("login.or")}
             </Text>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
           </View>
@@ -141,20 +143,20 @@ const LoginScreen = () => {
               FONT_14
               style={[styles.googleText, { color: colors.text }]}
             >
-              {googleLoginPending ? "Loading..." : "Continue with Google"}
+              {googleLoginPending ? t("login.loading") : t("login.continueWithGoogle")}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
             <Text FONT_14 style={{ color: colors.textSecondary }}>
-              Don't have an account?{" "}
+              {t("login.noAccount")}{" "}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => navigation.navigate(ROUTES.SIGNUP)}
             >
               <Text bold FONT_14 style={{ color: colors.primary }}>
-                Sign Up
+                {t("login.signUpLink")}
               </Text>
             </TouchableOpacity>
           </View>
