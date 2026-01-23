@@ -2,6 +2,7 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import AuthFlow from "./Auth";
 import MainFlow from "./Main";
+import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -14,8 +15,11 @@ export default function UserNavigation() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {token ? (
-        <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+      {!token ? (
+        <>
+          <Stack.Screen name={ROUTES.ONBOARDING} component={CompleteProfileScreen} />
+          <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+        </>
       ) : (
         <Stack.Screen name={ROUTES.AUTH_FLOW} component={AuthFlow} />
       )}

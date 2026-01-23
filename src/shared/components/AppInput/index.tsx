@@ -28,6 +28,7 @@ const AppInput: React.FC<AppInputProps> = ({
   containerStyle,
   keyboardType,
   control,
+  iconSize = moderateScale(18),
   name,
   ...props
 }) => {
@@ -91,7 +92,7 @@ const AppInput: React.FC<AppInputProps> = ({
             <AnyIcon
               type={iconType}
               name={iconName}
-              size={moderateScale(18)}
+              size={iconSize}
               color={focused ? colors.primary : colors.textSecondary}
               style={[
                 styles.icon,

@@ -99,7 +99,8 @@ const SignupScreen = () => {
             control={control}
             label={t("signup.confirmPassword")}
             iconType={Icons.MaterialCommunityIcons}
-            iconName="lock-outline"
+            iconName="lock-reset"
+            iconSize={moderateScale(24)}
             placeholder={t("signup.confirmPasswordPlaceholder")}
             secureText={true}
             error={errors.confirmPassword?.message}

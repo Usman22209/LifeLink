@@ -96,5 +96,32 @@
     "weakPassword": "پاس ورڈ بہت کمزور ہے",
     "networkError": "نیٹ ورک کی خرابی۔ دوبارہ کوشش کریں۔",
     "serverError": "سرور کی خرابی۔ بعد میں دوبارہ کوشش کریں۔"
+  },
+  "onboarding": {
+    "title": "اپنی پروفائل مکمل کریں",
+    "subtitle": "جان بچانے میں ہماری مدد کے لیے اپنی صحت کی معلومات فراہم کریں۔",
+    "uploadPhoto": "تصویر اپ لوڈ کریں",
+    "recognizeYou": "آپ کو آسانی سے پہچانا جا سکے",
+    "basicInfo": "بنیادی معلومات",
+    "fullName": "پورا نام",
+    "fullNamePlaceholder": "اپنا پورا نام درج کریں",
+    "phone": "فون نمبر",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "email": "ای میل ایڈریس",
+    "emailPlaceholder": "اپنا ای میل درج کریں",
+    "city": "شہر",
+    "cityPlaceholder": "مثال کے طور پر نیویارک",
+    "state": "صوبہ/ریاست",
+    "statePlaceholder": "مثال کے طور پر پنجاب",
+    "country": "ملک",
+    "countryPlaceholder": "مثال کے طور پر پاکستان",
+    "gender": "جنس",
+    "male": "مرد",
+    "female": "عورت",
+    "other": "دیگر",
+    "dob": "تاریخ پیدائش",
+    "selectBloodGroup": "بلڈ گروپ منتخب کریں",
+    "medicalInfo": "طبی معلومات",
+    "completeButton": "پروفائل مکمل کریں"
   }
 }
