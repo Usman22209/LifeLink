@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, I18nManager } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
   logo: { width: scale(250), height: verticalScale(180) },
   formContainer: { width: "100%", paddingHorizontal: 0 },
   dividerContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     marginVertical: verticalScale(20),
   },
   divider: { flex: 1, height: 1 },
   dividerText: { marginHorizontal: scale(16) },
   googleButton: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: moderateScale(12),
@@ -204,11 +204,11 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(8),
     alignItems: "center",
     justifyContent: "center",
-    marginRight: scale(12),
+    [I18nManager.isRTL ? "marginLeft" : "marginRight"]: scale(12),
   },
   googleText: {},
   footer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "center",
     marginTop: verticalScale(20),
   },

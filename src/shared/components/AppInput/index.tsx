@@ -10,6 +10,8 @@ import { colors } from "@theme/colors";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { Controller } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
 
 import { AppInputProps } from "@shared/interfaces/components/app-input.interface";
 
@@ -31,6 +33,7 @@ const AppInput: React.FC<AppInputProps> = ({
 }) => {
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const isRtl = useSelector(selectIsRtl);
 
   const renderInput = (fieldProps?: any) => (
     <TextInput
@@ -43,7 +46,14 @@ const AppInput: React.FC<AppInputProps> = ({
       keyboardType={keyboardType}
       autoCapitalize="none"
       secureTextEntry={secureText ? !showPassword : false}
-      style={[styles.input, { color: colors.text }, inputStyle]}
+      style={[
+        styles.input,
+        {
+          color: colors.text,
+          textAlign: isRtl ? "right" : "left",
+        },
+        inputStyle,
+      ]}
       onFocus={() => setFocused(true)}
       onBlur={fieldProps?.onBlur ?? (() => setFocused(false))}
     />
@@ -71,14 +81,22 @@ const AppInput: React.FC<AppInputProps> = ({
           containerStyle,
         ]}
       >
-        <View style={styles.inputRow}>
+        <View
+          style={[
+            styles.inputRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           {iconName && (
             <AnyIcon
               type={iconType}
               name={iconName}
               size={moderateScale(18)}
               color={focused ? colors.primary : colors.textSecondary}
-              style={styles.icon}
+              style={[
+                styles.icon,
+                { [isRtl ? "marginLeft" : "marginRight"]: scale(10) },
+              ]}
             />
           )}
 

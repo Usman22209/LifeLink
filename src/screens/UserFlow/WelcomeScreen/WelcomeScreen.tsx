@@ -206,12 +206,12 @@ const styles = StyleSheet.create({
         paddingBottom: verticalScale(40),
     },
     topBar: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
+        flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+        justifyContent: I18nManager.isRTL ? "flex-start" : "flex-end",
         marginBottom: verticalScale(30),
     },
     languageButton: {
-        flexDirection: "row",
+        flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
         alignItems: "center",
         gap: scale(5),
         paddingHorizontal: scale(12),
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
         gap: verticalScale(12),
     },
     languageOption: {
-        flexDirection: "row",
+        flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: scale(18),
