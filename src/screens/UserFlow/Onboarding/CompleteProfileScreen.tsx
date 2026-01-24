@@ -2,18 +2,17 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
     View,
     TouchableOpacity,
-    ScrollView,
-    KeyboardAvoidingView,
     Platform,
     Image,
     I18nManager,
     StatusBar,
     PermissionsAndroid,
 } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useMediaPicker from "@shared/hooks/useImagePicker";
 import ScreenWrapper from "@components/ScreenWrapper";
 import Text from "@components/AppText";
@@ -150,256 +149,259 @@ const CompleteProfileScreen = () => {
             style={styles.container}
         >
             <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-                style={styles.flex}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+            <KeyboardAwareScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                keyboardShouldPersistTaps="handled"
+                enableOnAndroid={true}
+                extraScrollHeight={verticalScale(150)}
+                extraHeight={verticalScale(100)}
             >
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={styles.scrollContent}
-                    keyboardShouldPersistTaps="handled"
-                >
-                    {/* Universal AppHeader used globally */}
-                    <AppHeader title={t("onboarding.title")} />
+                {/* Universal AppHeader used globally */}
+                <AppHeader title={t("onboarding.title")} />
 
-                    {/* Profile Image Section */}
-                    <View style={styles.imageSection}>
-                        <TouchableOpacity
-                            onPress={() => setImageModalVisible(true)}
-                            style={styles.imageContainer}
-                            activeOpacity={0.8}
-                        >
-                            {profileImage ? (
-                                <Image source={{ uri: profileImage }} style={styles.profileImage} />
-                            ) : (
-                                <View style={styles.imagePlaceholder}>
-                                    <AnyIcon
-                                        type={Icons.MaterialIcons}
-                                        name="person"
-                                        size={moderateScale(55)}
-                                        color={colors.placeholder}
-                                    />
-                                </View>
-                            )}
-                            <View style={styles.cameraIconContainer}>
+                {/* Profile Image Section */}
+                <View style={styles.imageSection}>
+                    <TouchableOpacity
+                        onPress={() => setImageModalVisible(true)}
+                        style={styles.imageContainer}
+                        activeOpacity={0.8}
+                    >
+                        {profileImage ? (
+                            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                        ) : (
+                            <View style={styles.imagePlaceholder}>
                                 <AnyIcon
                                     type={Icons.MaterialIcons}
-                                    name="camera-alt"
-                                    size={moderateScale(16)}
-                                    color={colors.white}
+                                    name="person"
+                                    size={moderateScale(55)}
+                                    color={colors.placeholder}
                                 />
                             </View>
-                        </TouchableOpacity>
-                        <Text semiBold FONT_14 style={styles.uploadText}>
-                            {t("onboarding.uploadPhoto")}
-                        </Text>
-                        <Text regular FONT_12 style={styles.recognizeText}>
-                            {t("onboarding.recognizeYou")}
-                        </Text>
-                    </View>
-
-                    {/* Basic Information Section */}
-                    <View style={styles.section}>
-                        <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.basicInfo")}
-                        </Text>
-                        <AppInput
-                            name="name"
-                            control={control}
-                            label={t("onboarding.fullName")}
-                            placeholder={t("onboarding.fullNamePlaceholder")}
-                            error={errors.name?.message}
-                            autoCapitalize="words"
-                        />
-                        <AppInput
-                            name="phone"
-                            control={control}
-                            label={t("onboarding.phone")}
-                            placeholder={t("onboarding.phonePlaceholder")}
-                            keyboardType="phone-pad"
-                            error={errors.phone?.message}
-                        />
-                        <AppInput
-                            name="email"
-                            control={control}
-                            label={t("onboarding.email")}
-                            placeholder={t("onboarding.emailPlaceholder")}
-                            keyboardType="email-address"
-                            error={errors.email?.message}
-                        />
-                    </View>
-
-                    {/* Gender Selection */}
-                    <View style={styles.section}>
-                        <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.gender")}
-                        </Text>
-                        <View style={[styles.genderContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-                            {["male", "female"].map((g) => (
-                                <TouchableOpacity
-                                    key={g}
-                                    onPress={() => setValue("gender", g)}
-                                    style={[
-                                        styles.genderCard,
-                                        watch("gender") === g && styles.genderCardActive
-                                    ]}
-                                    activeOpacity={0.8}
-                                >
-                                    <AnyIcon
-                                        type={Icons.MaterialCommunityIcons}
-                                        name={g === "male" ? "gender-male" : "gender-female"}
-                                        size={moderateScale(20)}
-                                        color={watch("gender") === g ? colors.white : colors.primary}
-                                    />
-                                    <Text
-                                        semiBold
-                                        FONT_14
-                                        style={[
-                                            styles.genderText,
-                                            watch("gender") === g ? { color: colors.white } : { color: colors.textSecondary }
-                                        ]}
-                                    >
-                                        {t(`onboarding.${g}`)}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                        {errors.gender && (
-                            <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
-                                {errors.gender.message}
-                            </Text>
                         )}
-                    </View>
-
-                    {/* DOB Picker */}
-                    <View style={styles.section}>
-                        <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.dob")}
-                        </Text>
-                        <TouchableOpacity
-                            onPress={() => setDatePickerVisibility(true)}
-                            activeOpacity={0.7}
-                            style={[
-                                styles.pickerButton,
-                                { flexDirection: isRtl ? "row-reverse" : "row" }
-                            ]}
-                        >
-                            <Text regular FONT_14 style={watch("dob") ? { color: colors.text } : { color: colors.placeholder }}>
-                                {watch("dob") || "YYYY-MM-DD"}
-                            </Text>
-                            <AnyIcon
-                                type={Icons.MaterialCommunityIcons}
-                                name="calendar-month"
-                                size={moderateScale(20)}
-                                color={colors.primary}
-                            />
-                        </TouchableOpacity>
-                        {errors.dob && (
-                            <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
-                                {errors.dob.message}
-                            </Text>
-                        )}
-                        <DateTimePickerModal
-                            isVisible={isDatePickerVisible}
-                            mode="date"
-                            onConfirm={handleConfirmDate}
-                            onCancel={() => setDatePickerVisibility(false)}
-                            maximumDate={new Date()}
-                            accentColor={colors.primary}
-                            buttonTextColorIOS={colors.primary}
-                        />
-                    </View>
-
-                    {/* Location Section */}
-                    <View style={styles.section}>
-                        <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
-                            Location
-                        </Text>
-
-                        <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.country")}
-                        </Text>
-                        <TouchableOpacity
-                            onPress={() => setCountryModalVisible(true)}
-                            activeOpacity={0.7}
-                            style={[
-                                styles.pickerButton,
-                                { flexDirection: isRtl ? "row-reverse" : "row" }
-                            ]}
-                        >
-                            <View style={styles.pickerValueContainer}>
-                                {currentFlag && <Text style={styles.flagEmoji}>{currentFlag}</Text>}
-                                <Text regular FONT_14 style={selectedCountry ? { color: colors.text } : { color: colors.placeholder }}>
-                                    {selectedCountry || t("onboarding.countryPlaceholder")}
-                                </Text>
-                            </View>
+                        <View style={styles.cameraIconContainer}>
                             <AnyIcon
                                 type={Icons.MaterialIcons}
-                                name="public"
-                                size={moderateScale(20)}
-                                color={colors.primary}
+                                name="camera-alt"
+                                size={moderateScale(16)}
+                                color={colors.white}
                             />
-                        </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                    <Text semiBold FONT_14 style={styles.uploadText}>
+                        {t("onboarding.uploadPhoto")}
+                    </Text>
+                    <Text regular FONT_12 style={styles.recognizeText}>
+                        {t("onboarding.recognizeYou")}
+                    </Text>
+                </View>
 
-                        <View style={{ height: 12 }} />
+                {/* Basic Information Section */}
+                <View style={styles.section}>
+                    <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.basicInfo")}
+                    </Text>
+                    <AppInput
+                        name="name"
+                        control={control}
+                        label={t("onboarding.fullName")}
+                        placeholder={t("onboarding.fullNamePlaceholder")}
+                        error={errors.name?.message}
+                        autoCapitalize="words"
+                        iconType={Icons.MaterialIcons}
+                        iconName="person-outline"
+                    />
+                    <AppInput
+                        name="phone"
+                        control={control}
+                        label={t("onboarding.phone")}
+                        placeholder={t("onboarding.phonePlaceholder")}
+                        keyboardType="phone-pad"
+                        error={errors.phone?.message}
+                        iconType={Icons.MaterialIcons}
+                        iconName="phone-iphone"
+                    />
+                    <AppInput
+                        name="email"
+                        control={control}
+                        label={t("onboarding.email")}
+                        placeholder={t("onboarding.emailPlaceholder")}
+                        keyboardType="email-address"
+                        error={errors.email?.message}
+                        iconType={Icons.MaterialIcons}
+                        iconName="mail-outline"
+                    />
+                </View>
 
-                        <AppInput
-                            name="state"
-                            control={control}
-                            label={t("onboarding.state")}
-                            placeholder={t("onboarding.statePlaceholder")}
-                            error={errors.state?.message}
-                        />
-                        <AppInput
-                            name="city"
-                            control={control}
-                            label={t("onboarding.city")}
-                            placeholder={t("onboarding.cityPlaceholder")}
-                            error={errors.city?.message}
-                        />
-                    </View>
-
-                    {/* Medical Section */}
-                    <View style={styles.section}>
-                        <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.medicalInfo")}
-                        </Text>
-                        <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
-                            {t("onboarding.selectBloodGroup")}
-                        </Text>
-                        <View style={[styles.bloodGroupGrid, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-                            {bloodGroups.map((group) => (
-                                <TouchableOpacity
-                                    key={group}
-                                    onPress={() => setValue("blood_group", group)}
+                {/* Gender Selection */}
+                <View style={styles.section}>
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.gender")}
+                    </Text>
+                    <View style={[styles.genderContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                        {["male", "female"].map((g) => (
+                            <TouchableOpacity
+                                key={g}
+                                onPress={() => setValue("gender", g)}
+                                style={[
+                                    styles.genderCard,
+                                    watch("gender") === g && styles.genderCardActive
+                                ]}
+                                activeOpacity={0.8}
+                            >
+                                <AnyIcon
+                                    type={Icons.MaterialCommunityIcons}
+                                    name={g === "male" ? "gender-male" : "gender-female"}
+                                    size={moderateScale(20)}
+                                    color={watch("gender") === g ? colors.white : colors.primary}
+                                />
+                                <Text
+                                    semiBold
+                                    FONT_14
                                     style={[
-                                        styles.bloodGroupButton,
-                                        watch("blood_group") === group && styles.bloodGroupButtonActive
+                                        styles.genderText,
+                                        watch("gender") === g ? { color: colors.white } : { color: colors.textSecondary }
                                     ]}
                                 >
-                                    <Text
-                                        bold
-                                        FONT_14
-                                        style={[
-                                            watch("blood_group") === group ? { color: colors.white } : { color: colors.primary }
-                                        ]}
-                                    >
-                                        {group}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                                    {t(`onboarding.${g}`)}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
+                    {errors.gender && (
+                        <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
+                            {errors.gender.message}
+                        </Text>
+                    )}
+                </View>
 
-                    <AppButton
-                        title={t("onboarding.completeButton")}
-                        onPress={handleSubmit(onSubmit)}
-                        loading={loading}
-                        style={styles.submitButton}
+                {/* DOB Picker */}
+                <View style={styles.section}>
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.dob")}
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => setDatePickerVisibility(true)}
+                        activeOpacity={0.7}
+                        style={[
+                            styles.pickerButton,
+                            { flexDirection: isRtl ? "row-reverse" : "row" }
+                        ]}
+                    >
+                        <Text regular FONT_14 style={watch("dob") ? { color: colors.text } : { color: colors.placeholder }}>
+                            {watch("dob") || "YYYY-MM-DD"}
+                        </Text>
+                        <AnyIcon
+                            type={Icons.MaterialCommunityIcons}
+                            name="calendar-month"
+                            size={moderateScale(20)}
+                            color={colors.primary}
+                        />
+                    </TouchableOpacity>
+                    {errors.dob && (
+                        <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
+                            {errors.dob.message}
+                        </Text>
+                    )}
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="date"
+                        onConfirm={handleConfirmDate}
+                        onCancel={() => setDatePickerVisibility(false)}
+                        maximumDate={new Date()}
+                        accentColor={colors.primary}
+                        buttonTextColorIOS={colors.primary}
                     />
-                </ScrollView>
-            </KeyboardAvoidingView>
+                </View>
+
+                {/* Location Section */}
+                <View style={styles.section}>
+                    <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
+                        Location
+                    </Text>
+
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.country")}
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => setCountryModalVisible(true)}
+                        activeOpacity={0.7}
+                        style={[
+                            styles.pickerButton,
+                            { flexDirection: isRtl ? "row-reverse" : "row" }
+                        ]}
+                    >
+                        <View style={styles.pickerValueContainer}>
+                            {currentFlag && <Text style={styles.flagEmoji}>{currentFlag}</Text>}
+                            <Text regular FONT_14 style={selectedCountry ? { color: colors.text } : { color: colors.placeholder }}>
+                                {selectedCountry || t("onboarding.countryPlaceholder")}
+                            </Text>
+                        </View>
+                        <AnyIcon
+                            type={Icons.MaterialIcons}
+                            name="public"
+                            size={moderateScale(20)}
+                            color={colors.primary}
+                        />
+                    </TouchableOpacity>
+
+                    <View style={{ height: 12 }} />
+
+                    <AppInput
+                        name="state"
+                        control={control}
+                        label={t("onboarding.state")}
+                        placeholder={t("onboarding.statePlaceholder")}
+                        error={errors.state?.message}
+                    />
+                    <AppInput
+                        name="city"
+                        control={control}
+                        label={t("onboarding.city")}
+                        placeholder={t("onboarding.cityPlaceholder")}
+                        error={errors.city?.message}
+                    />
+                </View>
+
+                {/* Medical Section */}
+                <View style={styles.section}>
+                    <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.medicalInfo")}
+                    </Text>
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.selectBloodGroup")}
+                    </Text>
+                    <View style={[styles.bloodGroupGrid, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                        {bloodGroups.map((group) => (
+                            <TouchableOpacity
+                                key={group}
+                                onPress={() => setValue("blood_group", group)}
+                                style={[
+                                    styles.bloodGroupButton,
+                                    watch("blood_group") === group && styles.bloodGroupButtonActive
+                                ]}
+                            >
+                                <Text
+                                    bold
+                                    FONT_14
+                                    style={[
+                                        watch("blood_group") === group ? { color: colors.white } : { color: colors.primary }
+                                    ]}
+                                >
+                                    {group}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+
+                <AppButton
+                    title={t("onboarding.completeButton")}
+                    onPress={handleSubmit(onSubmit)}
+                    loading={loading}
+                    style={styles.submitButton}
+                />
+            </KeyboardAwareScrollView>
 
             {/* Global Modals */}
             <ImagePickerModal
