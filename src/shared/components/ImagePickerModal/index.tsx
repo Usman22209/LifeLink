@@ -31,7 +31,10 @@ const ImagePickerModal: React.FC<ImagePickerModalProps> = ({ isVisible, onClose,
                     <View style={styles.optionsWrapper}>
                         <TouchableOpacity
                             style={styles.option}
-                            onPress={() => onSelectSource('camera')}
+                            onPress={() => {
+                                console.log("[ImagePickerModal] Camera button pressed");
+                                onSelectSource('camera');
+                            }}
                         >
                             <AnyIcon type={Icons.MaterialIcons} name="photo-camera" size={moderateScale(28)} color={colors.primary} />
                             <Text semiBold FONT_16 style={styles.optionText}>Camera</Text>
@@ -41,7 +44,10 @@ const ImagePickerModal: React.FC<ImagePickerModalProps> = ({ isVisible, onClose,
 
                         <TouchableOpacity
                             style={styles.option}
-                            onPress={() => onSelectSource('gallery')}
+                            onPress={() => {
+                                console.log("[ImagePickerModal] Gallery button pressed");
+                                onSelectSource('gallery');
+                            }}
                         >
                             <AnyIcon type={Icons.MaterialIcons} name="photo-library" size={moderateScale(28)} color={colors.success} />
                             <Text semiBold FONT_16 style={styles.optionText}>Gallery</Text>

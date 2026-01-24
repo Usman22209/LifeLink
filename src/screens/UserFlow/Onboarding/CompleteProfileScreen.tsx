@@ -8,6 +8,7 @@ import {
     Image,
     I18nManager,
     StatusBar,
+    PermissionsAndroid,
 } from "react-native";
 import { moderateScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
@@ -98,7 +99,30 @@ const CompleteProfileScreen = () => {
         setDatePickerVisibility(false);
     };
 
-    const pickImage = (type: 'camera' | 'gallery') => {
+    const pickImage = async (type: 'camera' | 'gallery') => {
+        console.log(`[PickImage] Initiated with type: ${type}`);
+
+        if (type === 'camera' && Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    {
+                        title: "Camera Permission",
+                        message: "LifeLink needs access to your camera to take a profile picture.",
+                        buttonNeutral: "Ask Me Later",
+                        buttonNegative: "Cancel",
+                        buttonPositive: "OK"
+                    }
+                );
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("[PickImage] Camera permission denied");
+                    return;
+                }
+            } catch (err) {
+                console.warn("[PickImage] Permission check error:", err);
+            }
+        }
+
         const options = {
             width: 400,
             height: 400,
@@ -106,17 +130,21 @@ const CompleteProfileScreen = () => {
             includeBase64: false,
             mediaType: 'photo' as any,
         };
+        console.log(`[PickImage] Using options:`, options);
 
         const picker = type === 'camera' ? ImagePicker.openCamera : ImagePicker.openPicker;
+        console.log(`[PickImage] Attempting to call ${type === 'camera' ? 'openCamera' : 'openPicker'}`);
 
         picker(options)
             .then(image => {
+                console.log(`[PickImage] Success! Path: ${image.path}`);
                 setValue("profile_image", image.path);
                 setImageModalVisible(false);
             })
             .catch(err => {
+                console.log(`[PickImage] Error:`, err);
                 if (err.code !== 'E_PICKER_CANCELLED') {
-                    console.log("ImagePicker Error:", err);
+                    console.error("[PickImage] Critical error captured:", err.message, err.code);
                 }
                 setImageModalVisible(false);
             });
@@ -286,6 +314,8 @@ const CompleteProfileScreen = () => {
                             onConfirm={handleConfirmDate}
                             onCancel={() => setDatePickerVisibility(false)}
                             maximumDate={new Date()}
+                            accentColor={colors.primary}
+                            buttonTextColorIOS={colors.primary}
                         />
                     </View>
 
