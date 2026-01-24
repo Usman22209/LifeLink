@@ -15,4 +15,5 @@ export interface AppInputProps extends TextInputProps {
   control?: Control<any>;
   name?: string;
   iconSize?: number;
+  marginBottom?: number;
 }

@@ -8,7 +8,7 @@ import {
     StatusBar,
     PermissionsAndroid,
 } from "react-native";
-import { moderateScale, verticalScale } from "react-native-size-matters";
+import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -85,11 +85,15 @@ const CompleteProfileScreen = () => {
 
     const onSubmit = (data: OnboardingFormValues) => {
         setLoading(true);
-        console.log("Profile Data:", data);
+        console.log("=== Profile Completion Initiated ===");
+        console.log("Form Data:", JSON.stringify(data, null, 2));
+
+        // Simulating API call
         setTimeout(() => {
             setLoading(false);
+            console.log("Profile successfully updated locally.");
             navigation.replace(ROUTES.MAIN_FLOW);
-        }, 1500);
+        }, 2000);
     };
 
     const handleConfirmDate = (date: Date) => {
@@ -230,6 +234,7 @@ const CompleteProfileScreen = () => {
                         error={errors.email?.message}
                         iconType={Icons.MaterialIcons}
                         iconName="mail-outline"
+                        marginBottom={0}
                     />
                 </View>
 
@@ -345,7 +350,7 @@ const CompleteProfileScreen = () => {
                         />
                     </TouchableOpacity>
 
-                    <View style={{ height: 12 }} />
+
 
                     <AppInput
                         name="state"
@@ -353,6 +358,8 @@ const CompleteProfileScreen = () => {
                         label={t("onboarding.state")}
                         placeholder={t("onboarding.statePlaceholder")}
                         error={errors.state?.message}
+                        iconType={Icons.MaterialIcons}
+                        iconName="map"
                     />
                     <AppInput
                         name="city"
@@ -360,6 +367,9 @@ const CompleteProfileScreen = () => {
                         label={t("onboarding.city")}
                         placeholder={t("onboarding.cityPlaceholder")}
                         error={errors.city?.message}
+                        iconType={Icons.MaterialIcons}
+                        iconName="location-city"
+                        marginBottom={0}
                     />
                 </View>
 

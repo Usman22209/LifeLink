@@ -29,6 +29,7 @@ const AppInput: React.FC<AppInputProps> = ({
   keyboardType,
   control,
   iconSize = moderateScale(18),
+  marginBottom = verticalScale(12),
   name,
   ...props
 }) => {
@@ -61,7 +62,7 @@ const AppInput: React.FC<AppInputProps> = ({
   );
 
   return (
-    <View style={{ marginBottom: verticalScale(12) }}>
+    <View style={{ marginBottom }}>
       {label && (
         <Text semiBold FONT_14 style={[styles.label, { color: colors.text }]}>
           {label}

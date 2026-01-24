@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
         opacity: 0.6,
     },
     section: {
-        marginBottom: verticalScale(20), // Reduced from 32
+        marginBottom: verticalScale(12), // Reduced to match AppInput margin
     },
     sectionTitle: {
         color: colors.text,
