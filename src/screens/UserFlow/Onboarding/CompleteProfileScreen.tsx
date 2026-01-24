@@ -180,7 +180,7 @@ const CompleteProfileScreen = () => {
                                 <AnyIcon
                                     type={Icons.MaterialIcons}
                                     name="person"
-                                    size={moderateScale(50)}
+                                    size={moderateScale(55)}
                                     color={colors.placeholder}
                                 />
                             </View>
@@ -189,7 +189,7 @@ const CompleteProfileScreen = () => {
                             <AnyIcon
                                 type={Icons.MaterialIcons}
                                 name="camera-alt"
-                                size={moderateScale(16)}
+                                size={moderateScale(14)}
                                 color={colors.white}
                             />
                         </View>
