@@ -47,8 +47,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const Container = scrollable ? ScrollView : View;
   const bgColor = backgroundColor || colors.background;
 
-  // Header is passed as a prop, but we'll include it inside the main wrapper view
-  // to ensure background color continuity and safe area handling.
 
   return (
     <>
@@ -68,7 +66,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           style,
         ]}
       >
-        {/* Header Section - Not using absolute position anymore to keep things simple and connected */}
         {header && <View style={styles.headerContainer}>{header}</View>}
 
         {showNetworkBanner && isOffline && (

@@ -174,12 +174,11 @@ const styles = StyleSheet.create({
         width: moderateScale(36),
         height: moderateScale(36),
         borderRadius: moderateScale(18),
-        backgroundColor: colors.border + '20', // Drarker than before
+        backgroundColor: colors.border + '20',
         justifyContent: 'center',
         alignItems: 'center',
     },
     optionsList: {
-        // Transparent and no padding for minimalist look
     },
     optionButton: {
         flexDirection: 'row',
@@ -201,6 +200,6 @@ const styles = StyleSheet.create({
     separator: {
         height: 1,
         backgroundColor: colors.border + 'cc',
-        marginHorizontal: -scale(8), // Matches parent padding to go full-width
+        marginHorizontal: -scale(8),
     },
 });

@@ -8,13 +8,13 @@ export const styles = StyleSheet.create({
     container: { flex: 1 },
     flex: { flex: 1 },
     scrollContent: {
-        paddingHorizontal: scale(16), // Matching Login Screen
+        paddingHorizontal: scale(16),
         paddingBottom: verticalScale(40),
     },
     imageSection: {
         alignItems: "center",
-        marginTop: verticalScale(10), // Reduced from 20
-        marginBottom: verticalScale(25), // Reduced from 35
+        marginTop: verticalScale(10),
+        marginBottom: verticalScale(25),
     },
     imageContainer: {
         width: moderateScale(100),
@@ -78,16 +78,16 @@ export const styles = StyleSheet.create({
         opacity: 0.7,
     },
     section: {
-        marginBottom: verticalScale(12), // Reduced to match AppInput margin
+        marginBottom: verticalScale(12),
     },
     sectionTitle: {
         color: colors.text,
-        marginBottom: verticalScale(12), // Reduced from 18
+        marginBottom: verticalScale(12),
         opacity: 0.9,
     },
     inputLabel: {
         color: colors.text,
-        marginBottom: verticalScale(6), // Tightened
+        marginBottom: verticalScale(6),
         opacity: 0.8,
     },
     genderContainer: {
@@ -96,10 +96,9 @@ export const styles = StyleSheet.create({
     },
     genderCard: {
         flex: 1,
-        height: verticalScale(48), // Matching standard button heights
+        height: verticalScale(48),
         flexDirection: 'row',
-        borderRadius: moderateScale(12), // Matching Login Screen
-        borderWidth: 1,
+        borderRadius: moderateScale(12),
         borderColor: colors.border,
         justifyContent: "center",
         alignItems: "center",
@@ -114,8 +113,8 @@ export const styles = StyleSheet.create({
         marginLeft: scale(8),
     },
     pickerButton: {
-        height: verticalScale(48), // Matching Login button height
-        borderRadius: moderateScale(12), // Matching Login rounding
+        height: verticalScale(48),
+        borderRadius: moderateScale(12),
         borderWidth: 1,
         borderColor: colors.border,
         paddingHorizontal: scale(12),
@@ -152,7 +151,7 @@ export const styles = StyleSheet.create({
     },
     submitButton: {
         marginTop: verticalScale(12),
-        height: verticalScale(48), // Standardized
+        height: verticalScale(48),
         borderRadius: moderateScale(12),
     },
 });

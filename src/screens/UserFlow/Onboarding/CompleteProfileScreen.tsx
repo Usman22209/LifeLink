@@ -167,7 +167,6 @@ const CompleteProfileScreen = () => {
                 extraScrollHeight={verticalScale(150)}
                 extraHeight={verticalScale(100)}
             >
-                {/* Profile Image Section */}
                 <View style={styles.imageSection}>
                     <TouchableOpacity
                         onPress={() => setImageModalVisible(true)}
@@ -204,7 +203,6 @@ const CompleteProfileScreen = () => {
 
                 </View>
 
-                {/* Basic Information Section */}
                 <View style={styles.section}>
                     <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
                         {t("onboarding.basicInfo")}
@@ -242,7 +240,6 @@ const CompleteProfileScreen = () => {
                     />
                 </View>
 
-                {/* Gender Selection */}
                 <View style={styles.section}>
                     <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
                         {t("onboarding.gender")}
@@ -284,7 +281,6 @@ const CompleteProfileScreen = () => {
                     )}
                 </View>
 
-                {/* DOB Picker */}
                 <View style={styles.section}>
                     <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
                         {t("onboarding.dob")}
@@ -323,7 +319,6 @@ const CompleteProfileScreen = () => {
                     />
                 </View>
 
-                {/* Location Section */}
                 <View style={styles.section}>
                     <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
                         Location
@@ -377,7 +372,6 @@ const CompleteProfileScreen = () => {
                     />
                 </View>
 
-                {/* Medical Section */}
                 <View style={styles.section}>
                     <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
                         {t("onboarding.medicalInfo")}
@@ -417,7 +411,6 @@ const CompleteProfileScreen = () => {
                 />
             </KeyboardAwareScrollView>
 
-            {/* Global Modals */}
             <ImagePickerModal
                 isVisible={isImageModalVisible}
                 onClose={() => setImageModalVisible(false)}

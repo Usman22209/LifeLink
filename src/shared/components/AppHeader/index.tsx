@@ -63,7 +63,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             }
         ]}>
             <View style={[styles.headerRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-                {/* Left Action */}
                 <View style={styles.actionContainer}>
                     {showBackButton && (
                         <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
@@ -77,7 +76,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
                     )}
                 </View>
 
-                {/* Title */}
                 <View style={styles.titleContainer}>
                     {title && (
                         <Text
@@ -91,7 +89,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
                     )}
                 </View>
 
-                {/* Right Action */}
                 <View style={styles.actionContainer}>
                     {rightIcon && (
                         <TouchableOpacity onPress={onRightPress} style={styles.iconButton}>
