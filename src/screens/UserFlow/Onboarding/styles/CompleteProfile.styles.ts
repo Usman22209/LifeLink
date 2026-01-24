@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(25), // Reduced from 35
     },
     imageContainer: {
-        width: moderateScale(100), // Scaled down slightly
+        width: moderateScale(100),
         height: moderateScale(100),
         borderRadius: moderateScale(50),
         backgroundColor: colors.card,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
         marginBottom: verticalScale(12),
         borderWidth: 1,
         borderColor: colors.border,
-        elevation: 4,
+        elevation: 2,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -47,21 +47,35 @@ export const styles = StyleSheet.create({
     },
     cameraIconContainer: {
         position: "absolute",
-        bottom: 0,
-        right: 0,
+        bottom: -moderateScale(2),
+        right: -moderateScale(2),
         backgroundColor: colors.primary,
-        padding: moderateScale(6),
-        borderRadius: moderateScale(15),
-        borderWidth: 1.5,
+        padding: moderateScale(7),
+        borderRadius: moderateScale(18),
+        borderWidth: 2,
         borderColor: colors.white,
+        elevation: 4,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
     },
     uploadText: {
-        color: colors.text,
-        marginBottom: verticalScale(2),
+        color: colors.primary,
+        fontSize: moderateScale(14),
     },
     recognizeText: {
         color: colors.textSecondary,
         opacity: 0.6,
+        marginTop: verticalScale(4),
+    },
+    removeButton: {
+        marginTop: verticalScale(8),
+    },
+    removeText: {
+        color: colors.error,
+        fontSize: moderateScale(12),
+        opacity: 0.7,
     },
     section: {
         marginBottom: verticalScale(12), // Reduced to match AppInput margin

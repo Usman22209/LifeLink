@@ -4,14 +4,25 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface ImagePickerModalProps {
     isVisible: boolean;
     onClose: () => void;
     onSelectSource: (type: 'camera' | 'gallery') => void;
+    showRemove?: boolean;
+    onRemove?: () => void;
 }
 
-const ImagePickerModal: React.FC<ImagePickerModalProps> = ({ isVisible, onClose, onSelectSource }) => {
+const ImagePickerModal: React.FC<ImagePickerModalProps> = ({
+    isVisible,
+    onClose,
+    onSelectSource,
+    showRemove,
+    onRemove
+}) => {
+    const { t } = useTranslation();
+
     return (
         <Modal
             visible={isVisible}
@@ -24,35 +35,49 @@ const ImagePickerModal: React.FC<ImagePickerModalProps> = ({ isVisible, onClose,
                 activeOpacity={1}
                 onPress={onClose}
             >
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, { backgroundColor: colors.white }]}>
                     <View style={styles.grabber} />
-                    <Text bold FONT_18 style={styles.title}>Select Photo</Text>
+                    <Text bold FONT_16 style={styles.title}>{t("common.select") || "Select Source"}</Text>
 
-                    <View style={styles.optionsWrapper}>
+                    <View style={styles.optionsContainer}>
                         <TouchableOpacity
                             style={styles.option}
-                            onPress={() => {
-                                console.log("[ImagePickerModal] Camera button pressed");
-                                onSelectSource('camera');
-                            }}
+                            onPress={() => onSelectSource('camera')}
                         >
-                            <AnyIcon type={Icons.MaterialIcons} name="photo-camera" size={moderateScale(28)} color={colors.primary} />
-                            <Text semiBold FONT_16 style={styles.optionText}>Camera</Text>
+                            <AnyIcon type={Icons.MaterialIcons} name="photo-camera" size={moderateScale(24)} color={colors.primary} />
+                            <Text semiBold FONT_16 style={styles.optionTitle}>{t("common.camera") || "Camera"}</Text>
                         </TouchableOpacity>
 
                         <View style={styles.separator} />
 
                         <TouchableOpacity
                             style={styles.option}
-                            onPress={() => {
-                                console.log("[ImagePickerModal] Gallery button pressed");
-                                onSelectSource('gallery');
-                            }}
+                            onPress={() => onSelectSource('gallery')}
                         >
-                            <AnyIcon type={Icons.MaterialIcons} name="photo-library" size={moderateScale(28)} color={colors.success} />
-                            <Text semiBold FONT_16 style={styles.optionText}>Gallery</Text>
+                            <AnyIcon type={Icons.MaterialIcons} name="photo-library" size={moderateScale(24)} color={colors.primary} />
+                            <Text semiBold FONT_16 style={styles.optionTitle}>{t("common.gallery") || "Gallery"}</Text>
                         </TouchableOpacity>
+
+                        {showRemove && (
+                            <>
+                                <View style={styles.separator} />
+                                <TouchableOpacity
+                                    style={styles.option}
+                                    onPress={onRemove}
+                                >
+                                    <AnyIcon type={Icons.MaterialIcons} name="delete" size={moderateScale(24)} color={colors.primary} />
+                                    <Text semiBold FONT_16 style={[styles.optionTitle, { color: colors.error }]}>{t("onboarding.removePhoto")}</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
                     </View>
+
+                    <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={onClose}
+                    >
+                        <Text bold FONT_16 style={{ color: colors.textSecondary }}>{t("common.cancel")}</Text>
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
         </Modal>
@@ -64,7 +89,7 @@ export default ImagePickerModal;
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.4)',
         justifyContent: 'flex-end',
     },
     modalContent: {
@@ -72,13 +97,13 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: moderateScale(25),
         borderTopRightRadius: moderateScale(25),
         paddingHorizontal: scale(20),
-        paddingBottom: verticalScale(30),
+        paddingBottom: verticalScale(25),
     },
     grabber: {
         width: scale(40),
-        height: 4,
+        height: 5,
         backgroundColor: colors.border,
-        borderRadius: 2,
+        borderRadius: 3,
         alignSelf: 'center',
         marginVertical: verticalScale(12),
     },
@@ -87,7 +112,7 @@ const styles = StyleSheet.create({
         marginBottom: verticalScale(20),
         color: colors.text,
     },
-    optionsWrapper: {
+    optionsContainer: {
         backgroundColor: colors.card,
         borderRadius: moderateScale(15),
         borderWidth: 1,
@@ -99,7 +124,7 @@ const styles = StyleSheet.create({
         paddingVertical: verticalScale(15),
         paddingHorizontal: scale(20),
     },
-    optionText: {
+    optionTitle: {
         marginLeft: scale(15),
         color: colors.text,
     },
@@ -107,5 +132,13 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: colors.border + '20',
         marginHorizontal: scale(15),
+    },
+    cancelButton: {
+        marginTop: verticalScale(15),
+        height: verticalScale(50),
+        borderRadius: moderateScale(15),
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.card,
     }
 });

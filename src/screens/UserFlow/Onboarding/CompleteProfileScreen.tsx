@@ -150,9 +150,15 @@ const CompleteProfileScreen = () => {
         <ScreenWrapper
             backgroundColor={colors.background}
             safeArea
+            header={
+                <AppHeader
+                    title={t("onboarding.title")}
+                    hasBorder
+                />
+            }
             style={styles.container}
         >
-            <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
+            <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
             <KeyboardAwareScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
@@ -161,9 +167,6 @@ const CompleteProfileScreen = () => {
                 extraScrollHeight={verticalScale(150)}
                 extraHeight={verticalScale(100)}
             >
-                {/* Universal AppHeader used globally */}
-                <AppHeader title={t("onboarding.title")} />
-
                 {/* Profile Image Section */}
                 <View style={styles.imageSection}>
                     <TouchableOpacity
@@ -178,7 +181,7 @@ const CompleteProfileScreen = () => {
                                 <AnyIcon
                                     type={Icons.MaterialIcons}
                                     name="person"
-                                    size={moderateScale(55)}
+                                    size={moderateScale(50)}
                                     color={colors.placeholder}
                                 />
                             </View>
@@ -192,12 +195,13 @@ const CompleteProfileScreen = () => {
                             />
                         </View>
                     </TouchableOpacity>
-                    <Text semiBold FONT_14 style={styles.uploadText}>
-                        {t("onboarding.uploadPhoto")}
-                    </Text>
-                    <Text regular FONT_12 style={styles.recognizeText}>
-                        {t("onboarding.recognizeYou")}
-                    </Text>
+
+                    <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+                        <Text semiBold style={styles.uploadText}>
+                            {profileImage ? t("onboarding.changePhoto") : t("onboarding.uploadPhoto")}
+                        </Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 {/* Basic Information Section */}
@@ -418,6 +422,11 @@ const CompleteProfileScreen = () => {
                 isVisible={isImageModalVisible}
                 onClose={() => setImageModalVisible(false)}
                 onSelectSource={pickImage}
+                showRemove={!!profileImage}
+                onRemove={() => {
+                    setValue("profile_image", "");
+                    setImageModalVisible(false);
+                }}
             />
 
             <CountryPickerModal

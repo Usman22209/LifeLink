@@ -5,6 +5,7 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -16,7 +17,6 @@ interface ScreenWrapperProps {
   children: React.ReactNode;
   style?: any;
   header?: React.ReactNode;
-  fixedHeader?: boolean;
   statusBarColor?: string;
   statusBarStyle?: "default" | "light-content" | "dark-content";
   showNetworkBanner?: boolean;
@@ -25,18 +25,12 @@ interface ScreenWrapperProps {
   safeArea?: boolean;
   scrollable?: boolean;
   backgroundColor?: string;
-  centerContent?: boolean;
-  centerHorizontal?: boolean;
-  centerVertical?: boolean;
 }
-
-const HEADER_HEIGHT = verticalScale(60);
 
 const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   children,
   style,
   header,
-  fixedHeader = false,
   statusBarColor,
   statusBarStyle,
   showNetworkBanner = true,
@@ -45,80 +39,37 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   safeArea = true,
   scrollable = false,
   backgroundColor,
-  centerContent = false,
-  centerHorizontal = false,
-  centerVertical = false,
 }) => {
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
   const isOffline = !netInfo.isConnected;
 
   const Container = scrollable ? ScrollView : View;
-
-  const getCenteringStyles = () => {
-    if (centerContent) {
-      return styles.centeredContent;
-    }
-
-    const centeringStyles: any = {};
-    if (centerHorizontal) {
-      centeringStyles.justifyContent = "center";
-    }
-    if (centerVertical) {
-      centeringStyles.alignItems = "center";
-    }
-    return centeringStyles;
-  };
-
-  const containerStyle = fixedHeader ? { marginTop: HEADER_HEIGHT } : {};
-  const centeringStyles = getCenteringStyles();
-
   const bgColor = backgroundColor || colors.background;
-  const barColor = statusBarColor || colors.primary;
-  const barStyle = statusBarStyle || "light-content";
 
-  const scrollContentContainerStyle = [
-    scrollable && styles.scrollContent,
-    scrollable && centeringStyles,
-  ];
-
-  const viewContainerStyle = [
-    styles.container,
-    { backgroundColor: bgColor },
-    containerStyle,
-    !scrollable && centeringStyles,
-  ];
+  // Header is passed as a prop, but we'll include it inside the main wrapper view
+  // to ensure background color continuity and safe area handling.
 
   return (
     <>
-      <StatusBar backgroundColor={barColor} barStyle={barStyle} />
+      <StatusBar
+        backgroundColor={statusBarColor || colors.background}
+        barStyle={statusBarStyle || "dark-content"}
+      />
       <View
         style={[
           styles.wrapper,
-          style,
           {
             backgroundColor: bgColor,
-            paddingTop: safeArea ? insets.top : 0,
             paddingBottom: safeArea ? insets.bottom : 0,
             paddingLeft: safeArea ? insets.left : 0,
             paddingRight: safeArea ? insets.right : 0,
           },
+          style,
         ]}
       >
-        {fixedHeader && header && (
-          <View
-            style={[
-              styles.fixedHeaderContainer,
-              {
-                height: HEADER_HEIGHT,
-                backgroundColor: colors.card,
-                borderBottomColor: colors.border,
-              },
-            ]}
-          >
-            {header}
-          </View>
-        )}
+        {/* Header Section - Not using absolute position anymore to keep things simple and connected */}
+        {header && <View style={styles.headerContainer}>{header}</View>}
 
         {showNetworkBanner && isOffline && (
           <View
@@ -129,23 +80,16 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         )}
 
         <Container
-          style={scrollable ? undefined : viewContainerStyle}
-          contentContainerStyle={
-            scrollable ? scrollContentContainerStyle : undefined
-          }
+          style={styles.container}
+          contentContainerStyle={scrollable ? styles.scrollContent : undefined}
+          keyboardShouldPersistTaps="handled"
         >
-          {!fixedHeader && header}
           {children}
         </Container>
 
         {loading && (
           <View
-            style={[
-              styles.loadingOverlay,
-              {
-                backgroundColor: "rgba(255,255,255,0.8)",
-              },
-            ]}
+            style={styles.loadingOverlay}
           >
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.text }]}>
@@ -162,6 +106,10 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
   },
+  headerContainer: {
+    width: '100%',
+    zIndex: 10,
+  },
   container: {
     flex: 1,
   },
@@ -169,21 +117,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingVertical: moderateScale(16),
     paddingHorizontal: moderateScale(20),
-  },
-  centeredContent: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  fixedHeaderContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    justifyContent: "center",
-    paddingHorizontal: moderateScale(16),
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   offlineBanner: {
     padding: verticalScale(10),
@@ -198,6 +131,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.8)",
+    zIndex: 999,
   },
   loadingText: {
     marginTop: verticalScale(10),

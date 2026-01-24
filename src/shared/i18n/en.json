@@ -87,7 +87,10 @@
     "success": "Success",
     "loading": "Loading...",
     "retry": "Retry",
-    "close": "Close"
+    "close": "Close",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "select": "Select Source"
   },
   "errors": {
     "required": "This field is required",
@@ -101,7 +104,8 @@
     "title": "Complete Your Profile",
     "subtitle": "Help us understand your health profile to save lives better.",
     "uploadPhoto": "Upload Photo",
-    "recognizeYou": "Recognize you easily",
+    "changePhoto": "Change Photo",
+    "removePhoto": "Remove Photo",
     "basicInfo": "Basic Information",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
