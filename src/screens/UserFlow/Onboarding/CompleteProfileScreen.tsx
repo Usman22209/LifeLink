@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     View,
     TouchableOpacity,
@@ -14,7 +14,7 @@ import { moderateScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import ImagePicker from "react-native-image-crop-picker";
+import useMediaPicker from "@shared/hooks/useImagePicker";
 import ScreenWrapper from "@components/ScreenWrapper";
 import Text from "@components/AppText";
 import AppInput from "@components/AppInput";
@@ -99,9 +99,16 @@ const CompleteProfileScreen = () => {
         setDatePickerVisibility(false);
     };
 
-    const pickImage = async (type: 'camera' | 'gallery') => {
-        console.log(`[PickImage] Initiated with type: ${type}`);
+    const { media, pickFromCamera, pickFromGallery } = useMediaPicker();
 
+    useEffect(() => {
+        if (media && !Array.isArray(media)) {
+            setValue("profile_image", media.path);
+            setImageModalVisible(false);
+        }
+    }, [media, setValue]);
+
+    const pickImage = async (type: 'camera' | 'gallery') => {
         if (type === 'camera' && Platform.OS === 'android') {
             try {
                 const granted = await PermissionsAndroid.request(
@@ -114,40 +121,24 @@ const CompleteProfileScreen = () => {
                         buttonPositive: "OK"
                     }
                 );
-                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("[PickImage] Camera permission denied");
-                    return;
-                }
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
             } catch (err) {
-                console.warn("[PickImage] Permission check error:", err);
+                console.warn("[PickImage] Permission error:", err);
             }
         }
 
         const options = {
+            mediaType: 'photo' as const,
+            cropping: true,
             width: 400,
             height: 400,
-            cropping: true,
-            includeBase64: false,
-            mediaType: 'photo' as any,
         };
-        console.log(`[PickImage] Using options:`, options);
 
-        const picker = type === 'camera' ? ImagePicker.openCamera : ImagePicker.openPicker;
-        console.log(`[PickImage] Attempting to call ${type === 'camera' ? 'openCamera' : 'openPicker'}`);
-
-        picker(options)
-            .then(image => {
-                console.log(`[PickImage] Success! Path: ${image.path}`);
-                setValue("profile_image", image.path);
-                setImageModalVisible(false);
-            })
-            .catch(err => {
-                console.log(`[PickImage] Error:`, err);
-                if (err.code !== 'E_PICKER_CANCELLED') {
-                    console.error("[PickImage] Critical error captured:", err.message, err.code);
-                }
-                setImageModalVisible(false);
-            });
+        if (type === 'camera') {
+            await pickFromCamera(options);
+        } else {
+            await pickFromGallery({ ...options, multiple: false });
+        }
     };
 
     const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -219,6 +210,7 @@ const CompleteProfileScreen = () => {
                             label={t("onboarding.fullName")}
                             placeholder={t("onboarding.fullNamePlaceholder")}
                             error={errors.name?.message}
+                            autoCapitalize="words"
                         />
                         <AppInput
                             name="phone"

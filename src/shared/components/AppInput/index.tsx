@@ -38,6 +38,7 @@ const AppInput: React.FC<AppInputProps> = ({
 
   const renderInput = (fieldProps?: any) => (
     <TextInput
+      autoCapitalize="none"
       {...props}
       {...fieldProps}
       value={fieldProps?.value ?? value}
@@ -45,7 +46,6 @@ const AppInput: React.FC<AppInputProps> = ({
       placeholder={placeholder}
       placeholderTextColor={colors.placeholder}
       keyboardType={keyboardType}
-      autoCapitalize="none"
       secureTextEntry={secureText ? !showPassword : false}
       style={[
         styles.input,
