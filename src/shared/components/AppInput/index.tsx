@@ -57,7 +57,10 @@ const AppInput: React.FC<AppInputProps> = ({
         inputStyle,
       ]}
       onFocus={() => setFocused(true)}
-      onBlur={fieldProps?.onBlur ?? (() => setFocused(false))}
+      onBlur={(e) => {
+        setFocused(false);
+        fieldProps?.onBlur?.(e);
+      }}
     />
   );
 

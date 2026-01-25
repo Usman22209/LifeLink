@@ -75,6 +75,12 @@ const CompleteProfileScreen = () => {
     const [localImage, setLocalImage] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+    const maxDate = useMemo(() => {
+        const date = new Date();
+        date.setFullYear(date.getFullYear() - 18);
+        return date;
+    }, []);
+
 
     const [isImageModalVisible, setImageModalVisible] = useState(false);
     const [isCountryModalVisible, setCountryModalVisible] = useState(false);
@@ -388,7 +394,8 @@ const CompleteProfileScreen = () => {
                         mode="date"
                         onConfirm={handleConfirmDate}
                         onCancel={() => setDatePickerVisibility(false)}
-                        maximumDate={new Date()}
+                        date={watch("dob") ? new Date(watch("dob")) : maxDate}
+                        maximumDate={maxDate}
                         accentColor={colors.primary}
                         buttonTextColorIOS={colors.primary}
                     />
