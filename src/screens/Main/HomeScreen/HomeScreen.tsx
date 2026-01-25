@@ -6,11 +6,11 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppButton from "@components/AppButton";
-import { useDispatch, useSelector } from "react-redux";
-import { logout, selectUser } from "@store/slices/authSlice";
+import { useSelector } from "react-redux";
+import { selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
-import { tokenStorage } from "@shared/utils/storage/tokenStorage";
+import { useLogout } from "@shared/query/auth/useLogout";
 import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
 type HomeScreenNavigationProp = StackNavigationProp<
@@ -20,12 +20,11 @@ type HomeScreenNavigationProp = StackNavigationProp<
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
 
   const handleLogout = async () => {
-    await tokenStorage.clearToken();
-    dispatch(logout());
+    logoutMutate();
   };
 
   const handleGoToProfile = () => {
@@ -47,7 +46,7 @@ const HomeScreen = () => {
             FONT_16
             style={{ color: colors.textSecondary, marginBottom: verticalScale(20) }}
           >
-            Hello, {user.name || user.email}!
+            Hello, {user.full_name || user.email}!
           </Text>
         )}
         <AppButton
@@ -58,6 +57,7 @@ const HomeScreen = () => {
         <AppButton
           title="Logout"
           onPress={handleLogout}
+          loading={logoutPending}
           style={{ marginTop: verticalScale(20) }}
         />
       </View>
