@@ -25,6 +25,9 @@ import { useOnboardingForm } from "@shared/forms/hooks/useOnboardingForm";
 import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
+import { useDispatch } from "react-redux";
+import { updateUser } from "@store/slices/authSlice";
 
 // Global Components
 import AppHeader from "@components/AppHeader";
@@ -52,6 +55,7 @@ const COUNTRIES = [
 
 const CompleteProfileScreen = () => {
     const navigation = useNavigation<CompleteProfileNavigationProp>();
+    const dispatch = useDispatch();
     const { t } = useTranslation();
     const {
         control,
@@ -83,17 +87,23 @@ const CompleteProfileScreen = () => {
         );
     }, [countrySearch]);
 
-    const onSubmit = (data: OnboardingFormValues) => {
+    const onSubmit = async (data: OnboardingFormValues) => {
         setLoading(true);
-        console.log("=== Profile Completion Initiated ===");
-        console.log("Form Data:", JSON.stringify(data, null, 2));
+        try {
+            const response = await PROFILE_SERVICE.updateProfile({
+                ...data,
+                is_onboarded: true
+            } as any);
 
-        // Simulating API call
-        setTimeout(() => {
+            if (response.data.success) {
+                dispatch(updateUser({ is_onboarded: true }));
+                // Navigation handles itself via UserNavigation
+            }
+        } catch (error) {
+            console.error("[CompleteProfile] Update error:", error);
+        } finally {
             setLoading(false);
-            console.log("Profile successfully updated locally.");
-            navigation.replace(ROUTES.MAIN_FLOW);
-        }, 2000);
+        }
     };
 
     const handleConfirmDate = (date: Date) => {

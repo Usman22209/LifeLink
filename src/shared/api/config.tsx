@@ -1,5 +1,5 @@
 
-const API_URL = "http:/192.168.0.101:3001";
+const API_URL = "http:/192.168.0.104:3001/";
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
@@ -9,6 +9,9 @@ const API_CONFIG = {
     forgotPassword: "auth/forgot-password",
     resetPassword: "auth/reset-password",
     logout: "auth/logout",
+  },
+  PROFILE: {
+    me: "profile/me",
   },
   FILE: {
     upload: "file/upload",

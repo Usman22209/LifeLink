@@ -1,7 +1,31 @@
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  is_onboarded: boolean;
+}
+
+export interface Profile {
+  phone?: string;
+  gender?: 'male' | 'female' | 'other';
+  dob?: string;
+  blood_group?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  profile_image?: string;
+  is_onboarded: boolean;
+  language_preference?: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  session: {
+    access_token: string;
+    refresh_token: string;
+  };
+  user: User;
 }
 
 export interface AuthState {
