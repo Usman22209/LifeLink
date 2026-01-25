@@ -72,7 +72,9 @@ const CompleteProfileScreen = () => {
 
     const [loading, setLoading] = useState(false);
     const { mutateAsync: uploadImage, isPending: isUploading } = useUploadImage();
+    const [localImage, setLocalImage] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
 
     const [isImageModalVisible, setImageModalVisible] = useState(false);
     const [isCountryModalVisible, setCountryModalVisible] = useState(false);
@@ -124,6 +126,7 @@ const CompleteProfileScreen = () => {
     useEffect(() => {
         const handleUpload = async () => {
             if (media && !Array.isArray(media)) {
+                setLocalImage(media.path);
                 try {
                     const file = {
                         uri: media.path,
@@ -133,6 +136,7 @@ const CompleteProfileScreen = () => {
                     const response = await uploadImage(file);
                     if (response?.data?.url) {
                         setValue("profile_image", response.data.url);
+                        setLocalImage(null); // Clear local preview once remote is set
                     }
                 } catch (error) {
                     console.error("[CompleteProfile] Upload error:", error);
@@ -145,6 +149,7 @@ const CompleteProfileScreen = () => {
     }, [media, setValue, uploadImage]);
 
 
+
     useEffect(() => {
         if (user?.email) {
             setValue("email", user.email);
@@ -153,7 +158,9 @@ const CompleteProfileScreen = () => {
 
 
     const pickImage = async (type: 'camera' | 'gallery') => {
+        setImageModalVisible(false);
         if (type === 'camera' && Platform.OS === 'android') {
+
             try {
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -214,16 +221,33 @@ const CompleteProfileScreen = () => {
                         style={styles.imageContainer}
                         activeOpacity={0.8}
                     >
-                        {profileImage ? (
-                            <View>
-                                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                        {(profileImage || localImage) ? (
+                            <View style={styles.profileImage}>
+                                <Image
+                                    source={{ uri: profileImage || localImage || "" }}
+                                    style={styles.profileImage}
+                                />
                                 {isUploading && (
-                                    <View style={[styles.profileImage, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' }]}>
-                                        <AnyIcon type={Icons.MaterialIcons} name="cloud-upload" size={30} color={colors.white} />
+                                    <View style={[
+                                        styles.profileImage,
+                                        {
+                                            position: 'absolute',
+                                            backgroundColor: 'rgba(0,0,0,0.4)',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }
+                                    ]}>
+                                        <AnyIcon
+                                            type={Icons.MaterialIcons}
+                                            name="cloud-upload"
+                                            size={moderateScale(32)}
+                                            color={colors.white}
+                                        />
                                     </View>
                                 )}
                             </View>
                         ) : (
+
 
                             <View style={styles.imagePlaceholder}>
                                 <AnyIcon
@@ -257,11 +281,11 @@ const CompleteProfileScreen = () => {
                         {t("onboarding.basicInfo")}
                     </Text>
                     <AppInput
-                        name="name"
+                        name="full_name"
                         control={control}
                         label={t("onboarding.fullName")}
                         placeholder={t("onboarding.fullNamePlaceholder")}
-                        error={errors.name?.message}
+                        error={errors.full_name?.message}
                         autoCapitalize="words"
                         iconType={Icons.MaterialIcons}
                         iconName="person-outline"

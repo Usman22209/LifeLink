@@ -10,8 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
-import { tokenStorage } from "@shared/utils/storage/tokenStorage";
+import { useLogout } from "@shared/query/auth/useLogout";
 import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   MainStackParamList,
@@ -23,9 +24,10 @@ const ProfileScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
 
+  const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
+
   const handleLogout = async () => {
-    await tokenStorage.clearToken();
-    dispatch(logout());
+    logoutMutate();
   };
 
   const handleGoBack = () => {
@@ -45,7 +47,7 @@ const ProfileScreen = () => {
         {user && (
           <View style={{ alignItems: "center", marginBottom: verticalScale(20) }}>
             <Text FONT_16 style={{ color: colors.textSecondary }}>
-              Name: {user.name}
+              Name: {user.full_name}
             </Text>
             <Text FONT_16 style={{ color: colors.textSecondary }}>
               Email: {user.email}
@@ -60,6 +62,7 @@ const ProfileScreen = () => {
         <AppButton
           title="Logout"
           onPress={handleLogout}
+          loading={logoutPending}
           style={{ marginTop: verticalScale(20) }}
         />
       </View>

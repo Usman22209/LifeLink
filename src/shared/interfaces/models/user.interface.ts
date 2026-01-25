@@ -1,10 +1,12 @@
 export interface User {
   id: string;
   email: string;
+  full_name: string;
   is_onboarded: boolean;
 }
 
 export interface Profile {
+  full_name?: string;
   phone?: string;
   gender?: 'male' | 'female' | 'other';
   dob?: string;

@@ -1,23 +1,23 @@
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { onboardingSchema, OnboardingFormValues } from "../schemas/onboarding.schema";
 
-export const useOnboardingForm = () => {
+export const useOnboardingForm = (): UseFormReturn<OnboardingFormValues> => {
     return useForm<OnboardingFormValues>({
         resolver: zodResolver(onboardingSchema),
         mode: "onChange",
         defaultValues: {
-            name: "",
+            full_name: "",
             email: "",
             phone: "",
-            gender: "male" as any,
+            gender: "male" as OnboardingFormValues["gender"],
             dob: "",
             city: "",
             state: "",
             country: "",
             blood_group: "",
             profile_image: "",
-            confirmed_data: true as any,
+            confirmed_data: true,
         },
     });
 };

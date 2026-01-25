@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const onboardingSchema = z.object({
-    name: z.string().min(3, "Name must be at least 3 characters"),
+    full_name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Invalid email address"),
     phone: z.string().min(10, "Invalid phone number"),
     gender: z.string().min(1, "Gender is required"),
