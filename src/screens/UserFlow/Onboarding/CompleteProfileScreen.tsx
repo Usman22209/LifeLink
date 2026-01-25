@@ -28,6 +28,8 @@ import type { UserStackParamList } from "@shared/interfaces/navigation/navigatio
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
+import { useUploadImage } from "@shared/query/file/useUploadImage";
+
 
 
 // Global Components
@@ -69,7 +71,9 @@ const CompleteProfileScreen = () => {
 
 
     const [loading, setLoading] = useState(false);
+    const { mutateAsync: uploadImage, isPending: isUploading } = useUploadImage();
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
     const [isImageModalVisible, setImageModalVisible] = useState(false);
     const [isCountryModalVisible, setCountryModalVisible] = useState(false);
     const [countrySearch, setCountrySearch] = useState("");
@@ -118,11 +122,28 @@ const CompleteProfileScreen = () => {
     const { media, pickFromCamera, pickFromGallery } = useMediaPicker();
 
     useEffect(() => {
-        if (media && !Array.isArray(media)) {
-            setValue("profile_image", media.path);
-            setImageModalVisible(false);
-        }
-    }, [media, setValue]);
+        const handleUpload = async () => {
+            if (media && !Array.isArray(media)) {
+                try {
+                    const file = {
+                        uri: media.path,
+                        type: media.mime || "image/jpeg",
+                        name: media.path.split("/").pop() || "profile.jpg",
+                    };
+                    const response = await uploadImage(file);
+                    if (response?.data?.url) {
+                        setValue("profile_image", response.data.url);
+                    }
+                } catch (error) {
+                    console.error("[CompleteProfile] Upload error:", error);
+                } finally {
+                    setImageModalVisible(false);
+                }
+            }
+        };
+        handleUpload();
+    }, [media, setValue, uploadImage]);
+
 
     useEffect(() => {
         if (user?.email) {
@@ -194,8 +215,16 @@ const CompleteProfileScreen = () => {
                         activeOpacity={0.8}
                     >
                         {profileImage ? (
-                            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                            <View>
+                                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                                {isUploading && (
+                                    <View style={[styles.profileImage, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' }]}>
+                                        <AnyIcon type={Icons.MaterialIcons} name="cloud-upload" size={30} color={colors.white} />
+                                    </View>
+                                )}
+                            </View>
                         ) : (
+
                             <View style={styles.imagePlaceholder}>
                                 <AnyIcon
                                     type={Icons.MaterialIcons}
