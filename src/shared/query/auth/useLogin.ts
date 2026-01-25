@@ -21,6 +21,7 @@ interface LoginResponse {
   user: {
     id: string;
     email: string;
+    is_onboarded: boolean;
   };
 }
 
@@ -52,7 +53,7 @@ export const useLogin = () => {
       Toast.show({
         type: "success",
         text1: "Welcome Back",
-        text2: "Login successful",
+        text2: response.data.message || "Login successful",
       });
     },
 

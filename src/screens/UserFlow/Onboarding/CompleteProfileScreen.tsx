@@ -26,8 +26,9 @@ import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
-import { useDispatch } from "react-redux";
-import { updateUser } from "@store/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, updateUser } from "@store/slices/authSlice";
+
 
 // Global Components
 import AppHeader from "@components/AppHeader";
@@ -56,6 +57,7 @@ const COUNTRIES = [
 const CompleteProfileScreen = () => {
     const navigation = useNavigation<CompleteProfileNavigationProp>();
     const dispatch = useDispatch();
+    const user = useSelector(selectUser);
     const { t } = useTranslation();
     const {
         control,
@@ -64,6 +66,7 @@ const CompleteProfileScreen = () => {
         setValue,
         watch,
     } = useOnboardingForm();
+
 
     const [loading, setLoading] = useState(false);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -120,6 +123,13 @@ const CompleteProfileScreen = () => {
             setImageModalVisible(false);
         }
     }, [media, setValue]);
+
+    useEffect(() => {
+        if (user?.email) {
+            setValue("email", user.email);
+        }
+    }, [user?.email, setValue]);
+
 
     const pickImage = async (type: 'camera' | 'gallery') => {
         if (type === 'camera' && Platform.OS === 'android') {
@@ -247,7 +257,9 @@ const CompleteProfileScreen = () => {
                         iconType={Icons.MaterialIcons}
                         iconName="mail-outline"
                         marginBottom={0}
+                        editable={!user?.email}
                     />
+
                 </View>
 
                 <View style={styles.section}>

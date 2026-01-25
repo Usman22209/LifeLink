@@ -20,6 +20,7 @@ interface GoogleLoginResponse {
   user: {
     id: string;
     email: string;
+    is_onboarded: boolean;
   };
 }
 
@@ -51,7 +52,7 @@ export const useGoogleLogin = () => {
       Toast.show({
         type: "success",
         text1: "Welcome",
-        text2: "Google login successful",
+        text2: response.data.message || "Google login successful",
       });
     },
 
