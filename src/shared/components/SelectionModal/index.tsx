@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { View, TouchableOpacity, Modal, FlatList, StyleSheet, I18nManager } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -7,30 +7,33 @@ import AppInput from "@components/AppInput";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 
-interface Country {
-    name: string;
-    code: string;
-    flag: string;
-}
-
-interface CountryPickerModalProps {
+interface SelectionModalProps {
     isVisible: boolean;
     onClose: () => void;
-    countries: Country[];
-    selectedCountry: string;
-    onSelect: (country: string) => void;
-    onSearch: (text: string) => void;
+    title: string;
+    options: string[];
+    selectedValue: string;
+    onSelect: (value: string) => void;
+    placeholder?: string;
 }
 
-const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
+const SelectionModal: React.FC<SelectionModalProps> = ({
     isVisible,
     onClose,
-    countries,
-    selectedCountry,
+    title,
+    options,
+    selectedValue,
     onSelect,
-    onSearch,
+    placeholder = "Search...",
 }) => {
     const isRtl = I18nManager.isRTL;
+    const [search, setSearch] = useState("");
+
+    const filteredOptions = useMemo(() => {
+        return options.filter(opt =>
+            opt.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [options, search]);
 
     return (
         <Modal
@@ -44,24 +47,25 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
                     <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
                         <AnyIcon type={Icons.Ionicons} name="close-outline" size={moderateScale(24)} color={colors.text} />
                     </TouchableOpacity>
-                    <Text bold FONT_16 style={styles.headerTitle}>Select Country</Text>
+                    <Text bold FONT_16 style={styles.headerTitle}>{title}</Text>
                     <View style={{ width: 28 }} />
                 </View>
 
                 <View style={styles.searchContainer}>
                     <AppInput
-                        name="search_country"
-                        placeholder="Search..."
+                        name="search_selection"
+                        placeholder={placeholder}
+                        value={search}
+                        onChangeText={setSearch}
                         iconType={Icons.Ionicons}
                         iconName="search-outline"
-                        onChangeText={onSearch}
                         marginBottom={0}
                     />
                 </View>
 
                 <FlatList
-                    data={countries}
-                    keyExtractor={(item) => item.code}
+                    data={filteredOptions}
+                    keyExtractor={(item) => item}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -71,21 +75,18 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
                             style={[
                                 styles.item,
                                 { flexDirection: isRtl ? "row-reverse" : "row" },
-                                selectedCountry === item.name && styles.selectedItem
+                                selectedValue === item && styles.selectedItem
                             ]}
-                            onPress={() => onSelect(item.name)}
+                            onPress={() => {
+                                onSelect(item);
+                                setSearch("");
+                                onClose();
+                            }}
                         >
-                            <View style={[styles.itemContent, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-                                <Text style={styles.flagEmoji}>{item.flag}</Text>
-                                <Text regular FONT_14 style={[
-                                    styles.countryName,
-                                    { marginLeft: isRtl ? 0 : scale(12), marginRight: isRtl ? scale(12) : 0 },
-                                    selectedCountry === item.name && styles.selectedItemText
-                                ]}>
-                                    {item.name}
-                                </Text>
-                            </View>
-                            {selectedCountry === item.name && (
+                            <Text regular FONT_14 style={[styles.itemName, selectedValue === item && styles.selectedItemText]}>
+                                {item}
+                            </Text>
+                            {selectedValue === item && (
                                 <View style={styles.checkIconWrapper}>
                                     <AnyIcon type={Icons.Ionicons} name="checkmark" size={moderateScale(16)} color={colors.white} />
                                 </View>
@@ -93,13 +94,18 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
                         </TouchableOpacity>
                     )}
                     contentContainerStyle={styles.list}
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Text regular FONT_14 style={{ color: colors.textSecondary }}>No results found</Text>
+                        </View>
+                    }
                 />
             </ScreenWrapper>
         </Modal>
     );
 };
 
-export default CountryPickerModal;
+export default SelectionModal;
 
 const styles = StyleSheet.create({
     header: {
@@ -159,8 +165,8 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: colors.border + '15',
-        marginHorizontal: scale(12),
+        backgroundColor: colors.border + '80',
+        marginHorizontal: scale(4),
     },
     selectedItem: {
         backgroundColor: colors.primary + '10',
@@ -177,13 +183,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    itemContent: {
-        alignItems: 'center',
-    },
-    flagEmoji: {
-        fontSize: moderateScale(20),
-    },
-    countryName: {
+    itemName: {
         color: colors.text,
     },
+    emptyContainer: {
+        alignItems: 'center',
+        marginTop: verticalScale(20),
+    }
 });

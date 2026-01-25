@@ -130,6 +130,10 @@ export const styles = StyleSheet.create({
         fontSize: moderateScale(18),
         marginRight: scale(10),
     },
+    icon: {
+        justifyContent: "center",
+        alignItems: "center",
+    },
     bloodGroupGrid: {
         flexDirection: "row",
         flexWrap: "wrap",

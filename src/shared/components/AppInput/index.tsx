@@ -17,7 +17,7 @@ import { AppInputProps } from "@shared/interfaces/components/app-input.interface
 
 const AppInput: React.FC<AppInputProps> = ({
   label,
-  value = "",
+  value,
   iconType,
   iconName,
   placeholder,

@@ -32,11 +32,12 @@ import { useUploadImage } from "@shared/query/file/useUploadImage";
 
 
 
-// Global Components
 import AppHeader from "@components/AppHeader";
 import ImagePickerModal from "@components/ImagePickerModal";
 import CountryPickerModal from "@components/CountryPickerModal";
+import SelectionModal from "@components/SelectionModal";
 import { styles } from "./styles/CompleteProfile.styles";
+import CitiesData from "@shared/data/cities.json";
 
 type CompleteProfileNavigationProp = StackNavigationProp<
     UserStackParamList,
@@ -45,16 +46,7 @@ type CompleteProfileNavigationProp = StackNavigationProp<
 
 const COUNTRIES = [
     { name: "Pakistan", code: "PK", flag: "🇵🇰" },
-    { name: "United States", code: "US", flag: "🇺🇸" },
-    { name: "United Kingdom", code: "GB", flag: "🇬🇧" },
-    { name: "Canada", code: "CA", flag: "🇨🇦" },
-    { name: "Australia", code: "AU", flag: "🇦🇺" },
-    { name: "India", code: "IN", flag: "🇮🇳" },
-    { name: "United Arab Emirates", code: "AE", flag: "🇦🇪" },
-    { name: "Saudi Arabia", code: "SA", flag: "🇸🇦" },
-    { name: "Germany", code: "DE", flag: "🇩🇪" },
-    { name: "France", code: "FR", flag: "🇫🇷" },
-].sort((a, b) => a.name.localeCompare(b.name));
+];
 
 const CompleteProfileScreen = () => {
     const navigation = useNavigation<CompleteProfileNavigationProp>();
@@ -84,7 +76,26 @@ const CompleteProfileScreen = () => {
 
     const [isImageModalVisible, setImageModalVisible] = useState(false);
     const [isCountryModalVisible, setCountryModalVisible] = useState(false);
+    const [isProvinceModalVisible, setProvinceModalVisible] = useState(false);
+    const [isCityModalVisible, setCityModalVisible] = useState(false);
     const [countrySearch, setCountrySearch] = useState("");
+
+    const provinces = useMemo(() => {
+        return CitiesData.cities.map(item => typeof item === 'string' ? item : item.province);
+    }, []);
+
+    const selectedProvince = watch("state");
+    const selectedCity = watch("city");
+
+    const availableCities = useMemo(() => {
+        if (!selectedProvince) return [];
+        const provinceData = CitiesData.cities.find(item =>
+            (typeof item === 'string' && item === selectedProvince) ||
+            (typeof item === 'object' && item.province === selectedProvince)
+        );
+        if (typeof provinceData === 'object') return provinceData.cities;
+        return [selectedProvince]; // Case for Islamabad
+    }, [selectedProvince]);
 
     const profileImage = watch("profile_image");
     const selectedCountry = watch("country");
@@ -374,14 +385,23 @@ const CompleteProfileScreen = () => {
                             { flexDirection: isRtl ? "row-reverse" : "row" }
                         ]}
                     >
-                        <Text regular FONT_14 style={watch("dob") ? { color: colors.text } : { color: colors.placeholder }}>
-                            {watch("dob") || "YYYY-MM-DD"}
-                        </Text>
+                        <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                            <AnyIcon
+                                type={Icons.MaterialCommunityIcons}
+                                name="calendar-month"
+                                size={moderateScale(20)}
+                                color={colors.primary}
+                                style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
+                            />
+                            <Text regular FONT_14 style={watch("dob") ? { color: colors.text } : { color: colors.placeholder }}>
+                                {watch("dob") || "YYYY-MM-DD"}
+                            </Text>
+                        </View>
                         <AnyIcon
-                            type={Icons.MaterialCommunityIcons}
-                            name="calendar-month"
-                            size={moderateScale(20)}
-                            color={colors.primary}
+                            type={Icons.Feather}
+                            name="chevron-down"
+                            size={moderateScale(18)}
+                            color={colors.placeholder}
                         />
                     </TouchableOpacity>
                     {errors.dob && (
@@ -409,49 +429,119 @@ const CompleteProfileScreen = () => {
                     <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
                         {t("onboarding.country")}
                     </Text>
+                    <View
+                        style={[
+                            styles.pickerButton,
+                            {
+                                flexDirection: isRtl ? "row-reverse" : "row",
+                                opacity: 0.8,
+                                backgroundColor: colors.border + "40",
+                                marginBottom: verticalScale(16)
+                            }
+                        ]}
+                    >
+                        <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                            <View style={[styles.icon, { [isRtl ? "marginLeft" : "marginRight"]: scale(10) }]}>
+                                {currentFlag ? (
+                                    <Text style={styles.flagEmoji}>{currentFlag}</Text>
+                                ) : (
+                                    <AnyIcon
+                                        type={Icons.MaterialIcons}
+                                        name="public"
+                                        size={moderateScale(20)}
+                                        color={colors.primary}
+                                    />
+                                )}
+                            </View>
+                            <Text regular FONT_14 style={{ color: colors.text }}>
+                                {selectedCountry || "Pakistan"}
+                            </Text>
+                        </View>
+                    </View>
+
+
+
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.state")} (Province)
+                    </Text>
                     <TouchableOpacity
-                        onPress={() => setCountryModalVisible(true)}
+                        onPress={() => setProvinceModalVisible(true)}
                         activeOpacity={0.7}
                         style={[
                             styles.pickerButton,
-                            { flexDirection: isRtl ? "row-reverse" : "row" }
+                            { flexDirection: isRtl ? "row-reverse" : "row", marginBottom: verticalScale(12) }
                         ]}
                     >
-                        <View style={styles.pickerValueContainer}>
-                            {currentFlag && <Text style={styles.flagEmoji}>{currentFlag}</Text>}
-                            <Text regular FONT_14 style={selectedCountry ? { color: colors.text } : { color: colors.placeholder }}>
-                                {selectedCountry || t("onboarding.countryPlaceholder")}
+                        <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                            <AnyIcon
+                                type={Icons.MaterialIcons}
+                                name="map"
+                                size={moderateScale(20)}
+                                color={colors.primary}
+                                style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
+                            />
+                            <Text regular FONT_14 style={selectedProvince ? { color: colors.text } : { color: colors.placeholder }}>
+                                {selectedProvince || "Select Province"}
                             </Text>
                         </View>
                         <AnyIcon
-                            type={Icons.MaterialIcons}
-                            name="public"
-                            size={moderateScale(20)}
-                            color={colors.primary}
+                            type={Icons.Feather}
+                            name="chevron-down"
+                            size={moderateScale(18)}
+                            color={colors.placeholder}
                         />
                     </TouchableOpacity>
+                    {errors.state && (
+                        <Text FONT_12 style={[{ color: colors.error, marginTop: -8, marginBottom: 8, textAlign: isRtl ? "right" : "left" }]}>
+                            {errors.state.message}
+                        </Text>
+                    )}
 
-
-
-                    <AppInput
-                        name="state"
-                        control={control}
-                        label={t("onboarding.state")}
-                        placeholder={t("onboarding.statePlaceholder")}
-                        error={errors.state?.message}
-                        iconType={Icons.MaterialIcons}
-                        iconName="map"
-                    />
-                    <AppInput
-                        name="city"
-                        control={control}
-                        label={t("onboarding.city")}
-                        placeholder={t("onboarding.cityPlaceholder")}
-                        error={errors.city?.message}
-                        iconType={Icons.MaterialIcons}
-                        iconName="location-city"
-                        marginBottom={0}
-                    />
+                    <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
+                        {t("onboarding.city")}
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (!selectedProvince) {
+                                // Maybe show toast or hint
+                            } else {
+                                setCityModalVisible(true);
+                            }
+                        }}
+                        activeOpacity={0.7}
+                        style={[
+                            styles.pickerButton,
+                            {
+                                flexDirection: isRtl ? "row-reverse" : "row",
+                                opacity: !selectedProvince ? 0.6 : 1,
+                                marginBottom: 0
+                            }
+                        ]}
+                    >
+                        <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+                            <AnyIcon
+                                type={Icons.MaterialIcons}
+                                name="location-city"
+                                size={moderateScale(20)}
+                                color={colors.primary}
+                                style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
+                            />
+                            <Text regular FONT_14 style={selectedCity ? { color: colors.text } : { color: colors.placeholder }}>
+                                {selectedCity || "Select City"}
+                            </Text>
+                        </View>
+                        <AnyIcon
+                            type={Icons.Feather}
+                            name="chevron-down"
+                            size={moderateScale(18)}
+                            color={colors.placeholder}
+                        />
+                    </TouchableOpacity>
+                    {errors.city && (
+                        <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
+                            {errors.city.message}
+                        </Text>
+                    )}
                 </View>
 
                 <View style={styles.section}>
@@ -514,6 +604,29 @@ const CompleteProfileScreen = () => {
                     setCountryModalVisible(false);
                 }}
                 onSearch={setCountrySearch}
+            />
+
+            <SelectionModal
+                isVisible={isProvinceModalVisible}
+                onClose={() => setProvinceModalVisible(false)}
+                title="Select Province"
+                options={provinces}
+                selectedValue={selectedProvince}
+                onSelect={(value) => {
+                    setValue("state", value);
+                    setValue("city", ""); // Clear city when province changes
+                }}
+            />
+
+            <SelectionModal
+                isVisible={isCityModalVisible}
+                onClose={() => setCityModalVisible(false)}
+                title={`Select City in ${selectedProvince}`}
+                options={availableCities}
+                selectedValue={selectedCity}
+                onSelect={(value) => {
+                    setValue("city", value);
+                }}
             />
         </ScreenWrapper>
     );

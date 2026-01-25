@@ -14,7 +14,7 @@ export const useOnboardingForm = (): UseFormReturn<OnboardingFormValues> => {
             dob: "",
             city: "",
             state: "",
-            country: "",
+            country: "Pakistan",
             blood_group: "",
             profile_image: "",
             confirmed_data: true,
