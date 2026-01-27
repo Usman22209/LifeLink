@@ -9,6 +9,7 @@ const API_CONFIG = {
     forgotPassword: "auth/forgot-password",
     resetPassword: "auth/reset-password",
     logout: "auth/logout",
+    refresh: "auth/refresh",
   },
   PROFILE: {
     me: "profile/me",
