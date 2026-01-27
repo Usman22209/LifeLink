@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import * as RNLocalize from "react-native-localize";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { I18nManager } from "react-native";
 
 import en from "./en.json";
 import ur from "./ur.json";
@@ -12,6 +13,9 @@ const resources = {
   en: { translation: en },
   ur: { translation: ur },
 };
+
+// RTL Languages
+const RTL_LANGUAGES = ["ur", "ar"];
 
 const languageDetector = {
   type: "languageDetector",
@@ -32,9 +36,9 @@ const languageDetector = {
       })
       .catch(() => callback("en"));
   },
-  init: () => {},
+  init: () => { },
   cacheUserLanguage: (lng: string) => {
-    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng).catch(() => {});
+    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng).catch(() => { });
   },
 };
 
@@ -51,5 +55,13 @@ i18n
     react: { useSuspense: false },
   });
 
+// Set initial RTL based on current language
+const currentLanguage = i18n.language || "en";
+const isRTL = RTL_LANGUAGES.includes(currentLanguage);
+if (I18nManager.isRTL !== isRTL) {
+  I18nManager.forceRTL(isRTL);
+  I18nManager.allowRTL(isRTL);
+}
+
 export default i18n;
-export { LANGUAGE_STORAGE_KEY };
+export { LANGUAGE_STORAGE_KEY, RTL_LANGUAGES };

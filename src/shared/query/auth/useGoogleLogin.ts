@@ -20,6 +20,8 @@ interface GoogleLoginResponse {
   user: {
     id: string;
     email: string;
+    full_name: string;
+    is_onboarded: boolean;
   };
 }
 
@@ -34,7 +36,7 @@ export const useGoogleLogin = () => {
     onSuccess: async (response) => {
       const { session, user } = response.data as GoogleLoginResponse;
       const { access_token, refresh_token, expires_at } = session;
-
+      console.log(refresh_token, "refresh_token")
       await tokenStorage.setRefreshToken(refresh_token);
 
       queryClient.setQueryData(["user"], user);
@@ -51,7 +53,7 @@ export const useGoogleLogin = () => {
       Toast.show({
         type: "success",
         text1: "Welcome",
-        text2: "Google login successful",
+        text2: response.data.message || "Google login successful",
       });
     },
 

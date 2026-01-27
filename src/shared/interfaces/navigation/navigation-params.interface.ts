@@ -3,9 +3,11 @@ import { ROUTES } from "@utils/Routes";
 export type UserStackParamList = {
   [ROUTES.AUTH_FLOW]: undefined;
   [ROUTES.MAIN_FLOW]: undefined;
+  [ROUTES.ONBOARDING]: undefined;
 };
 
 export type AuthStackParamList = {
+  [ROUTES.WELCOME]: undefined;
   [ROUTES.LOGIN]: undefined;
   [ROUTES.SIGNUP]: undefined;
   [ROUTES.FORGOT_PASSWORD]: undefined;

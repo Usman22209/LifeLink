@@ -1,5 +1,6 @@
 import HTTP_CLIENT from "../controller/HTTP_CLIENT";
 import { API_CONFIG } from "../config";
+import axios from "axios";
 export const AUTH_SERVICE = {
   login: (data: { email: string; password: string }) => {
     const url = API_CONFIG.AUTH.login;
@@ -13,9 +14,9 @@ export const AUTH_SERVICE = {
     const url = API_CONFIG.AUTH.forgotPassword;
     return HTTP_CLIENT.post(url, data);
   },
-  googleLogin: (data: { idToken: string }) => {   
-    const url = API_CONFIG.AUTH.googleLogin;  
-    return HTTP_CLIENT.post(url, data); 
+  googleLogin: (data: { idToken: string }) => {
+    const url = API_CONFIG.AUTH.googleLogin;
+    return HTTP_CLIENT.post(url, data);
   },
   resetPassword: (data: { password: string }, token: string) => {
     const url = API_CONFIG.AUTH.resetPassword;
@@ -26,5 +27,9 @@ export const AUTH_SERVICE = {
   logout: () => {
     const url = API_CONFIG.AUTH.logout;
     return HTTP_CLIENT.post(url);
+  },
+  refresh: (refreshToken: string) => {
+    const url = API_CONFIG.AUTH.refresh;
+    return axios.post(`${API_CONFIG.BASE_URL}${url}`, { refresh_token: refreshToken });
   },
 };

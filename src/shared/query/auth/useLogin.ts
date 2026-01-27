@@ -21,6 +21,8 @@ interface LoginResponse {
   user: {
     id: string;
     email: string;
+    full_name: string;
+    is_onboarded: boolean;
   };
 }
 
@@ -35,6 +37,7 @@ export const useLogin = () => {
     onSuccess: async (response) => {
       const { session, user } = response.data as LoginResponse;
       const { access_token, refresh_token, expires_at } = session;
+      console.log(refresh_token, "refresh_token")
 
       await tokenStorage.setRefreshToken(refresh_token);
 
@@ -52,7 +55,7 @@ export const useLogin = () => {
       Toast.show({
         type: "success",
         text1: "Welcome Back",
-        text2: "Login successful",
+        text2: response.data.message || "Login successful",
       });
     },
 

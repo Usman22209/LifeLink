@@ -10,12 +10,14 @@ import { colors } from "@theme/colors";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { Controller } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
 
 import { AppInputProps } from "@shared/interfaces/components/app-input.interface";
 
 const AppInput: React.FC<AppInputProps> = ({
   label,
-  value = "",
+  value,
   iconType,
   iconName,
   placeholder,
@@ -26,14 +28,18 @@ const AppInput: React.FC<AppInputProps> = ({
   containerStyle,
   keyboardType,
   control,
+  iconSize = moderateScale(18),
+  marginBottom = verticalScale(12),
   name,
   ...props
 }) => {
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const isRtl = useSelector(selectIsRtl);
 
   const renderInput = (fieldProps?: any) => (
     <TextInput
+      autoCapitalize="none"
       {...props}
       {...fieldProps}
       value={fieldProps?.value ?? value}
@@ -41,16 +47,25 @@ const AppInput: React.FC<AppInputProps> = ({
       placeholder={placeholder}
       placeholderTextColor={colors.placeholder}
       keyboardType={keyboardType}
-      autoCapitalize="none"
       secureTextEntry={secureText ? !showPassword : false}
-      style={[styles.input, { color: colors.text }, inputStyle]}
+      style={[
+        styles.input,
+        {
+          color: colors.text,
+          textAlign: isRtl ? "right" : "left",
+        },
+        inputStyle,
+      ]}
       onFocus={() => setFocused(true)}
-      onBlur={fieldProps?.onBlur ?? (() => setFocused(false))}
+      onBlur={(e) => {
+        setFocused(false);
+        fieldProps?.onBlur?.(e);
+      }}
     />
   );
 
   return (
-    <View style={{ marginBottom: verticalScale(12) }}>
+    <View style={{ marginBottom }}>
       {label && (
         <Text semiBold FONT_14 style={[styles.label, { color: colors.text }]}>
           {label}
@@ -71,14 +86,22 @@ const AppInput: React.FC<AppInputProps> = ({
           containerStyle,
         ]}
       >
-        <View style={styles.inputRow}>
+        <View
+          style={[
+            styles.inputRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           {iconName && (
             <AnyIcon
               type={iconType}
               name={iconName}
-              size={moderateScale(18)}
+              size={iconSize}
               color={focused ? colors.primary : colors.textSecondary}
-              style={styles.icon}
+              style={[
+                styles.icon,
+                { [isRtl ? "marginLeft" : "marginRight"]: scale(10) },
+              ]}
             />
           )}
 

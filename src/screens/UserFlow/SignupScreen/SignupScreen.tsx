@@ -1,10 +1,11 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, I18nManager } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
+import useTranslation from "@shared/hooks/useTranslation";
+import Text from "@components/AppText";
 import AppImage from "@components/AppImage";
 import { AppImages } from "@assets/images";
 import { Icons } from "@components/AnyIcon";
@@ -29,6 +30,7 @@ type SignupScreenNavigationProp = StackNavigationProp<
 
 const SignupScreen = () => {
   const navigation = useNavigation<SignupScreenNavigationProp>();
+  const { t } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -73,10 +75,10 @@ const SignupScreen = () => {
           <AppInput
             name="email"
             control={control}
-            label="Email"
+            label={t("signup.email")}
             iconType={Icons.Feather}
             iconName="mail"
-            placeholder="Enter your email"
+            placeholder={t("signup.emailPlaceholder")}
             keyboardType="email-address"
             error={errors.email?.message}
           />
@@ -84,10 +86,10 @@ const SignupScreen = () => {
           <AppInput
             name="password"
             control={control}
-            label="Password"
+            label={t("signup.password")}
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
-            placeholder="Enter your password"
+            placeholder={t("signup.passwordPlaceholder")}
             secureText={true}
             error={errors.password?.message}
           />
@@ -95,16 +97,17 @@ const SignupScreen = () => {
           <AppInput
             name="confirmPassword"
             control={control}
-            label="Confirm Password"
+            label={t("signup.confirmPassword")}
             iconType={Icons.MaterialCommunityIcons}
-            iconName="lock-outline"
-            placeholder="Confirm your password"
+            iconName="lock-reset"
+            iconSize={moderateScale(24)}
+            placeholder={t("signup.confirmPasswordPlaceholder")}
             secureText={true}
             error={errors.confirmPassword?.message}
           />
 
           <AppButton
-            title="Sign Up"
+            title={t("signup.signUpButton")}
             onPress={handleSubmit(handleSignup)}
             loading={signupPending}
             style={{ marginTop: verticalScale(12) }}
@@ -117,7 +120,7 @@ const SignupScreen = () => {
               FONT_12
               style={[styles.dividerText, { color: colors.textSecondary }]}
             >
-              OR
+              {t("signup.or")}
             </Text>
             <View style={[styles.divider, { backgroundColor: colors.border }]} />
           </View>
@@ -146,20 +149,20 @@ const SignupScreen = () => {
               FONT_14
               style={[styles.googleText, { color: colors.text }]}
             >
-              {googleLoginPending ? "Loading..." : "Continue with Google"}
+              {googleLoginPending ? t("signup.loading") : t("signup.continueWithGoogle")}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
             <Text FONT_14 style={{ color: colors.textSecondary }}>
-              Already have an account?{" "}
+              {t("signup.haveAccount")}{" "}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => navigation.navigate(ROUTES.LOGIN)}
             >
               <Text bold FONT_14 style={{ color: colors.primary }}>
-                Login
+                {t("signup.loginLink")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -182,14 +185,14 @@ const styles = StyleSheet.create({
   logo: { width: scale(250), height: verticalScale(180) },
   formContainer: { width: "100%", paddingHorizontal: 0 },
   dividerContainer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     marginVertical: verticalScale(20),
   },
   divider: { flex: 1, height: 1 },
   dividerText: { marginHorizontal: scale(16) },
   googleButton: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: moderateScale(12),
@@ -202,11 +205,11 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(8),
     alignItems: "center",
     justifyContent: "center",
-    marginRight: scale(12),
+    [I18nManager.isRTL ? "marginLeft" : "marginRight"]: scale(12),
   },
   googleText: {},
   footer: {
-    flexDirection: "row",
+    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
     justifyContent: "center",
     marginTop: verticalScale(20),
   },

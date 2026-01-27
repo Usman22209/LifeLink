@@ -27,6 +27,9 @@ interface AppButtonProps {
   /** States */
   disabled?: boolean;
   loading?: boolean;
+
+  /** Variants */
+  variant?: "primary" | "outline" | "text";
 }
 
 const AppButton: React.FC<AppButtonProps> = ({
@@ -40,7 +43,34 @@ const AppButton: React.FC<AppButtonProps> = ({
   isNotFull = false,
   disabled = false,
   loading = false,
+  variant = "primary",
 }) => {
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "outline":
+        return {
+          backgroundColor: "transparent",
+          borderWidth: 1,
+          borderColor: colors.primary,
+        };
+      case "text":
+        return {
+          backgroundColor: "transparent",
+        };
+      default:
+        return {
+          backgroundColor: backgroundColor ?? colors.primary,
+        };
+    }
+  };
+
+  const getTextColor = () => {
+    if (textColor !== colors.white) return textColor;
+    return variant === "outline" || variant === "text"
+      ? colors.primary
+      : colors.white;
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
@@ -48,8 +78,8 @@ const AppButton: React.FC<AppButtonProps> = ({
       onPress={onPress}
       style={[
         styles.button,
+        getVariantStyles(),
         {
-          backgroundColor: backgroundColor ?? colors.primary,
           marginBottom,
         },
         isNotFull && styles.autoWidth,
@@ -58,12 +88,12 @@ const AppButton: React.FC<AppButtonProps> = ({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} />
+        <ActivityIndicator color={getTextColor()} />
       ) : (
         <Text
           bold
           FONT_16
-          style={[styles.text, { color: textColor }, textStyle]}
+          style={[styles.text, { color: getTextColor() }, textStyle]}
         >
           {title}
         </Text>

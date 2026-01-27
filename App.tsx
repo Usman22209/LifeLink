@@ -1,6 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
-import store from "@store/store";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "@store/store";
 import AppNavigation from "@navigation/index";
 import "@shared/i18n";
 import OneSignalProvider from "@providers/OneSignalProvider";
@@ -69,14 +70,16 @@ const App = (): React.JSX.Element => {
   return (
     <SafeAreaProvider>
       <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          <OneSignalProvider>
-            <NavigationContainer linking={linking}>
-              <AppNavigation />
-              <Toast config={toastConfig} position="top" topOffset={10} />
-            </NavigationContainer>
-          </OneSignalProvider>
-        </QueryClientProvider>
+        <PersistGate loading={null} persistor={persistor}>
+          <QueryClientProvider client={queryClient}>
+            <OneSignalProvider>
+              <NavigationContainer linking={linking}>
+                <AppNavigation />
+                <Toast config={toastConfig} position="top" topOffset={10} />
+              </NavigationContainer>
+            </OneSignalProvider>
+          </QueryClientProvider>
+        </PersistGate>
       </Provider>
     </SafeAreaProvider>
   );
