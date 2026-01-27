@@ -4,7 +4,7 @@ import { AUTH_SERVICE } from "../../api/service/auth.service";
 import { logout as logoutAction } from "../../../store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import Toast from "react-native-toast-message";
-import { supabase } from "@shared/config/supabase";
+// import { supabase } from "@shared/config/supabase";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export const useLogout = () => {
@@ -15,7 +15,6 @@ export const useLogout = () => {
         try {
             await Promise.allSettled([
                 tokenStorage.clearToken(),
-                supabase.auth.signOut(),
                 GoogleSignin.signOut(),
             ]);
             dispatch(logoutAction());

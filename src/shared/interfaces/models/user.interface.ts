@@ -12,8 +12,7 @@ export interface Profile {
   dob?: string;
   blood_group?: string;
   country?: string;
-  state?: string;
-  city?: string;
+  city_id?: string;
   latitude?: number;
   longitude?: number;
   profile_image?: string;

@@ -7,11 +7,16 @@ import AppInput from "@components/AppInput";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 
+interface SelectionOption {
+    label: string;
+    value: string;
+}
+
 interface SelectionModalProps {
     isVisible: boolean;
     onClose: () => void;
     title: string;
-    options: string[];
+    options: string[] | SelectionOption[];
     selectedValue: string;
     onSelect: (value: string) => void;
     placeholder?: string;
@@ -29,11 +34,17 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
     const isRtl = I18nManager.isRTL;
     const [search, setSearch] = useState("");
 
-    const filteredOptions = useMemo(() => {
-        return options.filter(opt =>
-            opt.toLowerCase().includes(search.toLowerCase())
+    const normalizedOptions = useMemo((): SelectionOption[] => {
+        return options.map(opt =>
+            typeof opt === 'string' ? { label: opt, value: opt } : opt
         );
-    }, [options, search]);
+    }, [options]);
+
+    const filteredOptions = useMemo(() => {
+        return normalizedOptions.filter(opt =>
+            opt.label.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [normalizedOptions, search]);
 
     return (
         <Modal
@@ -65,7 +76,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
 
                 <FlatList
                     data={filteredOptions}
-                    keyExtractor={(item) => item}
+                    keyExtractor={(item) => item.value}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -75,18 +86,18 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
                             style={[
                                 styles.item,
                                 { flexDirection: isRtl ? "row-reverse" : "row" },
-                                selectedValue === item && styles.selectedItem
+                                selectedValue === item.value && styles.selectedItem
                             ]}
                             onPress={() => {
-                                onSelect(item);
+                                onSelect(item.value);
                                 setSearch("");
                                 onClose();
                             }}
                         >
-                            <Text regular FONT_14 style={[styles.itemName, selectedValue === item && styles.selectedItemText]}>
-                                {item}
+                            <Text regular FONT_14 style={[styles.itemName, selectedValue === item.value && styles.selectedItemText]}>
+                                {item.label}
                             </Text>
-                            {selectedValue === item && (
+                            {selectedValue === item.value && (
                                 <View style={styles.checkIconWrapper}>
                                     <AnyIcon type={Icons.Ionicons} name="checkmark" size={moderateScale(16)} color={colors.white} />
                                 </View>

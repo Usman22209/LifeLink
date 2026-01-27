@@ -28,6 +28,7 @@ import type { UserStackParamList } from "@shared/interfaces/navigation/navigatio
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
+import { selectLanguage } from "@store/slices/appSlice";
 import { useUploadImage } from "@shared/query/file/useUploadImage";
 
 
@@ -52,7 +53,8 @@ const CompleteProfileScreen = () => {
     const navigation = useNavigation<CompleteProfileNavigationProp>();
     const dispatch = useDispatch();
     const user = useSelector(selectUser);
-    const { t } = useTranslation();
+    const selectedLang = useSelector(selectLanguage);
+    const { t, i18n } = useTranslation();
     const {
         control,
         handleSubmit,
@@ -81,7 +83,8 @@ const CompleteProfileScreen = () => {
     const [countrySearch, setCountrySearch] = useState("");
 
     const provinces = useMemo(() => {
-        return CitiesData.cities.map(item => typeof item === 'string' ? item : item.province);
+        const provinceSet = new Set(CitiesData.cities.map(item => item.province));
+        return Array.from(provinceSet).sort();
     }, []);
 
     const selectedProvince = watch("state");
@@ -89,13 +92,20 @@ const CompleteProfileScreen = () => {
 
     const availableCities = useMemo(() => {
         if (!selectedProvince) return [];
-        const provinceData = CitiesData.cities.find(item =>
-            (typeof item === 'string' && item === selectedProvince) ||
-            (typeof item === 'object' && item.province === selectedProvince)
-        );
-        if (typeof provinceData === 'object') return provinceData.cities;
-        return [selectedProvince]; // Case for Islamabad
-    }, [selectedProvince]);
+        return CitiesData.cities
+            .filter(item => item.province === selectedProvince)
+            .map(item => ({
+                label: item.name[selectedLang] || item.name.en,
+                value: item.id
+            }));
+    }, [selectedProvince, selectedLang]);
+
+    const selectedCityName = useMemo(() => {
+        if (!selectedCity) return "";
+        const city = CitiesData.cities.find(c => c.id === selectedCity);
+        if (!city) return "";
+        return city.name[selectedLang] || city.name.en;
+    }, [selectedCity, selectedLang]);
 
     const profileImage = watch("profile_image");
     const selectedCountry = watch("country");
@@ -116,8 +126,15 @@ const CompleteProfileScreen = () => {
     const onSubmit = async (data: OnboardingFormValues) => {
         setLoading(true);
         try {
+            // Remove fields that are not in the profiles table schema
+            // We only store city_id now, and derive state/city name on frontend
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { email, confirmed_data, city, state, ...sanitizedData } = data;
+
             const response = await PROFILE_SERVICE.updateProfile({
-                ...data,
+                ...sanitizedData,
+                city_id: data.city, // 'city' in form holds the ID
+                language_preference: selectedLang,
                 is_onboarded: true
             } as any);
 
@@ -134,7 +151,7 @@ const CompleteProfileScreen = () => {
 
     const handleConfirmDate = (date: Date) => {
         const formattedDate = date.toISOString().split("T")[0];
-        setValue("dob", formattedDate);
+        setValue("dob", formattedDate, { shouldValidate: true });
         setDatePickerVisibility(false);
     };
 
@@ -152,7 +169,7 @@ const CompleteProfileScreen = () => {
                     };
                     const response = await uploadImage(file);
                     if (response?.data?.url) {
-                        setValue("profile_image", response.data.url);
+                        setValue("profile_image", response.data.url, { shouldValidate: true });
                         setLocalImage(null); // Clear local preview once remote is set
                     }
                 } catch (error) {
@@ -340,7 +357,7 @@ const CompleteProfileScreen = () => {
                         {["male", "female"].map((g) => (
                             <TouchableOpacity
                                 key={g}
-                                onPress={() => setValue("gender", g)}
+                                onPress={() => setValue("gender", g, { shouldValidate: true })}
                                 style={[
                                     styles.genderCard,
                                     watch("gender") === g && styles.genderCardActive
@@ -527,7 +544,7 @@ const CompleteProfileScreen = () => {
                                 style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
                             />
                             <Text regular FONT_14 style={selectedCity ? { color: colors.text } : { color: colors.placeholder }}>
-                                {selectedCity || "Select City"}
+                                {selectedCityName || "Select City"}
                             </Text>
                         </View>
                         <AnyIcon
@@ -555,7 +572,7 @@ const CompleteProfileScreen = () => {
                         {bloodGroups.map((group) => (
                             <TouchableOpacity
                                 key={group}
-                                onPress={() => setValue("blood_group", group)}
+                                onPress={() => setValue("blood_group", group, { shouldValidate: true })}
                                 style={[
                                     styles.bloodGroupButton,
                                     watch("blood_group") === group && styles.bloodGroupButtonActive
@@ -573,6 +590,11 @@ const CompleteProfileScreen = () => {
                             </TouchableOpacity>
                         ))}
                     </View>
+                    {errors.blood_group && (
+                        <Text FONT_12 style={[{ color: colors.error, marginTop: 4, textAlign: isRtl ? "right" : "left" }]}>
+                            {errors.blood_group.message}
+                        </Text>
+                    )}
                 </View>
 
                 <AppButton
@@ -589,7 +611,7 @@ const CompleteProfileScreen = () => {
                 onSelectSource={pickImage}
                 showRemove={!!profileImage}
                 onRemove={() => {
-                    setValue("profile_image", "");
+                    setValue("profile_image", "", { shouldValidate: true });
                     setImageModalVisible(false);
                 }}
             />
@@ -613,8 +635,8 @@ const CompleteProfileScreen = () => {
                 options={provinces}
                 selectedValue={selectedProvince}
                 onSelect={(value) => {
-                    setValue("state", value);
-                    setValue("city", ""); // Clear city when province changes
+                    setValue("state", value, { shouldValidate: true });
+                    setValue("city", "", { shouldValidate: true }); // Clear city when province changes
                 }}
             />
 
@@ -625,7 +647,7 @@ const CompleteProfileScreen = () => {
                 options={availableCities}
                 selectedValue={selectedCity}
                 onSelect={(value) => {
-                    setValue("city", value);
+                    setValue("city", value, { shouldValidate: true });
                 }}
             />
         </ScreenWrapper>
