@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useUploadImage } from "@shared/query/file/useUploadImage";
+import { getCurrentLocation, Coords } from "@shared/utils/locationService";
 
 
 
@@ -68,6 +69,7 @@ const CompleteProfileScreen = () => {
     const { mutateAsync: uploadImage, isPending: isUploading } = useUploadImage();
     const [localImage, setLocalImage] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [location, setLocation] = useState<Coords | null>(null);
 
     const maxDate = useMemo(() => {
         const date = new Date();
@@ -135,11 +137,15 @@ const CompleteProfileScreen = () => {
                 ...sanitizedData,
                 city_id: data.city, // 'city' in form holds the ID
                 language_preference: selectedLang,
-                is_onboarded: true
+                is_onboarded: true,
+                latitude: location?.latitude,
+                longitude: location?.longitude,
             } as any);
 
             if (response.data.success) {
-                dispatch(updateUser({ is_onboarded: true }));
+                dispatch(updateUser({
+                    is_onboarded: true,
+                }));
                 // Navigation handles itself via UserNavigation
             }
         } catch (error) {
@@ -189,6 +195,21 @@ const CompleteProfileScreen = () => {
             setValue("email", user.email);
         }
     }, [user?.email, setValue]);
+
+    useEffect(() => {
+        const fetchLocation = async () => {
+            try {
+                const coords = await getCurrentLocation();
+                if (coords) {
+                    setLocation(coords);
+                    console.log("[CompleteProfile] Location captured:", coords);
+                }
+            } catch (err) {
+                console.warn("[CompleteProfile] Failed to fetch location:", err);
+            }
+        };
+        fetchLocation();
+    }, []);
 
 
     const pickImage = async (type: 'camera' | 'gallery') => {
@@ -403,22 +424,15 @@ const CompleteProfileScreen = () => {
                         ]}
                     >
                         <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-                            <AnyIcon
-                                type={Icons.MaterialCommunityIcons}
-                                name="calendar-month"
-                                size={moderateScale(20)}
-                                color={colors.primary}
-                                style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
-                            />
                             <Text regular FONT_14 style={watch("dob") ? { color: colors.text } : { color: colors.placeholder }}>
                                 {watch("dob") || "YYYY-MM-DD"}
                             </Text>
                         </View>
                         <AnyIcon
-                            type={Icons.Feather}
-                            name="chevron-down"
-                            size={moderateScale(18)}
-                            color={colors.placeholder}
+                            type={Icons.MaterialCommunityIcons}
+                            name="calendar-month"
+                            size={moderateScale(20)}
+                            color={colors.primary}
                         />
                     </TouchableOpacity>
                     {errors.dob && (
