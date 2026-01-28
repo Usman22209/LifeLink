@@ -1,11 +1,15 @@
 import React, { useEffect, ReactNode } from "react";
-import { OneSignal, LogLevel } from "react-native-onesignal";
+import { useSelector } from "react-redux";
+import { OneSignal, LogLevel, NotificationWillDisplayEvent, NotificationClickEvent } from "react-native-onesignal";
 import { showInfoToast } from "@components/Toast";
+import { selectUser } from "@store/slices/authSlice";
 import ENV from "@config/env";
 
 const ONESIGNAL_APP_ID = ENV.ONESIGNAL_APP_ID;
 
 const OneSignalProvider = ({ children }: { children: ReactNode }) => {
+  const user = useSelector(selectUser);
+
   useEffect(() => {
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
     OneSignal.initialize(ONESIGNAL_APP_ID);
@@ -13,7 +17,7 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
 
     OneSignal.Notifications.addEventListener(
       "foregroundWillDisplay",
-      (event) => {
+      (event: NotificationWillDisplayEvent) => {
         event.notification.display();
         const title = event.notification.title || "New Notification";
         const description = event.notification.body || "";
@@ -22,10 +26,20 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
       },
     );
 
-    OneSignal.Notifications.addEventListener("click", (event) => {
+    OneSignal.Notifications.addEventListener("click", (event: NotificationClickEvent) => {
       console.log("Notification opened:", event.notification);
     });
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      OneSignal.login(user.id);
+      console.log("OneSignal login for user:", user.id);
+    } else {
+      OneSignal.logout();
+      console.log("OneSignal logout");
+    }
+  }, [user?.id]);
 
   return <>{children}</>;
 };
