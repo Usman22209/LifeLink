@@ -86,10 +86,21 @@ const CompleteProfileScreen = () => {
 
     const provinces = useMemo(() => {
         const provinceSet = new Set(CitiesData.cities.map(item => item.province));
-        return Array.from(provinceSet).sort();
-    }, []);
+        return Array.from(provinceSet).sort().map(p => ({
+            label: t(`onboarding.provinces.${p}`) !== `onboarding.provinces.${p}`
+                ? t(`onboarding.provinces.${p}`)
+                : p,
+            value: p
+        }));
+    }, [t]);
 
     const selectedProvince = watch("state");
+    const selectedProvinceLabel = useMemo(() => {
+        if (!selectedProvince) return "";
+        return t(`onboarding.provinces.${selectedProvince}`) !== `onboarding.provinces.${selectedProvince}`
+            ? t(`onboarding.provinces.${selectedProvince}`)
+            : selectedProvince;
+    }, [selectedProvince, t]);
     const selectedCity = watch("city");
 
     const availableCities = useMemo(() => {
@@ -454,7 +465,7 @@ const CompleteProfileScreen = () => {
 
                 <View style={styles.section}>
                     <Text bold FONT_16 style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}>
-                        Location
+                        {t("onboarding.location")}
                     </Text>
 
                     <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
@@ -485,7 +496,7 @@ const CompleteProfileScreen = () => {
                                 )}
                             </View>
                             <Text regular FONT_14 style={{ color: colors.text }}>
-                                {selectedCountry || "Pakistan"}
+                                {selectedCountry ? t(`onboarding.${selectedCountry.toLowerCase()}`) : t("onboarding.pakistan")}
                             </Text>
                         </View>
                     </View>
@@ -493,7 +504,7 @@ const CompleteProfileScreen = () => {
 
 
                     <Text semiBold FONT_14 style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}>
-                        {t("onboarding.state")} (Province)
+                        {t("onboarding.state")} {t("onboarding.provinceLabel")}
                     </Text>
                     <TouchableOpacity
                         onPress={() => setProvinceModalVisible(true)}
@@ -512,7 +523,7 @@ const CompleteProfileScreen = () => {
                                 style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
                             />
                             <Text regular FONT_14 style={selectedProvince ? { color: colors.text } : { color: colors.placeholder }}>
-                                {selectedProvince || "Select Province"}
+                                {selectedProvinceLabel || t("onboarding.selectProvince")}
                             </Text>
                         </View>
                         <AnyIcon
@@ -558,7 +569,7 @@ const CompleteProfileScreen = () => {
                                 style={{ [isRtl ? "marginLeft" : "marginRight"]: scale(10) }}
                             />
                             <Text regular FONT_14 style={selectedCity ? { color: colors.text } : { color: colors.placeholder }}>
-                                {selectedCityName || "Select City"}
+                                {selectedCityName || t("onboarding.selectCity")}
                             </Text>
                         </View>
                         <AnyIcon
@@ -645,7 +656,7 @@ const CompleteProfileScreen = () => {
             <SelectionModal
                 isVisible={isProvinceModalVisible}
                 onClose={() => setProvinceModalVisible(false)}
-                title="Select Province"
+                title={t("onboarding.selectProvince")}
                 options={provinces}
                 selectedValue={selectedProvince}
                 onSelect={(value) => {
@@ -657,7 +668,7 @@ const CompleteProfileScreen = () => {
             <SelectionModal
                 isVisible={isCityModalVisible}
                 onClose={() => setCityModalVisible(false)}
-                title={`Select City in ${selectedProvince}`}
+                title={`${t("onboarding.selectCityIn")} ${selectedProvinceLabel}`}
                 options={availableCities}
                 selectedValue={selectedCity}
                 onSelect={(value) => {

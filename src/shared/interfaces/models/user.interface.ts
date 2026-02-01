@@ -8,7 +8,7 @@ export interface User {
 export interface Profile {
   full_name?: string;
   phone?: string;
-  gender?: 'male' | 'female' | 'other';
+  gender?: 'male' | 'female';
   dob?: string;
   blood_group?: string;
   country?: string;

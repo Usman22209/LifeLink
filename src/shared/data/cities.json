@@ -5,7 +5,7 @@
       "province": "Islamabad Capital Territory",
       "name": {
         "en": "Islamabad",
-        "ur": null
+        "ur": "اسلام آباد"
       }
     },
     {
@@ -13,7 +13,7 @@
       "province": "Punjab",
       "name": {
         "en": "Ahmadpur East",
-        "ur": null
+        "ur": "احمد پور شرقیہ"
       }
     },
     {
@@ -21,7 +21,7 @@
       "province": "Punjab",
       "name": {
         "en": "Alipur",
-        "ur": null
+        "ur": "علی پور"
       }
     },
     {
@@ -29,7 +29,7 @@
       "province": "Punjab",
       "name": {
         "en": "Arifwala",
-        "ur": null
+        "ur": "عارف والا"
       }
     },
     {
@@ -37,7 +37,7 @@
       "province": "Punjab",
       "name": {
         "en": "Attock",
-        "ur": null
+        "ur": "اٹک"
       }
     },
     {
@@ -45,7 +45,7 @@
       "province": "Punjab",
       "name": {
         "en": "Bhera",
-        "ur": null
+        "ur": "بھیرہ"
       }
     },
     {
@@ -53,7 +53,7 @@
       "province": "Punjab",
       "name": {
         "en": "Bhalwal",
-        "ur": null
+        "ur": "بھلوال"
       }
     },
     {
@@ -61,7 +61,7 @@
       "province": "Punjab",
       "name": {
         "en": "Bahawalnagar",
-        "ur": null
+        "ur": "بہاولنگر"
       }
     },
     {
@@ -69,7 +69,7 @@
       "province": "Punjab",
       "name": {
         "en": "Bahawalpur",
-        "ur": null
+        "ur": "بہاولپور"
       }
     },
     {
@@ -77,7 +77,7 @@
       "province": "Punjab",
       "name": {
         "en": "Bhakkar",
-        "ur": null
+        "ur": "بھکر"
       }
     },
     {
@@ -85,7 +85,7 @@
       "province": "Punjab",
       "name": {
         "en": "Burewala",
-        "ur": null
+        "ur": "بورے والا"
       }
     },
     {
@@ -93,7 +93,7 @@
       "province": "Punjab",
       "name": {
         "en": "Chakwal",
-        "ur": null
+        "ur": "چکوال"
       }
     },
     {
@@ -101,7 +101,7 @@
       "province": "Punjab",
       "name": {
         "en": "Chichawatni",
-        "ur": null
+        "ur": "چیچہ وطنی"
       }
     },
     {
@@ -109,7 +109,7 @@
       "province": "Punjab",
       "name": {
         "en": "Chiniot",
-        "ur": null
+        "ur": "چنیوٹ"
       }
     },
     {
@@ -117,7 +117,7 @@
       "province": "Punjab",
       "name": {
         "en": "Chishtian",
-        "ur": null
+        "ur": "چشتیاں"
       }
     },
     {
@@ -125,7 +125,7 @@
       "province": "Punjab",
       "name": {
         "en": "Darya Khan",
-        "ur": null
+        "ur": "دریا خان"
       }
     },
     {
@@ -133,7 +133,7 @@
       "province": "Punjab",
       "name": {
         "en": "Dera Ghazi Khan",
-        "ur": null
+        "ur": "ڈیرہ غازی خان"
       }
     },
     {
@@ -141,7 +141,7 @@
       "province": "Punjab",
       "name": {
         "en": "Dhaular",
-        "ur": null
+        "ur": "دھولر"
       }
     },
     {
@@ -149,7 +149,7 @@
       "province": "Punjab",
       "name": {
         "en": "Dina",
-        "ur": null
+        "ur": "دینہ"
       }
     },
     {
@@ -157,7 +157,7 @@
       "province": "Punjab",
       "name": {
         "en": "Dinga",
-        "ur": null
+        "ur": "ڈنگہ"
       }
     },
     {
@@ -165,7 +165,7 @@
       "province": "Punjab",
       "name": {
         "en": "Dipalpur",
-        "ur": null
+        "ur": "دیپالپور"
       }
     },
     {
@@ -173,7 +173,7 @@
       "province": "Punjab",
       "name": {
         "en": "Faisalabad",
-        "ur": null
+        "ur": "فیصل آباد"
       }
     },
     {
@@ -181,7 +181,7 @@
       "province": "Punjab",
       "name": {
         "en": "Gojra",
-        "ur": null
+        "ur": "گوجرہ"
       }
     },
     {
@@ -189,7 +189,7 @@
       "province": "Punjab",
       "name": {
         "en": "Gujranwala",
-        "ur": null
+        "ur": "گوجرانوالہ"
       }
     },
     {
@@ -197,7 +197,7 @@
       "province": "Punjab",
       "name": {
         "en": "Gujrat",
-        "ur": null
+        "ur": "گجرات"
       }
     },
     {
@@ -205,7 +205,7 @@
       "province": "Punjab",
       "name": {
         "en": "Gujar Khan",
-        "ur": null
+        "ur": "گوجر خان"
       }
     },
     {
@@ -213,7 +213,7 @@
       "province": "Punjab",
       "name": {
         "en": "Hafizabad",
-        "ur": null
+        "ur": "حافظ آباد"
       }
     },
     {
@@ -221,7 +221,7 @@
       "province": "Punjab",
       "name": {
         "en": "Hasilpur",
-        "ur": null
+        "ur": "حاصل پور"
       }
     },
     {
@@ -229,7 +229,7 @@
       "province": "Punjab",
       "name": {
         "en": "Haveli Lakha",
-        "ur": null
+        "ur": "حویلی لکھا"
       }
     },
     {
@@ -237,7 +237,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jatoi",
-        "ur": null
+        "ur": "جتوئی"
       }
     },
     {
@@ -245,7 +245,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jalalpur",
-        "ur": null
+        "ur": "جلال پور"
       }
     },
     {
@@ -253,7 +253,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jattan",
-        "ur": null
+        "ur": "جٹاں"
       }
     },
     {
@@ -261,7 +261,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jampur",
-        "ur": null
+        "ur": "جام پور"
       }
     },
     {
@@ -269,7 +269,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jaranwala",
-        "ur": null
+        "ur": "جڑانوالہ"
       }
     },
     {
@@ -277,7 +277,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jhang",
-        "ur": null
+        "ur": "جھنگ"
       }
     },
     {
@@ -285,7 +285,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jhelum",
-        "ur": null
+        "ur": "جہلم"
       }
     },
     {
@@ -293,7 +293,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kalabagh",
-        "ur": null
+        "ur": "کالا باغ"
       }
     },
     {
@@ -301,7 +301,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kasur",
-        "ur": null
+        "ur": "قصور"
       }
     },
     {
@@ -309,7 +309,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kamalia",
-        "ur": null
+        "ur": "کمالیہ"
       }
     },
     {
@@ -317,7 +317,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kamoke",
-        "ur": null
+        "ur": "کامونکے"
       }
     },
     {
@@ -325,7 +325,7 @@
       "province": "Punjab",
       "name": {
         "en": "Khanewal",
-        "ur": null
+        "ur": "خانیوال"
       }
     },
     {
@@ -333,7 +333,7 @@
       "province": "Punjab",
       "name": {
         "en": "Khanpur",
-        "ur": null
+        "ur": "خان پور"
       }
     },
     {
@@ -341,7 +341,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kharian",
-        "ur": null
+        "ur": "کھاریاں"
       }
     },
     {
@@ -349,7 +349,7 @@
       "province": "Punjab",
       "name": {
         "en": "Khushab",
-        "ur": null
+        "ur": "خوشاب"
       }
     },
     {
@@ -357,7 +357,7 @@
       "province": "Punjab",
       "name": {
         "en": "Kot Addu",
-        "ur": null
+        "ur": "کوٹ ادو"
       }
     },
     {
@@ -365,7 +365,7 @@
       "province": "Punjab",
       "name": {
         "en": "Jauharabad",
-        "ur": null
+        "ur": "جوہر آباد"
       }
     },
     {
@@ -373,7 +373,7 @@
       "province": "Punjab",
       "name": {
         "en": "Lahore",
-        "ur": null
+        "ur": "لاہور"
       }
     },
     {
@@ -381,7 +381,7 @@
       "province": "Punjab",
       "name": {
         "en": "Layyah",
-        "ur": null
+        "ur": "لیہ"
       }
     },
     {
@@ -389,7 +389,7 @@
       "province": "Punjab",
       "name": {
         "en": "Lodhran",
-        "ur": null
+        "ur": "لودھراں"
       }
     },
     {
@@ -397,7 +397,7 @@
       "province": "Punjab",
       "name": {
         "en": "Malakwal",
-        "ur": null
+        "ur": "ملکوال"
       }
     },
     {
@@ -405,7 +405,7 @@
       "province": "Punjab",
       "name": {
         "en": "Mailsi",
-        "ur": null
+        "ur": "میلسی"
       }
     },
     {
@@ -413,7 +413,7 @@
       "province": "Punjab",
       "name": {
         "en": "Mandi Bahauddin",
-        "ur": null
+        "ur": "منڈی بہاؤالدین"
       }
     },
     {
@@ -421,7 +421,7 @@
       "province": "Punjab",
       "name": {
         "en": "Mianwali",
-        "ur": null
+        "ur": "میانوالی"
       }
     },
     {
@@ -429,7 +429,7 @@
       "province": "Punjab",
       "name": {
         "en": "Multan",
-        "ur": null
+        "ur": "ملتان"
       }
     },
     {
@@ -437,7 +437,7 @@
       "province": "Punjab",
       "name": {
         "en": "Murree",
-        "ur": null
+        "ur": "مری"
       }
     },
     {
@@ -445,7 +445,7 @@
       "province": "Punjab",
       "name": {
         "en": "Muridke",
-        "ur": null
+        "ur": "مریدکے"
       }
     },
     {
@@ -453,7 +453,7 @@
       "province": "Punjab",
       "name": {
         "en": "Muzaffargarh",
-        "ur": null
+        "ur": "مظفر گڑھ"
       }
     },
     {
@@ -461,7 +461,7 @@
       "province": "Punjab",
       "name": {
         "en": "Narowal",
-        "ur": null
+        "ur": "ناروال"
       }
     },
     {
@@ -469,7 +469,7 @@
       "province": "Punjab",
       "name": {
         "en": "Nankana Sahib",
-        "ur": null
+        "ur": "نکانہ صاحب"
       }
     },
     {
@@ -477,7 +477,7 @@
       "province": "Punjab",
       "name": {
         "en": "Okara",
-        "ur": null
+        "ur": "اوکاڑہ"
       }
     },
     {
@@ -485,7 +485,7 @@
       "province": "Punjab",
       "name": {
         "en": "Renala Khurd",
-        "ur": null
+        "ur": "رنالہ خورد"
       }
     },
     {
@@ -493,7 +493,7 @@
       "province": "Punjab",
       "name": {
         "en": "Pakpattan",
-        "ur": null
+        "ur": "پاکپتن"
       }
     },
     {
@@ -501,7 +501,7 @@
       "province": "Punjab",
       "name": {
         "en": "Pattoki",
-        "ur": null
+        "ur": "پتوکی"
       }
     },
     {
@@ -509,7 +509,7 @@
       "province": "Punjab",
       "name": {
         "en": "Pir Mahal",
-        "ur": null
+        "ur": "پیر محل"
       }
     },
     {
@@ -517,7 +517,7 @@
       "province": "Punjab",
       "name": {
         "en": "Qaimpur",
-        "ur": null
+        "ur": "قائم پور"
       }
     },
     {
@@ -525,7 +525,7 @@
       "province": "Punjab",
       "name": {
         "en": "Qila Didar Singh",
-        "ur": null
+        "ur": "قلعہ دیدار سنگھ"
       }
     },
     {
@@ -533,7 +533,7 @@
       "province": "Punjab",
       "name": {
         "en": "Rabwah",
-        "ur": null
+        "ur": "ربوہ"
       }
     },
     {
@@ -541,7 +541,7 @@
       "province": "Punjab",
       "name": {
         "en": "Raiwind",
-        "ur": null
+        "ur": "رائے ونڈ"
       }
     },
     {
@@ -549,7 +549,7 @@
       "province": "Punjab",
       "name": {
         "en": "Rajanpur",
-        "ur": null
+        "ur": "راجن پور"
       }
     },
     {
@@ -557,7 +557,7 @@
       "province": "Punjab",
       "name": {
         "en": "Rahim Yar Khan",
-        "ur": null
+        "ur": "رحیم یار خان"
       }
     },
     {
@@ -565,7 +565,7 @@
       "province": "Punjab",
       "name": {
         "en": "Rawalpindi",
-        "ur": null
+        "ur": "راولپنڈی"
       }
     },
     {
@@ -573,7 +573,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sadiqabad",
-        "ur": null
+        "ur": "صادق آباد"
       }
     },
     {
@@ -581,7 +581,7 @@
       "province": "Punjab",
       "name": {
         "en": "Safdarabad",
-        "ur": null
+        "ur": "صفدر آباد"
       }
     },
     {
@@ -589,7 +589,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sahiwal",
-        "ur": null
+        "ur": "ساہیوال"
       }
     },
     {
@@ -597,7 +597,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sangla Hill",
-        "ur": null
+        "ur": "سانگلہ ہل"
       }
     },
     {
@@ -605,7 +605,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sarai Alamgir",
-        "ur": null
+        "ur": "سرائے عالمگیر"
       }
     },
     {
@@ -613,7 +613,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sargodha",
-        "ur": null
+        "ur": "سرگودھا"
       }
     },
     {
@@ -621,7 +621,7 @@
       "province": "Punjab",
       "name": {
         "en": "Shakargarh",
-        "ur": null
+        "ur": "شکر گڑھ"
       }
     },
     {
@@ -629,7 +629,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sheikhupura",
-        "ur": null
+        "ur": "شیخوپورہ"
       }
     },
     {
@@ -637,7 +637,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sialkot",
-        "ur": null
+        "ur": "سیالکوٹ"
       }
     },
     {
@@ -645,7 +645,7 @@
       "province": "Punjab",
       "name": {
         "en": "Sohawa",
-        "ur": null
+        "ur": "سوہاوہ"
       }
     },
     {
@@ -653,7 +653,7 @@
       "province": "Punjab",
       "name": {
         "en": "Soianwala",
-        "ur": null
+        "ur": "سویاں والا"
       }
     },
     {
@@ -661,7 +661,7 @@
       "province": "Punjab",
       "name": {
         "en": "Talagang",
-        "ur": null
+        "ur": "تلہ گنگ"
       }
     },
     {
@@ -669,7 +669,7 @@
       "province": "Punjab",
       "name": {
         "en": "Taxila",
-        "ur": null
+        "ur": "ٹیکسلا"
       }
     },
     {
@@ -677,7 +677,7 @@
       "province": "Punjab",
       "name": {
         "en": "Toba Tek Singh",
-        "ur": null
+        "ur": "ٹوبہ ٹیک سنگھ"
       }
     },
     {
@@ -685,7 +685,7 @@
       "province": "Punjab",
       "name": {
         "en": "Wazirabad",
-        "ur": null
+        "ur": "وزیر آباد"
       }
     },
     {
@@ -693,7 +693,7 @@
       "province": "Sindh",
       "name": {
         "en": "Badin",
-        "ur": null
+        "ur": "بدین"
       }
     },
     {
@@ -701,7 +701,7 @@
       "province": "Sindh",
       "name": {
         "en": "Rajo Khanani",
-        "ur": null
+        "ur": "راجو خانانی"
       }
     },
     {
@@ -709,7 +709,7 @@
       "province": "Sindh",
       "name": {
         "en": "Chak",
-        "ur": null
+        "ur": "چک"
       }
     },
     {
@@ -717,7 +717,7 @@
       "province": "Sindh",
       "name": {
         "en": "Dadu",
-        "ur": null
+        "ur": "دادو"
       }
     },
     {
@@ -725,7 +725,7 @@
       "province": "Sindh",
       "name": {
         "en": "Digri",
-        "ur": null
+        "ur": "ڈگری"
       }
     },
     {
@@ -733,7 +733,7 @@
       "province": "Sindh",
       "name": {
         "en": "Diplo",
-        "ur": null
+        "ur": "ڈپلو"
       }
     },
     {
@@ -741,7 +741,7 @@
       "province": "Sindh",
       "name": {
         "en": "Dokri",
-        "ur": null
+        "ur": "ڈوکری"
       }
     },
     {
@@ -749,7 +749,7 @@
       "province": "Sindh",
       "name": {
         "en": "Ghotki",
-        "ur": null
+        "ur": "گھوٹکی"
       }
     },
     {
@@ -757,7 +757,7 @@
       "province": "Sindh",
       "name": {
         "en": "Hyderabad",
-        "ur": null
+        "ur": "حیدرآباد"
       }
     },
     {
@@ -765,7 +765,7 @@
       "province": "Sindh",
       "name": {
         "en": "Islamkot",
-        "ur": null
+        "ur": "اسلام کوٹ"
       }
     },
     {
@@ -773,7 +773,7 @@
       "province": "Sindh",
       "name": {
         "en": "Jacobabad",
-        "ur": null
+        "ur": "جیکب آباد"
       }
     },
     {
@@ -781,7 +781,7 @@
       "province": "Sindh",
       "name": {
         "en": "Jamshoro",
-        "ur": null
+        "ur": "جامشورو"
       }
     },
     {
@@ -789,7 +789,7 @@
       "province": "Sindh",
       "name": {
         "en": "Kandhkot",
-        "ur": null
+        "ur": "کاندھ کوٹ"
       }
     },
     {
@@ -797,7 +797,7 @@
       "province": "Sindh",
       "name": {
         "en": "Kandiaro",
-        "ur": null
+        "ur": "کنڈیارو"
       }
     },
     {
@@ -805,7 +805,7 @@
       "province": "Sindh",
       "name": {
         "en": "Karachi",
-        "ur": null
+        "ur": "کراچی"
       }
     },
     {
@@ -813,7 +813,7 @@
       "province": "Sindh",
       "name": {
         "en": "Keti Bandar",
-        "ur": null
+        "ur": "کیٹی بندر"
       }
     },
     {
@@ -821,7 +821,7 @@
       "province": "Sindh",
       "name": {
         "en": "Khairpur",
-        "ur": null
+        "ur": "خیرپور"
       }
     },
     {
@@ -829,7 +829,7 @@
       "province": "Sindh",
       "name": {
         "en": "Kotri",
-        "ur": null
+        "ur": "کوٹری"
       }
     },
     {
@@ -837,7 +837,7 @@
       "province": "Sindh",
       "name": {
         "en": "Larkana",
-        "ur": null
+        "ur": "لاڑکانہ"
       }
     },
     {
@@ -845,7 +845,7 @@
       "province": "Sindh",
       "name": {
         "en": "Matiari",
-        "ur": null
+        "ur": "مٹیاری"
       }
     },
     {
@@ -853,7 +853,7 @@
       "province": "Sindh",
       "name": {
         "en": "Mehar",
-        "ur": null
+        "ur": "میہڑ"
       }
     },
     {
@@ -861,7 +861,7 @@
       "province": "Sindh",
       "name": {
         "en": "Mirpur Khas",
-        "ur": null
+        "ur": "میرپور خاص"
       }
     },
     {
@@ -869,7 +869,7 @@
       "province": "Sindh",
       "name": {
         "en": "Mithani",
-        "ur": null
+        "ur": "مٹھانی"
       }
     },
     {
@@ -877,7 +877,7 @@
       "province": "Sindh",
       "name": {
         "en": "Mithi",
-        "ur": null
+        "ur": "مٹھی"
       }
     },
     {
@@ -885,7 +885,7 @@
       "province": "Sindh",
       "name": {
         "en": "Mehrabpur",
-        "ur": null
+        "ur": "محراب پور"
       }
     },
     {
@@ -893,7 +893,7 @@
       "province": "Sindh",
       "name": {
         "en": "Moro",
-        "ur": null
+        "ur": "مورو"
       }
     },
     {
@@ -901,7 +901,7 @@
       "province": "Sindh",
       "name": {
         "en": "Naudero",
-        "ur": null
+        "ur": "نوڈیرو"
       }
     },
     {
@@ -909,7 +909,7 @@
       "province": "Sindh",
       "name": {
         "en": "Nawabshah",
-        "ur": null
+        "ur": "نواب شاہ"
       }
     },
     {
@@ -917,7 +917,7 @@
       "province": "Sindh",
       "name": {
         "en": "Nazimabad",
-        "ur": null
+        "ur": "ناظم آباد"
       }
     },
     {
@@ -925,7 +925,7 @@
       "province": "Sindh",
       "name": {
         "en": "Qambar",
-        "ur": null
+        "ur": "قنبر"
       }
     },
     {
@@ -933,7 +933,7 @@
       "province": "Sindh",
       "name": {
         "en": "Qasimabad",
-        "ur": null
+        "ur": "قاسم آباد"
       }
     },
     {
@@ -941,7 +941,7 @@
       "province": "Sindh",
       "name": {
         "en": "Ranipur",
-        "ur": null
+        "ur": "رانی پور"
       }
     },
     {
@@ -949,7 +949,7 @@
       "province": "Sindh",
       "name": {
         "en": "Ratodero",
-        "ur": null
+        "ur": "رتوڈیرو"
       }
     },
     {
@@ -957,7 +957,7 @@
       "province": "Sindh",
       "name": {
         "en": "Rohri",
-        "ur": null
+        "ur": "روہڑی"
       }
     },
     {
@@ -965,7 +965,7 @@
       "province": "Sindh",
       "name": {
         "en": "Sakrand",
-        "ur": null
+        "ur": "سکرنڈ"
       }
     },
     {
@@ -973,7 +973,7 @@
       "province": "Sindh",
       "name": {
         "en": "Sanghar",
-        "ur": null
+        "ur": "سانگھڑ"
       }
     },
     {
@@ -981,7 +981,7 @@
       "province": "Sindh",
       "name": {
         "en": "Shahbandar",
-        "ur": null
+        "ur": "شاہ بندر"
       }
     },
     {
@@ -989,7 +989,7 @@
       "province": "Sindh",
       "name": {
         "en": "Shahdadpur",
-        "ur": null
+        "ur": "شہداد پور"
       }
     },
     {
@@ -997,7 +997,7 @@
       "province": "Sindh",
       "name": {
         "en": "Shahpur Chakar",
-        "ur": null
+        "ur": "شاہ پور چاکر"
       }
     },
     {
@@ -1005,7 +1005,7 @@
       "province": "Sindh",
       "name": {
         "en": "Sukkur",
-        "ur": null
+        "ur": "سکھر"
       }
     },
     {
@@ -1013,7 +1013,7 @@
       "province": "Sindh",
       "name": {
         "en": "Tangwani",
-        "ur": null
+        "ur": "تنگوانی"
       }
     },
     {
@@ -1021,7 +1021,7 @@
       "province": "Sindh",
       "name": {
         "en": "Tando Allahyar",
-        "ur": null
+        "ur": "ٹنڈو اللہ یار"
       }
     },
     {
@@ -1029,7 +1029,7 @@
       "province": "Sindh",
       "name": {
         "en": "Tando Muhammad Khan",
-        "ur": null
+        "ur": "ٹنڈو محمد خان"
       }
     },
     {
@@ -1037,7 +1037,7 @@
       "province": "Sindh",
       "name": {
         "en": "Thatta",
-        "ur": null
+        "ur": "ٹھٹھہ"
       }
     },
     {
@@ -1045,7 +1045,7 @@
       "province": "Sindh",
       "name": {
         "en": "Umerkot",
-        "ur": null
+        "ur": "عمر کوٹ"
       }
     },
     {
@@ -1053,7 +1053,7 @@
       "province": "Sindh",
       "name": {
         "en": "Warah",
-        "ur": null
+        "ur": "وارہ"
       }
     },
     {
@@ -1061,7 +1061,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Abbottabad",
-        "ur": null
+        "ur": "ایبٹ آباد"
       }
     },
     {
@@ -1069,7 +1069,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Adezai",
-        "ur": null
+        "ur": "ادیزئی"
       }
     },
     {
@@ -1077,7 +1077,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Alpuri",
-        "ur": null
+        "ur": "الپوری"
       }
     },
     {
@@ -1085,7 +1085,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Akora Khattak",
-        "ur": null
+        "ur": "اکوڑہ خٹک"
       }
     },
     {
@@ -1093,7 +1093,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Ayubia",
-        "ur": null
+        "ur": "ایوبیہ"
       }
     },
     {
@@ -1101,7 +1101,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Banda Daud Shah",
-        "ur": null
+        "ur": "بانڈہ داؤد شاہ"
       }
     },
     {
@@ -1109,7 +1109,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Bannu",
-        "ur": null
+        "ur": "بنو"
       }
     },
     {
@@ -1117,7 +1117,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Battagram",
-        "ur": null
+        "ur": "بٹگرام"
       }
     },
     {
@@ -1125,7 +1125,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Charsadda",
-        "ur": null
+        "ur": "چار سدہ"
       }
     },
     {
@@ -1133,7 +1133,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Chitral",
-        "ur": null
+        "ur": "چترال"
       }
     },
     {
@@ -1141,7 +1141,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Daggar",
-        "ur": null
+        "ur": "ڈگر"
       }
     },
     {
@@ -1149,7 +1149,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Dargai",
-        "ur": null
+        "ur": "درگئی"
       }
     },
     {
@@ -1157,7 +1157,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Darya Khan",
-        "ur": null
+        "ur": "دریا خان"
       }
     },
     {
@@ -1165,7 +1165,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Dera Ismail Khan",
-        "ur": null
+        "ur": "ڈیرہ اسماعیل خان"
       }
     },
     {
@@ -1173,7 +1173,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Doaba",
-        "ur": null
+        "ur": "دوآبہ"
       }
     },
     {
@@ -1181,7 +1181,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Dir",
-        "ur": null
+        "ur": "دیر"
       }
     },
     {
@@ -1189,7 +1189,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Drosh",
-        "ur": null
+        "ur": "دروش"
       }
     },
     {
@@ -1197,7 +1197,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Hangu",
-        "ur": null
+        "ur": "ہنگو"
       }
     },
     {
@@ -1205,7 +1205,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Haripur",
-        "ur": null
+        "ur": "ہری پور"
       }
     },
     {
@@ -1213,7 +1213,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Karak",
-        "ur": null
+        "ur": "کرک"
       }
     },
     {
@@ -1221,7 +1221,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Kohat",
-        "ur": null
+        "ur": "کوہاٹ"
       }
     },
     {
@@ -1229,7 +1229,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Kulachi",
-        "ur": null
+        "ur": "کلاچی"
       }
     },
     {
@@ -1237,7 +1237,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Madyan",
-        "ur": null
+        "ur": "مدین"
       }
     },
     {
@@ -1245,7 +1245,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Mansehra",
-        "ur": null
+        "ur": "مانسہرہ"
       }
     },
     {
@@ -1253,7 +1253,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Mardan",
-        "ur": null
+        "ur": "مردان"
       }
     },
     {
@@ -1261,7 +1261,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Mastuj",
-        "ur": null
+        "ur": "مستوج"
       }
     },
     {
@@ -1269,7 +1269,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Mingora",
-        "ur": null
+        "ur": "مینگورہ"
       }
     },
     {
@@ -1277,7 +1277,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Nowshera",
-        "ur": null
+        "ur": "نوشہرہ"
       }
     },
     {
@@ -1285,7 +1285,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Paharpur",
-        "ur": null
+        "ur": "پہاڑ پور"
       }
     },
     {
@@ -1293,7 +1293,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Pabbi",
-        "ur": null
+        "ur": "پبی"
       }
     },
     {
@@ -1301,7 +1301,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Peshawar",
-        "ur": null
+        "ur": "پشاور"
       }
     },
     {
@@ -1309,7 +1309,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Saidu Sharif",
-        "ur": null
+        "ur": "سیدو شریف"
       }
     },
     {
@@ -1317,7 +1317,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Shorkot",
-        "ur": null
+        "ur": "شورکوٹ"
       }
     },
     {
@@ -1325,7 +1325,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Shewa Adda",
-        "ur": null
+        "ur": "شیوا اڈہ"
       }
     },
     {
@@ -1333,7 +1333,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Swabi",
-        "ur": null
+        "ur": "صوابی"
       }
     },
     {
@@ -1341,7 +1341,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Swat",
-        "ur": null
+        "ur": "سوات"
       }
     },
     {
@@ -1349,7 +1349,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Tangi",
-        "ur": null
+        "ur": "تنگی"
       }
     },
     {
@@ -1357,7 +1357,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Tank",
-        "ur": null
+        "ur": "ٹانک"
       }
     },
     {
@@ -1365,7 +1365,7 @@
       "province": "Khyber Pakhtunkhwa",
       "name": {
         "en": "Tordher",
-        "ur": null
+        "ur": "تورڈھیر"
       }
     },
     {
@@ -1373,7 +1373,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Awaran",
-        "ur": null
+        "ur": "آواران"
       }
     },
     {
@@ -1381,7 +1381,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Barkhan",
-        "ur": null
+        "ur": "بارکھان"
       }
     },
     {
@@ -1389,7 +1389,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Chagai",
-        "ur": null
+        "ur": "چاغی"
       }
     },
     {
@@ -1397,7 +1397,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Dera Bugti",
-        "ur": null
+        "ur": "ڈیرہ بگٹی"
       }
     },
     {
@@ -1405,7 +1405,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Gwadar",
-        "ur": null
+        "ur": "گوادر"
       }
     },
     {
@@ -1413,7 +1413,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Harnai",
-        "ur": null
+        "ur": "ہرنائی"
       }
     },
     {
@@ -1421,7 +1421,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Jafarabad",
-        "ur": null
+        "ur": "جعفر آباد"
       }
     },
     {
@@ -1429,7 +1429,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Jhal Magsi",
-        "ur": null
+        "ur": "جھل مگسی"
       }
     },
     {
@@ -1437,7 +1437,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Kalat",
-        "ur": null
+        "ur": "قلات"
       }
     },
     {
@@ -1445,7 +1445,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Kech",
-        "ur": null
+        "ur": "کیچ"
       }
     },
     {
@@ -1453,7 +1453,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Kharan",
-        "ur": null
+        "ur": "خاران"
       }
     },
     {
@@ -1461,7 +1461,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Khuzdar",
-        "ur": null
+        "ur": "خضدار"
       }
     },
     {
@@ -1469,7 +1469,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Kohlu",
-        "ur": null
+        "ur": "کوہلو"
       }
     },
     {
@@ -1477,7 +1477,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Lehri",
-        "ur": null
+        "ur": "لہڑی"
       }
     },
     {
@@ -1485,7 +1485,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Loralai",
-        "ur": null
+        "ur": "لورالائی"
       }
     },
     {
@@ -1493,7 +1493,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Mastung",
-        "ur": null
+        "ur": "مستونگ"
       }
     },
     {
@@ -1501,7 +1501,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Nasirabad",
-        "ur": null
+        "ur": "نصیر آباد"
       }
     },
     {
@@ -1509,7 +1509,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Nushki",
-        "ur": null
+        "ur": "نوشکی"
       }
     },
     {
@@ -1517,7 +1517,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Panjgur",
-        "ur": null
+        "ur": "پنجگور"
       }
     },
     {
@@ -1525,7 +1525,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Quetta",
-        "ur": null
+        "ur": "کوئٹہ"
       }
     },
     {
@@ -1533,7 +1533,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Sherani",
-        "ur": null
+        "ur": "شیرانی"
       }
     },
     {
@@ -1541,7 +1541,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Sibi",
-        "ur": null
+        "ur": "سبی"
       }
     },
     {
@@ -1549,7 +1549,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Sohbatpur",
-        "ur": null
+        "ur": "صحبت پور"
       }
     },
     {
@@ -1557,7 +1557,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Washuk",
-        "ur": null
+        "ur": "واشک"
       }
     },
     {
@@ -1565,7 +1565,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Zhob",
-        "ur": null
+        "ur": "ژوب"
       }
     },
     {
@@ -1573,7 +1573,7 @@
       "province": "Balochistan",
       "name": {
         "en": "Ziarat",
-        "ur": null
+        "ur": "زیارت"
       }
     }
   ]
