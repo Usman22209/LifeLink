@@ -98,7 +98,16 @@
     "passwordMismatch": "پاس ورڈ مماثل نہیں ہیں",
     "weakPassword": "پاس ورڈ بہت کمزور ہے",
     "networkError": "نیٹ ورک کی خرابی۔ دوبارہ کوشش کریں۔",
-    "serverError": "سرور کی خرابی۔ بعد میں دوبارہ کوشش کریں۔"
+    "serverError": "سرور کی خرابی۔ بعد میں دوبارہ کوشش کریں۔",
+    "invalidPhone": "غلط فون نمبر",
+    "nameTooShort": "نام کم از کم 3 حروف کا ہونا چاہیے",
+    "genderRequired": "جنس کا انتخاب ضروری ہے",
+    "dobRequired": "تاریخ پیدائش ضروری ہے",
+    "cityRequired": "شہر کا انتخاب ضروری ہے",
+    "stateRequired": "صوبے کا انتخاب ضروری ہے",
+    "countryRequired": "ملک کا انتخاب ضروری ہے",
+    "bloodGroupRequired": "بلڈ گروپ کا انتخاب ضروری ہے",
+    "confirmRequired": "آپ کو تصدیق کرنی ہوگی کہ معلومات درست ہیں"
   },
   "onboarding": {
     "title": "اپنی پروفائل مکمل کریں",
@@ -119,6 +128,7 @@
     "statePlaceholder": "مثال کے طور پر پنجاب",
     "country": "ملک",
     "countryPlaceholder": "مثال کے طور پر پاکستان",
+    "pakistan": "پاکستان",
     "gender": "جنس",
     "male": "مرد",
     "female": "عورت",
@@ -126,6 +136,18 @@
     "dob": "تاریخ پیدائش",
     "selectBloodGroup": "بلڈ گروپ منتخب کریں",
     "medicalInfo": "طبی معلومات",
-    "completeButton": "پروفائل مکمل کریں"
+    "completeButton": "پروفائل مکمل کریں",
+    "location": "مقام",
+    "provinceLabel": "(صوبہ)",
+    "selectProvince": "صوبہ منتخب کریں",
+    "selectCity": "شہر منتخب کریں",
+    "selectCityIn": "شہر منتخب کریں بمقام",
+    "provinces": {
+      "Punjab": "پنجاب",
+      "Sindh": "سندھ",
+      "Khyber Pakhtunkhwa": "خیبر پختونخوا",
+      "Balochistan": "بلوچستان",
+      "Islamabad Capital Territory": "اسلام آباد"
+    }
   }
 }

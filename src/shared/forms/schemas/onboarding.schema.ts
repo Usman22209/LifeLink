@@ -1,19 +1,20 @@
 import { z } from "zod";
 
-export const onboardingSchema = z.object({
-    full_name: z.string().min(3, "Name must be at least 3 characters"),
-    email: z.string().email("Invalid email address"),
-    phone: z.string().min(10, "Invalid phone number"),
-    gender: z.string().min(1, "Gender is required"),
-    dob: z.string().min(1, "Date of birth is required"),
-    city: z.string().min(2, "City is required"),
-    state: z.string().min(2, "State is required"),
-    country: z.string().min(2, "Country is required"),
-    blood_group: z.string().min(1, "Blood group is required"),
+export const getOnboardingSchema = (t: any) => z.object({
+    full_name: z.string().min(3, t("errors.nameTooShort")),
+    email: z.string().email(t("errors.invalidEmail")),
+    phone: z.string().min(10, t("errors.invalidPhone")),
+    gender: z.string().min(1, t("errors.genderRequired")),
+    dob: z.string().min(1, t("errors.dobRequired")),
+    city: z.string().min(2, t("errors.cityRequired")),
+    state: z.string().min(2, t("errors.stateRequired")),
+    country: z.string().min(2, t("errors.countryRequired")),
+    blood_group: z.string().min(1, t("errors.bloodGroupRequired")),
     profile_image: z.string().optional(),
     confirmed_data: z.boolean().refine((val) => val === true, {
-        message: "You must confirm the information is correct",
+        message: t("errors.confirmRequired"),
     }),
 });
 
-export type OnboardingFormValues = z.infer<typeof onboardingSchema>;
+export type OnboardingFormValues = z.infer<ReturnType<typeof getOnboardingSchema>>;
+
