@@ -142,11 +142,12 @@ const CompleteProfileScreen = () => {
             // Remove fields that are not in the profiles table schema
             // We only store city_id now, and derive state/city name on frontend
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { email, confirmed_data, city, state, ...sanitizedData } = data;
+            const { email, confirmed_data, city, ...sanitizedData } = data;
 
             const response = await PROFILE_SERVICE.updateProfile({
                 ...sanitizedData,
                 city_id: data.city, // 'city' in form holds the ID
+                state: data.state, // Send state/province to match DB schema
                 language_preference: selectedLang,
                 is_onboarded: true,
                 latitude: location?.latitude,
