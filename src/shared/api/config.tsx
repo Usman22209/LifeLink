@@ -1,5 +1,5 @@
 
-const API_URL = "http://192.168.18.54:3001/";
+const API_URL = "http://192.168.0.102:3001/";
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
@@ -17,6 +17,16 @@ const API_CONFIG = {
   FILE: {
     upload: "file/upload",
     delete: "file/delete",
+  },
+  BLOOD_REQUESTS: {
+    base: "blood-requests",
+    create: "blood-requests",
+    feed: "blood-requests/feed",
+    myRequests: "blood-requests/my",
+  },
+  DONATIONS: {
+    base: "donations",
+    accept: "donations/accept",
   },
 };
 export { API_CONFIG };

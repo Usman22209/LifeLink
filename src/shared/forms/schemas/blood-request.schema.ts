@@ -1,0 +1,36 @@
+import { z } from "zod";
+import { UrgencyLevel } from "@shared/interfaces/models/blood-request.interface";
+
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+export const getBloodRequestSchema = (t: any) =>
+    z.object({
+        patient_name: z.string().optional(),
+        blood_group: z
+            .string()
+            .min(1, t("errors.bloodGroupRequired"))
+            .refine((val) => BLOOD_GROUPS.includes(val), {
+                message: t("errors.invalidBloodGroup"),
+            }),
+        units_required: z
+            .coerce.number()
+            .int(t("errors.unitsMustBeInteger"))
+            .min(1, t("errors.unitsMinOne")),
+        hospital_name: z.string().min(3, t("errors.hospitalNameRequired")),
+        hospital_address: z.string().optional(),
+        city_id: z.string().optional(),
+        state: z.string().optional(),
+        urgency: z
+            .enum([UrgencyLevel.NORMAL, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL])
+            .default(UrgencyLevel.NORMAL),
+        contact_number: z.string().optional(),
+        description: z.string().max(500, t("errors.descriptionTooLong")).optional(),
+        required_date: z.string().optional(),
+        // Location will be set programmatically
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
+    });
+
+export type BloodRequestFormValues = z.infer<
+    ReturnType<typeof getBloodRequestSchema>
+>;
