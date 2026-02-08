@@ -33,6 +33,7 @@ HTTP_CLIENT.interceptors.request.use(
 HTTP_CLIENT.interceptors.response.use(
   (response) => {
     console.log(`[HTTP_CLIENT] Response: ${response.status} from ${response.config.url}`);
+    console.log(`[HTTP_CLIENT] Response data:`, response.data);
     return response;
   },
   async (error) => {

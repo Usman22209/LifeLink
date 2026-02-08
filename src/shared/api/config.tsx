@@ -18,5 +18,15 @@ const API_CONFIG = {
     upload: "file/upload",
     delete: "file/delete",
   },
+  BLOOD_REQUESTS: {
+    base: "blood-requests",
+    create: "blood-requests",
+    feed: "blood-requests/feed",
+    myRequests: "blood-requests/my",
+  },
+  DONATIONS: {
+    base: "donations",
+    accept: "donations/accept",
+  },
 };
 export { API_CONFIG };
