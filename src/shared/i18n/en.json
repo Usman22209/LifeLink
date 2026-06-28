@@ -63,7 +63,25 @@
     "donate": "Donate Blood",
     "emergencyRequest": "Emergency Request",
     "bloodBanks": "Blood Banks",
-    "myDonations": "My Donations"
+    "myDonations": "My Donations",
+    "yourBloodType": "Your Blood Type",
+    "universalDonor": "Universal Donor",
+    "donations": "Donations",
+    "livesSaved": "Lives Saved",
+    "lastDonated": "Last Donated",
+    "urgentRequests": "Urgent Requests",
+    "seeAll": "See All",
+    "goodMorning": "Good Morning",
+    "goodAfternoon": "Good Afternoon",
+    "goodEvening": "Good Evening",
+    "critical": "Critical",
+    "urgent": "Urgent",
+    "normal": "Normal",
+    "respond": "Respond",
+    "share": "Share",
+    "tapForTip": "Tap to read another tip",
+    "unit": "unit",
+    "units": "units"
   },
   "profile": {
     "title": "Profile",
@@ -142,5 +160,22 @@
     "selectProvince": "Select Province",
     "selectCity": "Select City",
     "selectCityIn": "Select City in"
+  },
+  "quotes": {
+    "factText1": "A single blood donation can save up to three lives.",
+    "factAuthor1": "Red Cross Fact",
+    "factText2": "Bring life back to someone. Your blood is a replacement for their hope.",
+    "factAuthor2": "Inspiration",
+    "factText3": "Every blood donor is a hero. Your contribution brings tomorrow to someone in need.",
+    "factAuthor3": "Daily Motivation",
+    "factText4": "Only 3% of the eligible population donates blood. Your choice makes you truly special.",
+    "factAuthor4": "Community Impact"
+  },
+  "tabs": {
+    "home": "Home",
+    "feed": "Feed",
+    "request": "Request",
+    "alerts": "Alerts",
+    "profile": "Profile"
   }
 }

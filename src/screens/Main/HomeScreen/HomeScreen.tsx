@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity, I18nManager } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import Text from "@components/AppText";
@@ -10,9 +10,10 @@ import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
 import HomeHeader from "./components/HomeHeader";
 import BloodTypeCard from "./components/BloodTypeCard";
-import DonationEligibilityCard from "./components/DonationEligibilityCard";
+import InspirationalQuoteCard from "./components/InspirationalQuoteCard";
 import UrgentRequestCard from "./components/UrgentRequestCard";
 import type { UrgentRequestData } from "./components/UrgentRequestCard";
+import useTranslation from "@shared/hooks/useTranslation";
 
 
 const MOCK_URGENT_REQUESTS: UrgentRequestData[] = [
@@ -51,6 +52,8 @@ const MOCK_URGENT_REQUESTS: UrgentRequestData[] = [
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const user = useSelector(selectUser);
+  const { t } = useTranslation();
+  const isRtl = I18nManager.isRTL;
 
   return (
     <ScreenWrapper
@@ -78,24 +81,20 @@ const HomeScreen = () => {
 
 
       <View style={styles.sectionGap}>
-        <DonationEligibilityCard
-          daysUntilEligible={0}
-          totalDaysCycle={56}
-          onDonatePress={() => navigation.navigate(ROUTES.REQUEST)}
-        />
+        <InspirationalQuoteCard />
       </View>
 
 
-      <View style={styles.sectionHeader}>
+      <View style={[styles.sectionHeader, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
         <Text semiBold FONT_16 style={{ color: colors.text }}>
-          Urgent Requests
+          {t("home.urgentRequests")}
         </Text>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => navigation.navigate(ROUTES.FEED)}
         >
           <Text semiBold FONT_12 style={{ color: colors.primary }}>
-            See All
+            {t("home.seeAll")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -106,6 +105,7 @@ const HomeScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.urgentScroll}
+          style={isRtl && { transform: [{ scaleX: -1 }] }}
         >
           {MOCK_URGENT_REQUESTS.map((request) => (
             <UrgentRequestCard key={request.id} {...request} />

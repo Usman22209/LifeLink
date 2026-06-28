@@ -4,6 +4,7 @@ import { moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface BloodTypeCardProps {
   bloodType?: string;
@@ -21,6 +22,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   lastDonated = "N/A",
 }) => {
   const isRtl = I18nManager.isRTL;
+  const { t } = useTranslation();
 
   return (
     <View style={styles.card}>
@@ -28,10 +30,10 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
       <View style={styles.decorCircle1} />
       <View style={styles.decorCircle2} />
 
-      <View style={styles.topRow}>
-        <View style={{ flex: 1 }}>
+      <View style={[styles.topRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        <View style={[styles.infoContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
           <Text medium FONT_12 style={{ color: withOpacity(colors.white, 0.75) }}>
-            Your Blood Type
+            {t("home.yourBloodType")}
           </Text>
           <Text extraBold FONT_34 style={{ color: colors.white }}>
             {bloodType}
@@ -44,7 +46,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
               marginTop: verticalScale(2),
             }}
           >
-            {subtitle}
+            {subtitle === "Universal Donor" ? t("home.universalDonor") : subtitle}
           </Text>
         </View>
         <View style={styles.iconContainer}>
@@ -64,11 +66,11 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        <StatItem value={String(donations)} label="Donations" />
+        <StatItem value={String(donations)} label={t("home.donations")} />
         <View style={styles.divider} />
-        <StatItem value={String(livesSaved)} label="Lives Saved" />
+        <StatItem value={String(livesSaved)} label={t("home.livesSaved")} />
         <View style={styles.divider} />
-        <StatItem value={lastDonated} label="Last Donated" />
+        <StatItem value={lastDonated} label={t("home.lastDonated")} />
       </View>
     </View>
   );
@@ -82,7 +84,7 @@ const StatItem = ({ value, label }: { value: string; label: string }) => (
     <Text
       medium
       FONT_9
-      style={{ color: withOpacity(colors.white, 0.65), marginTop: verticalScale(2) }}
+      style={{ color: withOpacity(colors.white, 0.65), marginTop: verticalScale(2), textAlign: "center" }}
     >
       {label}
     </Text>
@@ -121,6 +123,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  infoContainer: {
+    flex: 1,
   },
   iconContainer: {
     opacity: 0.8,

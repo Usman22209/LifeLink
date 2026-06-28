@@ -11,6 +11,7 @@ import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import AppImage from "@components/AppImage";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface HomeHeaderProps {
   userName?: string;
@@ -28,6 +29,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
   onProfilePress,
 }) => {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const isRtl = I18nManager.isRTL;
   const firstName = userName.split(" ")[0];
 
@@ -65,7 +67,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
             </View>
           )}
 
-          <View style={styles.onlineDot} />
+          <View style={[styles.onlineDot, { [isRtl ? "left" : "right"]: moderateScale(1) }]} />
         </View>
 
         <View
@@ -79,7 +81,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
             FONT_12
             style={{ color: colors.textSecondary }}
           >
-            Good {getGreeting()} 👋
+            {t(`home.${getGreetingKey()}`)} 👋
           </Text>
           <Text bold FONT_16 style={{ color: colors.text }} numberOfLines={1}>
             {firstName}
@@ -111,11 +113,11 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
   );
 };
 
-const getGreeting = (): string => {
+const getGreetingKey = (): string => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Morning";
-  if (hour < 17) return "Afternoon";
-  return "Evening";
+  if (hour < 12) return "goodMorning";
+  if (hour < 17) return "goodAfternoon";
+  return "goodEvening";
 };
 
 export default HomeHeader;

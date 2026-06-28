@@ -4,6 +4,7 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 export interface UrgentRequestData {
   id: string;
@@ -23,17 +24,14 @@ interface UrgentRequestCardProps extends UrgentRequestData {
 const URGENCY_CONFIG = {
   critical: {
     color: colors.danger,
-    label: "Critical",
     icon: "alert-circle",
   },
   urgent: {
     color: colors.warning,
-    label: "Urgent",
     icon: "alert-triangle",
   },
   normal: {
     color: colors.success,
-    label: "Normal",
     icon: "clock",
   },
 };
@@ -50,10 +48,11 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
 }) => {
   const config = URGENCY_CONFIG[urgency];
   const isRtl = I18nManager.isRTL;
+  const { t } = useTranslation();
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, isRtl && { transform: [{ scaleX: -1 }] }]}
       activeOpacity={0.85}
       onPress={onPress}
     >
@@ -66,7 +65,11 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
       <View
         style={[
           styles.urgencyBadge,
-          { backgroundColor: withOpacity(config.color, 0.1) },
+          {
+            backgroundColor: withOpacity(config.color, 0.1),
+            flexDirection: isRtl ? "row-reverse" : "row",
+            alignSelf: isRtl ? "flex-end" : "flex-start",
+          },
         ]}
       >
         <AnyIcon
@@ -80,15 +83,15 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
           FONT_9
           style={{
             color: config.color,
-            marginLeft: scale(3),
+            [isRtl ? "marginRight" : "marginLeft"]: scale(3),
           }}
         >
-          {config.label}
+          {t(`home.${urgency}`)}
         </Text>
       </View>
 
 
-      <View style={styles.bloodTypeContainer}>
+      <View style={[styles.bloodTypeContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
         <View
           style={[
             styles.bloodTypeBg,
@@ -105,7 +108,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
       <Text
         semiBold
         FONT_12
-        style={{ color: colors.text }}
+        style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
         numberOfLines={1}
       >
         {hospital}
@@ -127,7 +130,12 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
         <Text
           medium
           FONT_10
-          style={{ color: colors.textSecondary, marginLeft: scale(3), flex: 1 }}
+          style={{
+            color: colors.textSecondary,
+            [isRtl ? "marginRight" : "marginLeft"]: scale(3),
+            flex: 1,
+            textAlign: isRtl ? "right" : "left",
+          }}
           numberOfLines={1}
         >
           {city}
@@ -142,15 +150,22 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        <View style={styles.unitsTag}>
+        <View style={[styles.unitsTag, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
           <AnyIcon
             type={Icons.Ionicons}
             name="water"
             size={moderateScale(11)}
             color={colors.primary}
           />
-          <Text semiBold FONT_10 style={{ color: colors.primary, marginLeft: scale(3) }}>
-            {units} {units === 1 ? "unit" : "units"}
+          <Text
+            semiBold
+            FONT_10
+            style={{
+              color: colors.primary,
+              [isRtl ? "marginRight" : "marginLeft"]: scale(3),
+            }}
+          >
+            {units} {units === 1 ? t("home.unit") : t("home.units")}
           </Text>
         </View>
         <Text medium FONT_9 style={{ color: colors.textSecondary }}>
