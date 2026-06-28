@@ -18,8 +18,13 @@ export type AuthStackParamList = {
   };
 };
 
-export type MainStackParamList = {
+export type MainTabParamList = {
   [ROUTES.HOME]: undefined;
+  [ROUTES.FEED]: undefined;
+  [ROUTES.REQUEST]: undefined;
   [ROUTES.PROFILE]: undefined;
   [ROUTES.SETTINGS]: undefined;
 };
+
+/** @deprecated Use MainTabParamList instead */
+export type MainStackParamList = MainTabParamList;
