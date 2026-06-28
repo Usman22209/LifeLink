@@ -22,6 +22,7 @@ export type MainTabParamList = {
   [ROUTES.HOME]: undefined;
   [ROUTES.FEED]: undefined;
   [ROUTES.REQUEST]: undefined;
+  [ROUTES.NOTIFICATIONS]: undefined;
   [ROUTES.PROFILE]: undefined;
   [ROUTES.SETTINGS]: undefined;
 };

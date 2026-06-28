@@ -15,6 +15,7 @@ export const ROUTES = {
   HOME: "Home",
   FEED: "Feed",
   REQUEST: "Request",
+  NOTIFICATIONS: "Notifications",
   PROFILE: "Profile",
   SETTINGS: "Settings",
 } as const;
