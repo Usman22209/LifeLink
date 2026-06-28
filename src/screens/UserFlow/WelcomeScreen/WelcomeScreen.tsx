@@ -52,7 +52,6 @@ const WelcomeScreen = () => {
             style={styles.wrapper}
         >
             <View style={styles.container}>
-                {/* Language Button - Top Right */}
                 <View style={styles.topBar}>
                     <TouchableOpacity
                         style={styles.languageButton}
@@ -71,9 +70,7 @@ const WelcomeScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* Main Content */}
                 <View style={styles.content}>
-                    {/* Logo Section */}
                     <View style={styles.logoSection}>
 
                         <AppImage
@@ -87,7 +84,6 @@ const WelcomeScreen = () => {
                         </Text>
                     </View>
 
-                    {/* Action Buttons */}
                     <View style={styles.buttonSection}>
                         <AppButton
                             title={t("createAccount")}
@@ -103,7 +99,7 @@ const WelcomeScreen = () => {
                 </View>
             </View>
 
-            {/* Language Selection Modal */}
+           
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -120,17 +116,13 @@ const WelcomeScreen = () => {
                         activeOpacity={1}
                         onPress={(e) => e.stopPropagation()}
                     >
-                        {/* Modal Handle */}
                         <View style={styles.modalHandle} />
 
-                        {/* Modal Title */}
                         <Text bold FONT_18 style={styles.modalTitle}>
                             {t("selectLanguage")}
                         </Text>
 
-                        {/* Language Options */}
                         <View style={styles.languageOptions}>
-                            {/* English Option */}
                             <TouchableOpacity
                                 style={[
                                     styles.languageOption,
@@ -154,7 +146,6 @@ const WelcomeScreen = () => {
                                 </View>
                             </TouchableOpacity>
 
-                            {/* Urdu Option */}
                             <TouchableOpacity
                                 style={[
                                     styles.languageOption,
@@ -179,7 +170,6 @@ const WelcomeScreen = () => {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Confirm Button */}
                         <View style={styles.confirmButtonContainer}>
                             <AppButton
                                 title={t("confirmSelection")}

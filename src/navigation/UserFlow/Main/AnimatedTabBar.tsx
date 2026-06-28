@@ -18,7 +18,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const TAB_WIDTH = SCREEN_WIDTH / TAB_COUNT;
 const INDICATOR_WIDTH = scale(32);
 
-// Center FAB dimensions
 const FAB_SIZE = moderateScale(50);
 const FAB_RING_SIZE = FAB_SIZE + moderateScale(8);
 
@@ -30,18 +29,15 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
   const insets = useSafeAreaInsets();
   const previousIndex = useRef(0);
 
-  // Sliding indicator bar
   const indicatorX = useRef(new Animated.Value(0)).current;
   const indicatorOpacity = useRef(
     new Animated.Value(state.index !== CENTER_INDEX ? 1 : 0),
   ).current;
 
-  // Per-tab scale animations
   const tabScales = useRef(
     state.routes.map((_, i) => new Animated.Value(i === state.index ? 1 : 0)),
   ).current;
 
-  // FAB animations
   const fabScale = useRef(
     new Animated.Value(state.index === CENTER_INDEX ? 1.08 : 1),
   ).current;
@@ -52,12 +48,10 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
   useEffect(() => {
     const isCenter = state.index === CENTER_INDEX;
 
-    // Track previous non-center tab index
     if (!isCenter) {
       previousIndex.current = state.index;
     }
 
-    // Slide the indicator bar
     if (!isCenter) {
       const target =
         state.index * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2;
@@ -84,7 +78,6 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
       }).start();
     }
 
-    // FAB
     Animated.parallel([
       Animated.spring(fabScale, {
         toValue: isCenter ? 1.08 : 1,
@@ -100,7 +93,6 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
       }),
     ]).start();
 
-    // Per-tab
     tabScales.forEach((anim, index) => {
       Animated.spring(anim, {
         toValue: index === state.index ? 1 : 0,
@@ -119,7 +111,6 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
 
   return (
     <View style={[styles.barContainer, { paddingBottom: bottomPadding }]}>
-      {/* Sliding indicator bar at top */}
       <Animated.View
         style={[
           styles.indicator,
@@ -151,11 +142,9 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
           navigation.emit({ type: "tabLongPress", target: route.key });
         };
 
-        // ── Center FAB ──
         if (isCenter) {
           const onFabPress = () => {
             if (isFocused) {
-              // Already on Request → go back to previous tab
               const prevRoute = state.routes[previousIndex.current];
               if (prevRoute) {
                 navigation.navigate(prevRoute.name);
@@ -196,13 +185,11 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
                   </TouchableOpacity>
                 </View>
               </View>
-              {/* Empty space below FAB to keep bar height consistent */}
               <View style={styles.fabSpacer} />
             </View>
           );
         }
 
-        // ── Normal tabs ──
         const iconScale = tabScales[index].interpolate({
           inputRange: [0, 1],
           outputRange: [1, 1.1],
@@ -256,7 +243,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 0,
     paddingTop: verticalScale(10),
-    // Soft top shadow
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
@@ -295,7 +281,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",
-    // Shadow that matches the bar
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.08,
