@@ -1,10 +1,18 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, I18nManager } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  I18nManager,
+  useWindowDimensions,
+} from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+
 
 export interface UrgentRequestData {
   id: string;
@@ -22,18 +30,9 @@ interface UrgentRequestCardProps extends UrgentRequestData {
 }
 
 const URGENCY_CONFIG = {
-  critical: {
-    color: colors.danger,
-    icon: "alert-circle",
-  },
-  urgent: {
-    color: colors.warning,
-    icon: "alert-triangle",
-  },
-  normal: {
-    color: colors.success,
-    icon: "clock",
-  },
+  critical: { color: colors.danger,  icon: "alert-circle"  },
+  urgent:   { color: colors.warning, icon: "alert-triangle" },
+  normal:   { color: colors.success, icon: "clock"          },
 };
 
 const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
@@ -50,127 +49,99 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   const isRtl = I18nManager.isRTL;
   const { t } = useTranslation();
 
+  // Compute true usable width: screen minus safe area insets (applied by ScreenWrapper)
+  const { width: windowWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const usableWidth = windowWidth - insets.left - insets.right;
+  // Subtract only the LEFT padding + gap: card 2's right edge lands at screen edge,
+  // card 3 starts off-screen. The right scroll padding sits naturally beyond view.
+  const cardWidth = (usableWidth - moderateScale(20) - scale(12)) / 2;
+
   return (
     <TouchableOpacity
-      style={[styles.card, isRtl && { transform: [{ scaleX: -1 }] }]}
-      activeOpacity={0.85}
+      style={[styles.card, { width: cardWidth }]}
+      activeOpacity={0.8}
       onPress={onPress}
     >
+      {/* Left accent bar — clipped cleanly by overflow:hidden on the card */}
+      <View style={[styles.accentBar, { backgroundColor: config.color }]} />
 
-      <View
-        style={[styles.accentLine, { backgroundColor: config.color }]}
-      />
+      <View style={styles.inner}>
+        {/* Blood type + urgency badge row */}
+        <View style={[styles.topRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+          <View style={[styles.bloodPill, { borderColor: withOpacity(config.color, 0.35) }]}>
+            <Text extraBold FONT_16 style={{ color: config.color }}>
+              {bloodType}
+            </Text>
+          </View>
 
+          <View style={[styles.badge, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+            <AnyIcon
+              type={Icons.Feather}
+              name={config.icon}
+              size={moderateScale(9)}
+              color={config.color}
+            />
+            <Text
+              semiBold
+              FONT_9
+              style={{ color: config.color, marginLeft: scale(3) }}
+            >
+              {t(`home.${urgency}`)}
+            </Text>
+          </View>
+        </View>
 
-      <View
-        style={[
-          styles.urgencyBadge,
-          {
-            backgroundColor: withOpacity(config.color, 0.1),
-            flexDirection: isRtl ? "row-reverse" : "row",
-            alignSelf: isRtl ? "flex-end" : "flex-start",
-          },
-        ]}
-      >
-        <AnyIcon
-          type={Icons.Feather}
-          name={config.icon}
-          size={moderateScale(10)}
-          color={config.color}
-        />
+        {/* Hospital name */}
         <Text
           semiBold
-          FONT_9
-          style={{
-            color: config.color,
-            [isRtl ? "marginRight" : "marginLeft"]: scale(3),
-          }}
+          FONT_12
+          numberOfLines={2}
+          style={[styles.hospital, { textAlign: isRtl ? "right" : "left" }]}
         >
-          {t(`home.${urgency}`)}
+          {hospital}
         </Text>
-      </View>
 
-
-      <View style={[styles.bloodTypeContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
-        <View
-          style={[
-            styles.bloodTypeBg,
-            { backgroundColor: withOpacity(config.color, 0.06) },
-          ]}
-        >
-          <Text extraBold FONT_26 style={{ color: config.color }}>
-            {bloodType}
-          </Text>
-        </View>
-      </View>
-
-
-      <Text
-        semiBold
-        FONT_12
-        style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
-        numberOfLines={1}
-      >
-        {hospital}
-      </Text>
-
-
-      <View
-        style={[
-          styles.metaRow,
-          { flexDirection: isRtl ? "row-reverse" : "row" },
-        ]}
-      >
-        <AnyIcon
-          type={Icons.Feather}
-          name="map-pin"
-          size={moderateScale(10)}
-          color={colors.textSecondary}
-        />
-        <Text
-          medium
-          FONT_10
-          style={{
-            color: colors.textSecondary,
-            [isRtl ? "marginRight" : "marginLeft"]: scale(3),
-            flex: 1,
-            textAlign: isRtl ? "right" : "left",
-          }}
-          numberOfLines={1}
-        >
-          {city}
-          {distance ? ` · ${distance}` : ""}
-        </Text>
-      </View>
-
-
-      <View
-        style={[
-          styles.bottomRow,
-          { flexDirection: isRtl ? "row-reverse" : "row" },
-        ]}
-      >
-        <View style={[styles.unitsTag, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        {/* City + distance */}
+        <View style={[styles.metaRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
           <AnyIcon
-            type={Icons.Ionicons}
-            name="water"
-            size={moderateScale(11)}
-            color={colors.primary}
+            type={Icons.Feather}
+            name="map-pin"
+            size={moderateScale(9)}
+            color={colors.textSecondary}
           />
           <Text
-            semiBold
+            medium
             FONT_10
-            style={{
-              color: colors.primary,
-              [isRtl ? "marginRight" : "marginLeft"]: scale(3),
-            }}
+            numberOfLines={1}
+            style={{ color: colors.textSecondary, marginLeft: scale(3), flex: 1 }}
           >
-            {units} {units === 1 ? t("home.unit") : t("home.units")}
+            {city}
+            {distance ? ` · ${distance}` : ""}
           </Text>
         </View>
-        <Text medium FONT_9 style={{ color: colors.textSecondary }}>
-          {time}
-        </Text>
+
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Footer */}
+        <View style={[styles.footer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+          <View style={[styles.footerItem, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+            <AnyIcon
+              type={Icons.Ionicons}
+              name="water-outline"
+              size={moderateScale(10)}
+              color={colors.textSecondary}
+            />
+            <Text medium FONT_10 style={{ color: colors.textSecondary, marginLeft: scale(3) }}>
+              {units} {units === 1 ? t("home.unit") : t("home.units")}
+            </Text>
+          </View>
+
+          <Text medium FONT_9 style={{ color: colors.textSecondary }}>
+            {time}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -180,61 +151,58 @@ export default UrgentRequestCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: scale(160),
     backgroundColor: colors.white,
-    borderRadius: moderateScale(18),
-    padding: moderateScale(14),
+    borderRadius: moderateScale(16),
+    flexDirection: "row",
     overflow: "hidden",
-
-    shadowColor: colors.black,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 0.5,
-    borderColor: withOpacity(colors.border, 0.3),
+    shadowRadius: 6,
+    elevation: 2,
   },
-  accentLine: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: verticalScale(3),
-    borderTopLeftRadius: moderateScale(18),
-    borderTopRightRadius: moderateScale(18),
+  accentBar: {
+    width: moderateScale(4),
   },
-  urgencyBadge: {
-    flexDirection: "row",
+  inner: {
+    flex: 1,
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(12),
+  },
+  topRow: {
     alignItems: "center",
-    alignSelf: "flex-start",
-    paddingHorizontal: scale(7),
-    paddingVertical: verticalScale(3),
+    justifyContent: "space-between",
+    marginBottom: verticalScale(8),
+  },
+  bloodPill: {
+    borderWidth: 1.5,
     borderRadius: moderateScale(8),
-    marginBottom: verticalScale(10),
+    paddingHorizontal: scale(8),
+    paddingVertical: verticalScale(2),
   },
-  bloodTypeContainer: {
-    marginBottom: verticalScale(10),
+  badge: {
+    alignItems: "center",
   },
-  bloodTypeBg: {
-    alignSelf: "flex-start",
-    paddingHorizontal: scale(12),
-    paddingVertical: verticalScale(4),
-    borderRadius: moderateScale(10),
+  hospital: {
+    color: colors.text,
+    marginBottom: verticalScale(4),
+    lineHeight: verticalScale(17),
   },
   metaRow: {
     alignItems: "center",
-    marginTop: verticalScale(4),
   },
-  bottomRow: {
+  divider: {
+    height: 1,
+    backgroundColor: colors.gray300,
+    marginVertical: verticalScale(8),
+  },
+  footer: {
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: verticalScale(10),
-    paddingTop: verticalScale(10),
-    borderTopWidth: 1,
-    borderTopColor: withOpacity(colors.border, 0.3),
   },
-  unitsTag: {
-    flexDirection: "row",
+  footerItem: {
     alignItems: "center",
   },
 });

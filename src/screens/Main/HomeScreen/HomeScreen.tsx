@@ -133,10 +133,12 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(12),
   },
   urgentScrollWrapper: {
-    marginHorizontal: -moderateScale(20),
+    marginHorizontal: -moderateScale(16),
+    marginVertical: -verticalScale(6),
   },
   urgentScroll: {
-    paddingHorizontal: moderateScale(20),
-    gap: scale(12),
+    paddingHorizontal: moderateScale(16),
+    paddingVertical: verticalScale(6),
+    gap: scale(6),
   },
 });
