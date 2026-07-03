@@ -110,6 +110,8 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 patientName,
                 hospital,
                 city,
+                state,
+                patientImage,
                 units,
                 urgency,
                 time,

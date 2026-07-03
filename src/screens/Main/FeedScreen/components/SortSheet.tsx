@@ -60,7 +60,7 @@ const SortSheet: React.FC<SortSheetProps> = ({
             s.container,
             { paddingBottom: Math.max(insets.bottom, verticalScale(16)) },
           ]}
-          onPress={(e) => e.stopPropagation()}
+          onPress={() => {}}
         >
           {/* Drag Handle Indicator */}
           <View style={s.handleWrap} {...panResponder.panHandlers}>

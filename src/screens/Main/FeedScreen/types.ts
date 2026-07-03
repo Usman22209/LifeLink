@@ -6,6 +6,8 @@ export interface BloodRequest {
   patientName: string;
   hospital: string;
   city: string;
+  state?: string;
+  patientImage?: string;
   units: number;
   urgency: "critical" | "urgent" | "normal";
   time: string;
@@ -66,6 +68,9 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     patientName: "Ahmed Khan",
     hospital: "Mayo Hospital",
     city: "Lahore",
+    state: "Punjab",
+    patientImage:
+      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
     units: 3,
     urgency: "critical",
     time: "2h ago",
@@ -77,6 +82,9 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     patientName: "Sara Malik",
     hospital: "Jinnah Hospital",
     city: "Lahore",
+    state: "Punjab",
+    patientImage:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
     units: 2,
     urgency: "urgent",
     time: "4h ago",
@@ -88,6 +96,9 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     patientName: "Anonymous",
     hospital: "Services Hospital",
     city: "Lahore",
+    state: "Punjab",
+    patientImage:
+      "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&h=150&fit=crop",
     units: 1,
     urgency: "normal",
     time: "6h ago",
@@ -99,6 +110,9 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     patientName: "Bilal Raza",
     hospital: "Shaukat Khanum",
     city: "Lahore",
+    state: "Punjab",
+    patientImage:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
     units: 4,
     urgency: "critical",
     time: "30m ago",

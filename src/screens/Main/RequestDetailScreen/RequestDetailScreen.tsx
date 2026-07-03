@@ -8,6 +8,7 @@ import {
   Linking,
   Modal,
   Pressable,
+  Platform,
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
@@ -55,18 +56,48 @@ const RequestDetailScreen = () => {
   }, [request, cfg]);
 
   const handleContact = useCallback(() => {
+    const message = `Hi, I saw your urgent blood request on LifeLink for ${request.bloodType} blood for patient ${request.patientName} at ${request.hospital}. I would like to help!`;
+    const phone = "+9242111222333";
+
     Alert.alert(
-      "Contact Hospital",
-      `Would you like to dial Mayo Emergency Hotline for patient ${request.patientName}?`,
+      "Contact Recipient",
+      "Choose how you want to reach out to the requester:",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Call Hotline",
+          text: "Direct Phone Call",
           onPress: () => {
-            Alert.alert(
-              "Dialing",
-              "Dialing Mayo Emergency Hotline: +92-42-111-222-333",
-            );
+            Linking.openURL(`tel:${phone}`).catch(() => {
+              Alert.alert("Error", "Could not initiate call.");
+            });
+          },
+        },
+        {
+          text: "Send SMS Text",
+          onPress: () => {
+            const smsUrl = `sms:${phone}${
+              Platform.OS === "ios" ? "&" : "?"
+            }body=${encodeURIComponent(message)}`;
+            Linking.openURL(smsUrl).catch(() => {
+              Alert.alert("Error", "Could not open messaging client.");
+            });
+          },
+        },
+        {
+          text: "WhatsApp Message",
+          onPress: () => {
+            const waUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(
+              message,
+            )}`;
+            Linking.openURL(waUrl).catch(() => {
+              const waWebUrl = `https://wa.me/${phone.replace(
+                "+",
+                "",
+              )}?text=${encodeURIComponent(message)}`;
+              Linking.openURL(waWebUrl).catch(() => {
+                Alert.alert("Error", "Could not open WhatsApp.");
+              });
+            });
           },
         },
       ],
@@ -108,16 +139,14 @@ const RequestDetailScreen = () => {
   ) => (
     <View style={[styles.infoRow, isLast && { borderBottomWidth: 0 }]}>
       <View style={styles.infoRowLeft}>
-        <View style={styles.infoIconWrap}>
-          <AnyIcon
-            type={Icons.Feather}
-            name={icon}
-            size={moderateScale(12)}
-            color={colors.primary}
-          />
-        </View>
-        <AppText regular FONT_13 style={styles.infoLabel}>
-          {label}
+        <AnyIcon
+          type={Icons.Feather}
+          name={icon}
+          size={moderateScale(12)}
+          color={colors.primary}
+        />
+        <AppText bold FONT_10 style={styles.infoLabel}>
+          {label.toUpperCase()}
         </AppText>
       </View>
       <AppText semiBold FONT_13 style={styles.infoValue}>
@@ -322,21 +351,19 @@ const RequestDetailScreen = () => {
           {/* Unified Details Sheet */}
           <View style={styles.infoContainer}>
             {renderInfoRow("user", "Patient", request.patientName)}
-            {renderInfoRow(
-              "droplet",
-              "Blood Group Required",
-              request.bloodType,
-            )}
+            {renderInfoRow("droplet", "Blood Group", request.bloodType)}
             {renderInfoRow(
               "database",
-              "Units Required",
+              "Units Needed",
               `${request.units} ${request.units === 1 ? "Unit" : "Units"}`,
             )}
             {renderInfoRow("clock", "Time Requested", request.time)}
+            {renderInfoRow("home", "Hospital", request.hospital)}
+            {renderInfoRow("navigation", "City", request.city)}
             {renderInfoRow(
-              "home",
-              "Hospital Destination",
-              request.hospital,
+              "map",
+              "State / Province",
+              request.state || "Punjab",
               true,
             )}
           </View>
@@ -501,12 +528,12 @@ const RequestDetailScreen = () => {
           >
             <AnyIcon
               type={Icons.Feather}
-              name="phone"
+              name="message-square"
               size={moderateScale(14)}
               color={colors.text}
             />
             <AppText bold FONT_12 style={styles.contactText}>
-              Call Hospital
+              Message
             </AppText>
           </TouchableOpacity>
           <TouchableOpacity
@@ -544,7 +571,7 @@ const RequestDetailScreen = () => {
               styles.sheetContainer,
               { paddingBottom: Math.max(moderateScale(20), insets.bottom) },
             ]}
-            onPress={(e) => e.stopPropagation()}
+            onPress={() => {}}
           >
             {/* Modal Header */}
             <View style={styles.sheetHeader}>

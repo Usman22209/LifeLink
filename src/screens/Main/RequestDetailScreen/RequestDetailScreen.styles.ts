@@ -261,31 +261,24 @@ export const styles = StyleSheet.create({
     }),
   },
   infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: verticalScale(14),
+    paddingVertical: verticalScale(12),
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.gray300,
   },
   infoRowLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: scale(10),
-  },
-  infoIconWrap: {
-    width: moderateScale(28),
-    height: moderateScale(28),
-    borderRadius: moderateScale(8),
-    backgroundColor: colors.gray100,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: scale(6),
+    marginBottom: verticalScale(4),
   },
   infoLabel: {
     color: colors.textSecondary,
+    letterSpacing: 0.5,
   },
   infoValue: {
     color: colors.text,
+    paddingLeft: scale(18),
+    lineHeight: verticalScale(18),
   },
 
   // Interactive Map Preview
