@@ -1,9 +1,11 @@
 import { ROUTES } from "@utils/Routes";
+import { BloodRequest } from "@screens/Main/FeedScreen/types";
 
 export type UserStackParamList = {
   [ROUTES.AUTH_FLOW]: undefined;
   [ROUTES.MAIN_FLOW]: undefined;
   [ROUTES.ONBOARDING]: undefined;
+  [ROUTES.REQUEST_DETAIL]: { request: BloodRequest };
 };
 
 export type AuthStackParamList = {

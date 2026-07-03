@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AuthFlow from "./Auth";
 import MainFlow from "./Main";
 import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileScreen";
+import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -26,7 +27,13 @@ export default function UserNavigation() {
           component={CompleteProfileScreen}
         />
       ) : (
-        <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+        <>
+          <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+          <Stack.Screen
+            name={ROUTES.REQUEST_DETAIL}
+            component={RequestDetailScreen}
+          />
+        </>
       )}
     </Stack.Navigator>
   );

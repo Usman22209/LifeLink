@@ -77,7 +77,19 @@ const HomeScreen = () => {
           style={isRtl && { transform: [{ scaleX: -1 }] }}
         >
           {MOCK_URGENT_REQUESTS.map((request) => (
-            <UrgentRequestCard key={request.id} {...request} />
+            <UrgentRequestCard
+              key={request.id}
+              {...request}
+              onPress={() =>
+                navigation.navigate(ROUTES.REQUEST_DETAIL, {
+                  request: {
+                    ...request,
+                    patientName: "Anonymous Patient",
+                    distance: request.distance || "0 km",
+                  },
+                })
+              }
+            />
           ))}
         </ScrollView>
       </View>

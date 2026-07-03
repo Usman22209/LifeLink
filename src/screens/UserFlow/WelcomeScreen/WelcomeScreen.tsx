@@ -117,7 +117,7 @@ const WelcomeScreen = () => {
           <TouchableOpacity
             style={styles.modalContent}
             activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
+            onPress={() => {}}
           >
             <View style={styles.modalHandle} />
 

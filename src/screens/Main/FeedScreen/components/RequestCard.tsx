@@ -1,16 +1,19 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { moderateScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import { withOpacity } from "@theme/colors";
+import { ROUTES } from "@utils/Routes";
 import { BloodRequest, URGENCY_CONFIG } from "../types";
 import { styles } from "../FeedScreen.styles";
 
 type RequestCardProps = BloodRequest;
 
 const RequestCard: React.FC<RequestCardProps> = ({
+  id,
   bloodType,
   patientName,
   hospital,
@@ -20,6 +23,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   time,
   distance,
 }) => {
+  const navigation = useNavigation<any>();
   const cfg = URGENCY_CONFIG[urgency];
 
   return (
@@ -95,7 +99,25 @@ const RequestCard: React.FC<RequestCardProps> = ({
       <View style={styles.cardDivider} />
 
       <View style={styles.cardBottom}>
-        <TouchableOpacity style={styles.detailBtn} activeOpacity={0.75}>
+        <TouchableOpacity
+          style={styles.detailBtn}
+          activeOpacity={0.75}
+          onPress={() =>
+            navigation.navigate(ROUTES.REQUEST_DETAIL, {
+              request: {
+                id,
+                bloodType,
+                patientName,
+                hospital,
+                city,
+                units,
+                urgency,
+                time,
+                distance,
+              },
+            })
+          }
+        >
           <Text semiBold FONT_12 style={{ color: colors.primary }}>
             View Details
           </Text>

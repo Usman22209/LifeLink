@@ -18,4 +18,7 @@ export const ROUTES = {
   NOTIFICATIONS: "Notifications",
   PROFILE: "Profile",
   SETTINGS: "Settings",
+
+  // Details
+  REQUEST_DETAIL: "RequestDetail",
 } as const;
