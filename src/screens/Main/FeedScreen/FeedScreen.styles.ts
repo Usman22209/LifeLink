@@ -7,42 +7,16 @@ export const PAD = scale(16);
 export const styles = StyleSheet.create({
   wrapper: { flex: 1 },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: PAD,
-    paddingBottom: verticalScale(12),
-    backgroundColor: colors.background,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.gray300,
-  },
-  backBtn: {
-    width: moderateScale(32),
-    alignItems: "flex-start",
-    justifyContent: "center",
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: "center",
-  },
-  headerSubtitle: {
-    color: colors.textSecondary,
-    marginTop: verticalScale(1),
-  },
-  filterBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: scale(4),
-    paddingHorizontal: scale(12),
-    paddingVertical: verticalScale(7),
-    borderRadius: moderateScale(20),
-    backgroundColor: colors.gray100,
-    borderWidth: 1,
-    borderColor: colors.gray300,
-  },
-  filterBtnActive: {
+  filterBadge: {
+    position: "absolute",
+    top: verticalScale(2),
+    right: scale(2),
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    width: moderateScale(8),
+    height: moderateScale(8),
+    borderRadius: moderateScale(4),
+    borderWidth: 1,
+    borderColor: colors.background,
   },
 
   searchRow: {

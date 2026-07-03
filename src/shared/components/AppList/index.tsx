@@ -10,28 +10,35 @@ import {
 import { FlashList, FlashListProps } from "@shopify/flash-list";
 import { verticalScale, moderateScale } from "react-native-size-matters";
 
-type AppFlashListProps<T> = FlashListProps<T> & {
+export interface AppFlashListProps<T> extends Omit<
+  FlashListProps<T>,
+  "estimatedItemSize"
+> {
+  estimatedItemSize?: number;
   loading?: boolean;
   emptyMessage?: string;
   containerStyle?: ViewStyle;
   emptyStyle?: ViewStyle;
   emptyTextStyle?: TextStyle;
-};
+}
 
-function AppFlashList<T>({
-  data,
-  renderItem,
-  loading = false,
-  emptyMessage = "No items available",
-  estimatedItemSize,
-  containerStyle,
-  emptyStyle,
-  emptyTextStyle,
-  ListEmptyComponent,
-  ListFooterComponent,
-  ListHeaderComponent,
-  ...props
-}: AppFlashListProps<T>) {
+function AppFlashListInner<T>(
+  {
+    data,
+    renderItem,
+    loading = false,
+    emptyMessage = "No items available",
+    estimatedItemSize,
+    containerStyle,
+    emptyStyle,
+    emptyTextStyle,
+    ListEmptyComponent,
+    ListFooterComponent,
+    ListHeaderComponent,
+    ...props
+  }: AppFlashListProps<T>,
+  ref: React.Ref<any>,
+) {
   const DEFAULT_ESTIMATED_ITEM_SIZE = Math.max(80, moderateScale(120));
 
   const finalEstimatedItemSize =
@@ -54,7 +61,8 @@ function AppFlashList<T>({
   return (
     <View style={[styles.wrapper, containerStyle]}>
       <FlashList
-        {...(props as FlashListProps<T>)}
+        ref={ref}
+        {...(props as any)}
         data={data}
         renderItem={renderItem}
         estimatedItemSize={finalEstimatedItemSize}
@@ -65,6 +73,10 @@ function AppFlashList<T>({
     </View>
   );
 }
+
+const AppFlashList = React.forwardRef(AppFlashListInner) as <T>(
+  props: AppFlashListProps<T> & { ref?: React.Ref<any> },
+) => React.ReactElement;
 
 const styles = StyleSheet.create({
   wrapper: {
