@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
-import Svg, { Circle, Line, Path } from "react-native-svg";
+import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -388,96 +388,33 @@ const RequestDetailScreen = () => {
                 </View>
               </View>
             </View>
-
-            {/* Vector Map Drawing */}
+            {/* Interactive Maps View */}
             <View style={styles.mapCanvas}>
-              <Svg height="100%" width="100%" viewBox="0 0 320 140">
-                {/* Street Grid background lines */}
-                <Line
-                  x1="10"
-                  y1="25"
-                  x2="310"
-                  y2="25"
-                  stroke="#E4E7EC"
-                  strokeWidth="6"
-                  strokeLinecap="round"
+              <MapView
+                provider={PROVIDER_DEFAULT}
+                style={{ width: "100%", height: "100%" }}
+                key={`${request.latitude || 31.5723}-${request.longitude || 74.3213}`}
+                region={{
+                  latitude: request.latitude || 31.5723,
+                  longitude: request.longitude || 74.3213,
+                  latitudeDelta: 0.015,
+                  longitudeDelta: 0.0121,
+                }}
+                scrollEnabled={true}
+                zoomEnabled={true}
+                pitchEnabled={false}
+                rotateEnabled={false}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: request.latitude || 31.5723,
+                    longitude: request.longitude || 74.3213,
+                  }}
+                  pinColor={colors.primary}
+                  title={request.hospital}
+                  description={`Emergency Blood Request: ${request.bloodType}`}
                 />
-                <Line
-                  x1="10"
-                  y1="70"
-                  x2="310"
-                  y2="70"
-                  stroke="#E4E7EC"
-                  strokeWidth="8"
-                  strokeLinecap="round"
-                />
-                <Line
-                  x1="10"
-                  y1="115"
-                  x2="310"
-                  y2="115"
-                  stroke="#E4E7EC"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-                <Line
-                  x1="45"
-                  y1="10"
-                  x2="45"
-                  y2="130"
-                  stroke="#E4E7EC"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                />
-                <Line
-                  x1="160"
-                  y1="10"
-                  x2="160"
-                  y2="130"
-                  stroke="#E4E7EC"
-                  strokeWidth="10"
-                  strokeLinecap="round"
-                />
-                <Line
-                  x1="265"
-                  y1="10"
-                  x2="265"
-                  y2="130"
-                  stroke="#E4E7EC"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                />
-
-                {/* Routing Line (Primary Red Color Dashed path) */}
-                <Path
-                  d="M 45 115 L 45 70 L 160 70 L 160 25"
-                  fill="none"
-                  stroke={colors.primary}
-                  strokeWidth="3.5"
-                  strokeDasharray="6,4"
-                  strokeLinecap="round"
-                />
-
-                {/* Donor Home Node (Green Pin) */}
-                <Circle
-                  cx="45"
-                  cy="115"
-                  r="9"
-                  fill={colors.success}
-                  fillOpacity="0.25"
-                />
-                <Circle cx="45" cy="115" r="4.5" fill={colors.success} />
-
-                {/* Destination Hospital Node (Red Droplet Pin) */}
-                <Circle
-                  cx="160"
-                  cy="25"
-                  r="13"
-                  fill={colors.primary}
-                  fillOpacity="0.2"
-                />
-                <Circle cx="160" cy="25" r="6" fill={colors.primary} />
-              </Svg>
+              </MapView>
 
               {/* Floating Action Overlay on Map Canvas */}
               <View style={styles.mapOverlay}>

@@ -12,6 +12,8 @@ export interface BloodRequest {
   urgency: "critical" | "urgent" | "normal";
   time: string;
   distance: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface FilterState {
@@ -75,6 +77,8 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     urgency: "critical",
     time: "2h ago",
     distance: "3.2 km",
+    latitude: 31.5723,
+    longitude: 74.3213,
   },
   {
     id: "2",
@@ -89,6 +93,8 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     urgency: "urgent",
     time: "4h ago",
     distance: "5.1 km",
+    latitude: 31.4806,
+    longitude: 74.303,
   },
   {
     id: "3",
@@ -103,6 +109,8 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     urgency: "normal",
     time: "6h ago",
     distance: "1.8 km",
+    latitude: 31.5428,
+    longitude: 74.3364,
   },
   {
     id: "4",
@@ -117,5 +125,7 @@ export const MOCK_REQUESTS: BloodRequest[] = [
     urgency: "critical",
     time: "30m ago",
     distance: "7.0 km",
+    latitude: 31.4285,
+    longitude: 74.2796,
   },
 ];

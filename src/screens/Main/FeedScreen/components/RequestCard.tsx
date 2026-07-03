@@ -18,10 +18,14 @@ const RequestCard: React.FC<RequestCardProps> = ({
   patientName,
   hospital,
   city,
+  state,
+  patientImage,
   units,
   urgency,
   time,
   distance,
+  latitude,
+  longitude,
 }) => {
   const navigation = useNavigation<any>();
   const cfg = URGENCY_CONFIG[urgency];
@@ -116,6 +120,8 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 urgency,
                 time,
                 distance,
+                latitude,
+                longitude,
               },
             })
           }
