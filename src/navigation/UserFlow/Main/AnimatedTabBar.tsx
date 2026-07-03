@@ -247,13 +247,17 @@ const styles = StyleSheet.create({
   barContainer: {
     flexDirection: "row",
     backgroundColor: colors.white,
-    borderTopWidth: 0,
+    // Soft top border — primary separator on Android (elevation casts downward, not up)
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.07)",
     paddingTop: verticalScale(10),
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 12,
+    // iOS: upward shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    // Android: elevation gives a downward shadow; the borderTop handles the visual separation
+    elevation: 16,
   },
   indicator: {
     position: "absolute",
