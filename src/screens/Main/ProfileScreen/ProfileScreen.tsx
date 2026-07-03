@@ -13,7 +13,6 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 
-
 type ProfileScreenNavigationProp = StackNavigationProp<
   MainStackParamList,
   typeof ROUTES.PROFILE
@@ -41,11 +40,17 @@ const ProfileScreen = () => {
       style={styles.wrapper}
     >
       <View style={styles.container}>
-        <Text bold FONT_24 style={{ color: colors.text, marginBottom: verticalScale(20) }}>
+        <Text
+          bold
+          FONT_24
+          style={{ color: colors.text, marginBottom: verticalScale(20) }}
+        >
           Profile
         </Text>
         {user && (
-          <View style={{ alignItems: "center", marginBottom: verticalScale(20) }}>
+          <View
+            style={{ alignItems: "center", marginBottom: verticalScale(20) }}
+          >
             <Text FONT_16 style={{ color: colors.textSecondary }}>
               Name: {user.full_name}
             </Text>

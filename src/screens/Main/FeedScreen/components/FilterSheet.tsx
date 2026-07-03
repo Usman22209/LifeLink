@@ -31,11 +31,22 @@ interface OptionRowProps {
   onSelect: (v: string) => void;
 }
 
-const OptionRow: React.FC<OptionRowProps> = ({ label, icon, options, selected, onSelect }) => (
+const OptionRow: React.FC<OptionRowProps> = ({
+  label,
+  icon,
+  options,
+  selected,
+  onSelect,
+}) => (
   <View style={s.group}>
     <View style={s.groupHeader}>
       <View style={s.groupIconWrap}>
-        <AnyIcon type={Icons.Feather} name={icon} size={moderateScale(13)} color={colors.primary} />
+        <AnyIcon
+          type={Icons.Feather}
+          name={icon}
+          size={moderateScale(13)}
+          color={colors.primary}
+        />
       </View>
       <Text semiBold FONT_13 style={{ color: colors.text }}>
         {label}
@@ -52,7 +63,11 @@ const OptionRow: React.FC<OptionRowProps> = ({ label, icon, options, selected, o
             activeOpacity={0.7}
           >
             {active && <View style={s.optionDot} />}
-            <Text medium FONT_12 style={{ color: active ? colors.primary : colors.gray600 }}>
+            <Text
+              medium
+              FONT_12
+              style={{ color: active ? colors.primary : colors.gray600 }}
+            >
               {opt}
             </Text>
           </TouchableOpacity>
@@ -69,7 +84,12 @@ interface FilterSheetProps {
   setFilters: (f: FilterState) => void;
 }
 
-const FilterSheet: React.FC<FilterSheetProps> = ({ visible, onClose, filters, setFilters }) => {
+const FilterSheet: React.FC<FilterSheetProps> = ({
+  visible,
+  onClose,
+  filters,
+  setFilters,
+}) => {
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState<FilterState>(filters);
 
@@ -80,10 +100,13 @@ const FilterSheet: React.FC<FilterSheetProps> = ({ visible, onClose, filters, se
       onPanResponderRelease: (_, g) => {
         if (g.dy > 40) onClose();
       },
-    })
+    }),
   ).current;
 
-  const handleApply = () => { setFilters(draft); onClose(); };
+  const handleApply = () => {
+    setFilters(draft);
+    onClose();
+  };
   const handleReset = () => setDraft(DEFAULT_FILTERS);
 
   return (
@@ -98,7 +121,12 @@ const FilterSheet: React.FC<FilterSheetProps> = ({ visible, onClose, filters, se
       <View style={s.modalWrap}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
-        <View style={[s.container, { paddingBottom: insets.bottom + verticalScale(16) }]}>
+        <View
+          style={[
+            s.container,
+            { paddingBottom: insets.bottom + verticalScale(16) },
+          ]}
+        >
           <View style={s.handleWrap} {...panResponder.panHandlers}>
             <View style={s.handle} />
           </View>
@@ -108,7 +136,14 @@ const FilterSheet: React.FC<FilterSheetProps> = ({ visible, onClose, filters, se
               <Text bold FONT_16 style={{ color: colors.text }}>
                 Filter Requests
               </Text>
-              <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(1) }}>
+              <Text
+                regular
+                FONT_11
+                style={{
+                  color: colors.textSecondary,
+                  marginTop: verticalScale(1),
+                }}
+              >
                 Narrow down by urgency, distance & more
               </Text>
             </View>
@@ -117,20 +152,58 @@ const FilterSheet: React.FC<FilterSheetProps> = ({ visible, onClose, filters, se
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <AnyIcon type={Icons.Ionicons} name="close" size={moderateScale(16)} color={colors.gray600} />
+              <AnyIcon
+                type={Icons.Ionicons}
+                name="close"
+                size={moderateScale(16)}
+                color={colors.gray600}
+              />
             </TouchableOpacity>
           </View>
 
           <View style={s.divider} />
 
-          <OptionRow label="Urgency"    icon="alert-circle" options={URGENCY_OPTIONS}  selected={draft.urgency}   onSelect={(v) => setDraft({ ...draft, urgency: v })} />
-          <OptionRow label="Sort By"    icon="bar-chart-2"  options={SORT_OPTIONS}     selected={draft.sortBy}    onSelect={(v) => setDraft({ ...draft, sortBy: v })} />
-          <OptionRow label="Distance"   icon="map-pin"      options={DISTANCE_OPTIONS} selected={draft.distance}  onSelect={(v) => setDraft({ ...draft, distance: v })} />
-          <OptionRow label="Blood Type" icon="droplet"      options={BLOOD_OPTIONS}    selected={draft.bloodType} onSelect={(v) => setDraft({ ...draft, bloodType: v })} />
+          <OptionRow
+            label="Urgency"
+            icon="alert-circle"
+            options={URGENCY_OPTIONS}
+            selected={draft.urgency}
+            onSelect={(v) => setDraft({ ...draft, urgency: v })}
+          />
+          <OptionRow
+            label="Sort By"
+            icon="bar-chart-2"
+            options={SORT_OPTIONS}
+            selected={draft.sortBy}
+            onSelect={(v) => setDraft({ ...draft, sortBy: v })}
+          />
+          <OptionRow
+            label="Distance"
+            icon="map-pin"
+            options={DISTANCE_OPTIONS}
+            selected={draft.distance}
+            onSelect={(v) => setDraft({ ...draft, distance: v })}
+          />
+          <OptionRow
+            label="Blood Type"
+            icon="droplet"
+            options={BLOOD_OPTIONS}
+            selected={draft.bloodType}
+            onSelect={(v) => setDraft({ ...draft, bloodType: v })}
+          />
 
           <View style={s.footer}>
-            <TouchableOpacity style={s.resetBtn} onPress={handleReset} activeOpacity={0.7}>
-              <AnyIcon type={Icons.Feather} name="rotate-ccw" size={moderateScale(13)} color={colors.gray600} />
+            <TouchableOpacity
+              style={s.resetBtn}
+              onPress={handleReset}
+              activeOpacity={0.7}
+            >
+              <AnyIcon
+                type={Icons.Feather}
+                name="rotate-ccw"
+                size={moderateScale(13)}
+                color={colors.gray600}
+              />
               <Text medium FONT_13 style={{ color: colors.gray600 }}>
                 Reset
               </Text>

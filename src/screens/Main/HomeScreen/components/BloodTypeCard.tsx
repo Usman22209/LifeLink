@@ -26,13 +26,26 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
 
   return (
     <View style={styles.card}>
-
       <View style={styles.decorCircle1} />
       <View style={styles.decorCircle2} />
 
-      <View style={[styles.topRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-        <View style={[styles.infoContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
-          <Text medium FONT_12 style={{ color: withOpacity(colors.white, 0.75) }}>
+      <View
+        style={[
+          styles.topRow,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
+        <View
+          style={[
+            styles.infoContainer,
+            { alignItems: isRtl ? "flex-end" : "flex-start" },
+          ]}
+        >
+          <Text
+            medium
+            FONT_12
+            style={{ color: withOpacity(colors.white, 0.75) }}
+          >
             {t("home.yourBloodType")}
           </Text>
           <Text extraBold FONT_34 style={{ color: colors.white }}>
@@ -46,7 +59,9 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
               marginTop: verticalScale(2),
             }}
           >
-            {subtitle === "Universal Donor" ? t("home.universalDonor") : subtitle}
+            {subtitle === "Universal Donor"
+              ? t("home.universalDonor")
+              : subtitle}
           </Text>
         </View>
         <View style={styles.iconContainer}>
@@ -58,7 +73,6 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
           />
         </View>
       </View>
-
 
       <View
         style={[
@@ -84,7 +98,11 @@ const StatItem = ({ value, label }: { value: string; label: string }) => (
     <Text
       medium
       FONT_9
-      style={{ color: withOpacity(colors.white, 0.65), marginTop: verticalScale(2), textAlign: "center" }}
+      style={{
+        color: withOpacity(colors.white, 0.65),
+        marginTop: verticalScale(2),
+        textAlign: "center",
+      }}
     >
       {label}
     </Text>

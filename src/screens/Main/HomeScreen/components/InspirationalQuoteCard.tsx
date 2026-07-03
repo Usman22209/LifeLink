@@ -1,5 +1,11 @@
 import React, { useState, useRef } from "react";
-import { StyleSheet, View, TouchableOpacity, Animated, I18nManager } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Animated,
+  I18nManager,
+} from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
@@ -13,10 +19,26 @@ const InspirationalQuoteCard = () => {
   const isRtl = I18nManager.isRTL;
 
   const quotes = [
-    { text: t("quotes.factText1"), author: t("quotes.factAuthor1"), icon: "award" },
-    { text: t("quotes.factText2"), author: t("quotes.factAuthor2"), icon: "heart" },
-    { text: t("quotes.factText3"), author: t("quotes.factAuthor3"), icon: "sun" },
-    { text: t("quotes.factText4"), author: t("quotes.factAuthor4"), icon: "users" },
+    {
+      text: t("quotes.factText1"),
+      author: t("quotes.factAuthor1"),
+      icon: "award",
+    },
+    {
+      text: t("quotes.factText2"),
+      author: t("quotes.factAuthor2"),
+      icon: "heart",
+    },
+    {
+      text: t("quotes.factText3"),
+      author: t("quotes.factAuthor3"),
+      icon: "sun",
+    },
+    {
+      text: t("quotes.factText4"),
+      author: t("quotes.factAuthor4"),
+      icon: "users",
+    },
   ];
 
   const handleNextQuote = () => {
@@ -42,32 +64,63 @@ const InspirationalQuoteCard = () => {
       activeOpacity={0.9}
       onPress={handleNextQuote}
     >
-      <View style={[styles.quoteMarkContainer, { [isRtl ? "right" : "left"]: scale(8) }]}>
+      <View
+        style={[
+          styles.quoteMarkContainer,
+          { [isRtl ? "right" : "left"]: scale(8) },
+        ]}
+      >
         <Text extraBold style={styles.quoteMark}>
           “
         </Text>
       </View>
 
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <View style={[styles.header, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-          <View style={[styles.categoryBadge, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        <View
+          style={[
+            styles.header,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
+          <View
+            style={[
+              styles.categoryBadge,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
             <AnyIcon
               type={Icons.Feather}
               name={current.icon}
               size={moderateScale(12)}
               color={colors.primary}
             />
-            <Text semiBold FONT_9 style={[styles.categoryText, { [isRtl ? "marginRight" : "marginLeft"]: scale(4) }]}>
+            <Text
+              semiBold
+              FONT_9
+              style={[
+                styles.categoryText,
+                { [isRtl ? "marginRight" : "marginLeft"]: scale(4) },
+              ]}
+            >
               {current.author}
             </Text>
           </View>
         </View>
 
-        <Text medium FONT_13 style={[styles.quoteText, { textAlign: isRtl ? "right" : "left" }]}>
+        <Text
+          medium
+          FONT_13
+          style={[styles.quoteText, { textAlign: isRtl ? "right" : "left" }]}
+        >
           {current.text}
         </Text>
 
-        <View style={[styles.footer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        <View
+          style={[
+            styles.footer,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           <Text medium FONT_9 style={styles.tapTip}>
             {t("home.tapForTip")}
           </Text>

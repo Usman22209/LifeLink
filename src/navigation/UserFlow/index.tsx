@@ -21,7 +21,10 @@ export default function UserNavigation() {
       {!token ? (
         <Stack.Screen name={ROUTES.AUTH_FLOW} component={AuthFlow} />
       ) : !isOnboarded ? (
-        <Stack.Screen name={ROUTES.ONBOARDING} component={CompleteProfileScreen} />
+        <Stack.Screen
+          name={ROUTES.ONBOARDING}
+          component={CompleteProfileScreen}
+        />
       ) : (
         <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
       )}

@@ -30,7 +30,6 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-
         <View style={styles.ringContainer}>
           <View style={styles.ringOuter}>
             <View style={styles.ringInner}>
@@ -49,7 +48,6 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
             </View>
           </View>
         </View>
-
 
         <View
           style={[
@@ -72,7 +70,6 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
         </View>
       </View>
 
-
       <View style={styles.progressTrack}>
         <View
           style={[
@@ -84,7 +81,6 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
           ]}
         />
       </View>
-
 
       {isEligible && (
         <TouchableOpacity
@@ -98,7 +94,11 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
             size={moderateScale(16)}
             color={colors.white}
           />
-          <Text semiBold FONT_12 style={{ color: colors.white, marginLeft: scale(6) }}>
+          <Text
+            semiBold
+            FONT_12
+            style={{ color: colors.white, marginLeft: scale(6) }}
+          >
             Donate Now
           </Text>
         </TouchableOpacity>

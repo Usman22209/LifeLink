@@ -1,5 +1,10 @@
 import React from "react";
-import { View, TouchableOpacity, I18nManager, useWindowDimensions } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  I18nManager,
+  useWindowDimensions,
+} from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Text from "@components/AppText";
@@ -38,20 +43,48 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   const cardWidth = (usableWidth - moderateScale(20) - scale(12)) / 2;
 
   return (
-    <TouchableOpacity style={[styles.card, { width: cardWidth }]} activeOpacity={0.8} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.card, { width: cardWidth }]}
+      activeOpacity={0.8}
+      onPress={onPress}
+    >
       <View style={[styles.accentBar, { backgroundColor: config.color }]} />
 
       <View style={styles.inner}>
-        <View style={[styles.topRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-          <View style={[styles.bloodPill, { borderColor: withOpacity(config.color, 0.35) }]}>
+        <View
+          style={[
+            styles.topRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
+          <View
+            style={[
+              styles.bloodPill,
+              { borderColor: withOpacity(config.color, 0.35) },
+            ]}
+          >
             <Text extraBold FONT_16 style={{ color: config.color }}>
               {bloodType}
             </Text>
           </View>
 
-          <View style={[styles.badge, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-            <AnyIcon type={Icons.Feather} name={config.icon} size={moderateScale(9)} color={config.color} />
-            <Text semiBold FONT_9 style={{ color: config.color, marginLeft: scale(3) }}>
+          <View
+            style={[
+              styles.badge,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name={config.icon}
+              size={moderateScale(9)}
+              color={config.color}
+            />
+            <Text
+              semiBold
+              FONT_9
+              style={{ color: config.color, marginLeft: scale(3) }}
+            >
               {t(`home.${urgency}`)}
             </Text>
           </View>
@@ -66,19 +99,58 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
           {hospital}
         </Text>
 
-        <View style={[styles.metaRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-          <AnyIcon type={Icons.Feather} name="map-pin" size={moderateScale(9)} color={colors.textSecondary} />
-          <Text medium FONT_10 numberOfLines={1} style={{ color: colors.textSecondary, marginLeft: scale(3), flex: 1 }}>
-            {city}{distance ? ` · ${distance}` : ""}
+        <View
+          style={[
+            styles.metaRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
+          <AnyIcon
+            type={Icons.Feather}
+            name="map-pin"
+            size={moderateScale(9)}
+            color={colors.textSecondary}
+          />
+          <Text
+            medium
+            FONT_10
+            numberOfLines={1}
+            style={{
+              color: colors.textSecondary,
+              marginLeft: scale(3),
+              flex: 1,
+            }}
+          >
+            {city}
+            {distance ? ` · ${distance}` : ""}
           </Text>
         </View>
 
         <View style={styles.divider} />
 
-        <View style={[styles.footer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-          <View style={[styles.footerItem, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-            <AnyIcon type={Icons.Ionicons} name="water-outline" size={moderateScale(10)} color={colors.textSecondary} />
-            <Text medium FONT_10 style={{ color: colors.textSecondary, marginLeft: scale(3) }}>
+        <View
+          style={[
+            styles.footer,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
+          <View
+            style={[
+              styles.footerItem,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <AnyIcon
+              type={Icons.Ionicons}
+              name="water-outline"
+              size={moderateScale(10)}
+              color={colors.textSecondary}
+            />
+            <Text
+              medium
+              FONT_10
+              style={{ color: colors.textSecondary, marginLeft: scale(3) }}
+            >
               {units} {units === 1 ? t("home.unit") : t("home.units")}
             </Text>
           </View>

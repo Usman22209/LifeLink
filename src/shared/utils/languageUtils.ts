@@ -9,31 +9,31 @@ import { RTL_LANGUAGES } from "@shared/i18n";
  * @param t - Translation function from useTranslation hook
  */
 export const changeAppLanguage = async (
-    newLanguage: string,
-    t: (key: string) => string
+  newLanguage: string,
+  t: (key: string) => string,
 ) => {
-    const currentIsRTL = I18nManager.isRTL;
-    const newIsRTL = RTL_LANGUAGES.includes(newLanguage);
+  const currentIsRTL = I18nManager.isRTL;
+  const newIsRTL = RTL_LANGUAGES.includes(newLanguage);
 
-    // Change the language
-    await i18n.changeLanguage(newLanguage);
+  // Change the language
+  await i18n.changeLanguage(newLanguage);
 
-    // If RTL direction needs to change, restart the app
-    if (currentIsRTL !== newIsRTL) {
-        I18nManager.forceRTL(newIsRTL);
-        I18nManager.allowRTL(newIsRTL);
+  // If RTL direction needs to change, restart the app
+  if (currentIsRTL !== newIsRTL) {
+    I18nManager.forceRTL(newIsRTL);
+    I18nManager.allowRTL(newIsRTL);
 
-        Alert.alert(
-            t("restartRequired") || "Restart Required",
-            t("restartMessage") ||
-            "The app needs to restart to apply the language change.",
-            [
-                {
-                    text: t("restartNow") || "Restart Now",
-                    onPress: () => RNRestart.restart(),
-                },
-            ],
-            { cancelable: false }
-        );
-    }
+    Alert.alert(
+      t("restartRequired") || "Restart Required",
+      t("restartMessage") ||
+        "The app needs to restart to apply the language change.",
+      [
+        {
+          text: t("restartNow") || "Restart Now",
+          onPress: () => RNRestart.restart(),
+        },
+      ],
+      { cancelable: false },
+    );
+  }
 };

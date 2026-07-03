@@ -16,7 +16,9 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
 HTTP_CLIENT.interceptors.request.use(
   (config) => {
     const { accessToken } = store.getState().auth;
-    console.log(`[HTTP_CLIENT] Request: ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(
+      `[HTTP_CLIENT] Request: ${config.method?.toUpperCase()} ${config.url}`,
+    );
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -29,25 +31,34 @@ HTTP_CLIENT.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-
 HTTP_CLIENT.interceptors.response.use(
   (response) => {
-    console.log(`[HTTP_CLIENT] Response: ${response.status} from ${response.config.url}`);
+    console.log(
+      `[HTTP_CLIENT] Response: ${response.status} from ${response.config.url}`,
+    );
     console.log(`[HTTP_CLIENT] Response data:`, response.data);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    console.warn(`[HTTP_CLIENT] Error: ${error.response?.status} from ${originalRequest.url}`);
+    console.warn(
+      `[HTTP_CLIENT] Error: ${error.response?.status} from ${originalRequest.url}`,
+    );
 
     // Handle 413 Content Too Large
     if (error?.response?.status === 413) {
-      Alert.alert("Error", "The uploaded image is too large. Please select a file smaller than 2MB.");
+      Alert.alert(
+        "Error",
+        "The uploaded image is too large. Please select a file smaller than 2MB.",
+      );
       return Promise.reject(error);
     }
 
     // Handle 404 on profile/me - implies user needs onboarding
-    if (error?.response?.status === 404 && originalRequest.url?.includes(API_CONFIG.PROFILE.me)) {
+    if (
+      error?.response?.status === 404 &&
+      originalRequest.url?.includes(API_CONFIG.PROFILE.me)
+    ) {
       console.warn("[HTTP_CLIENT] Profile not found, user needs onboarding.");
       store.dispatch(updateUser({ is_onboarded: false }));
       return Promise.reject(error);

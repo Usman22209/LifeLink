@@ -39,7 +39,6 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
     formState: { errors, isSubmitting },
   } = useResetPasswordForm();
 
-
   const accessToken =
     route.params?.accessToken ||
     route.params?.access_token ||
@@ -58,7 +57,9 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
     }
 
     try {
-      console.log("Reset Password Request - Data:", { password: data.newPassword });
+      console.log("Reset Password Request - Data:", {
+        password: data.newPassword,
+      });
       const response = await AUTH_SERVICE.resetPassword(
         { password: data.newPassword },
         accessToken,
@@ -69,7 +70,8 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
         Toast.show({
           type: "success",
           text1: "Success",
-          text2: response.data.message || "Password has been reset successfully.",
+          text2:
+            response.data.message || "Password has been reset successfully.",
         });
         navigation.navigate(ROUTES.LOGIN);
       } else {

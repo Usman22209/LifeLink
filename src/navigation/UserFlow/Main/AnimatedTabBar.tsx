@@ -104,9 +104,17 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
         stiffness: 180,
       }).start();
     });
-  }, [state.index, indicatorX, indicatorOpacity, fabScale, fabRotation, tabScales]);
+  }, [
+    state.index,
+    indicatorX,
+    indicatorOpacity,
+    fabScale,
+    fabRotation,
+    tabScales,
+  ]);
 
-  const bottomPadding = Platform.OS === "ios" ? insets.bottom : verticalScale(6);
+  const bottomPadding =
+    Platform.OS === "ios" ? insets.bottom : verticalScale(6);
   const fabSpin = fabRotation.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "45deg"],
@@ -174,10 +182,7 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
                       style={[
                         styles.fab,
                         {
-                          transform: [
-                            { scale: fabScale },
-                            { rotate: fabSpin },
-                          ],
+                          transform: [{ scale: fabScale }, { rotate: fabSpin }],
                         },
                       ]}
                     >
@@ -227,7 +232,10 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
             </Animated.View>
 
             <Animated.Text
-              style={[styles.label, { color: iconColor, opacity: labelOpacity }]}
+              style={[
+                styles.label,
+                { color: iconColor, opacity: labelOpacity },
+              ]}
               numberOfLines={1}
             >
               {typeof options.tabBarLabel === "string"

@@ -47,13 +47,20 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
       ]}
     >
       <TouchableOpacity
-        style={[styles.profileSection, { flexDirection: isRtl ? "row-reverse" : "row" }]}
+        style={[
+          styles.profileSection,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
         activeOpacity={0.7}
         onPress={onProfilePress}
       >
         <View style={styles.avatarContainer}>
           {profileImage ? (
-            <AppImage source={{ uri: profileImage }} style={styles.avatar} resizeMode="cover" />
+            <AppImage
+              source={{ uri: profileImage }}
+              style={styles.avatar}
+              resizeMode="cover"
+            />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Text bold FONT_16 style={{ color: colors.white }}>
@@ -61,10 +68,20 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
               </Text>
             </View>
           )}
-          <View style={[styles.onlineDot, { [isRtl ? "left" : "right"]: moderateScale(1) }]} />
+          <View
+            style={[
+              styles.onlineDot,
+              { [isRtl ? "left" : "right"]: moderateScale(1) },
+            ]}
+          />
         </View>
 
-        <View style={[styles.greetingContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
+        <View
+          style={[
+            styles.greetingContainer,
+            { alignItems: isRtl ? "flex-end" : "flex-start" },
+          ]}
+        >
           <Text medium FONT_12 style={{ color: colors.textSecondary }}>
             {t(`home.${getGreetingKey()}`)} 👋
           </Text>
@@ -79,7 +96,12 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
         activeOpacity={0.7}
         onPress={onNotificationPress}
       >
-        <AnyIcon type={Icons.Feather} name="bell" size={moderateScale(22)} color={colors.text} />
+        <AnyIcon
+          type={Icons.Feather}
+          name="bell"
+          size={moderateScale(22)}
+          color={colors.text}
+        />
         {notificationCount > 0 && (
           <View style={styles.badge}>
             <Text bold FONT_8 style={{ color: colors.white }}>

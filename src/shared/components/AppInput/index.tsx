@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { colors } from "@theme/colors";
 import Text from "@components/AppText";

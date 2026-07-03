@@ -54,7 +54,10 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({
         </View>
 
         <TouchableOpacity
-          style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+          style={[
+            styles.filterBtn,
+            activeFilterCount > 0 && styles.filterBtnActive,
+          ]}
           onPress={onFilterPress}
           activeOpacity={0.75}
         >

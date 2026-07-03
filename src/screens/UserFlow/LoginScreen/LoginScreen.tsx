@@ -33,7 +33,8 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { mutate: loginMutate, isPending: loginPending } = useLogin();
-  const { mutate: googleLoginMutate, isPending: googleLoginPending } = useGoogleLogin();
+  const { mutate: googleLoginMutate, isPending: googleLoginPending } =
+    useGoogleLogin();
   const { signIn } = useGoogleSignIn();
   const dispatch = useDispatch();
 
@@ -124,7 +125,9 @@ const LoginScreen = () => {
           />
 
           <View style={styles.dividerContainer}>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
             <Text
               medium
               FONT_12
@@ -132,7 +135,9 @@ const LoginScreen = () => {
             >
               {t("login.or")}
             </Text>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
           </View>
 
           <TouchableOpacity
@@ -159,7 +164,9 @@ const LoginScreen = () => {
               FONT_14
               style={[styles.googleText, { color: colors.text }]}
             >
-              {googleLoginPending ? t("login.loading") : t("login.continueWithGoogle")}
+              {googleLoginPending
+                ? t("login.loading")
+                : t("login.continueWithGoogle")}
             </Text>
           </TouchableOpacity>
 

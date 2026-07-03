@@ -25,14 +25,24 @@ const RequestCard: React.FC<RequestCardProps> = ({
   return (
     <View style={styles.card}>
       <View style={styles.cardTop}>
-        <View style={[styles.bloodBadge, { backgroundColor: withOpacity(cfg.color, 0.09) }]}>
+        <View
+          style={[
+            styles.bloodBadge,
+            { backgroundColor: withOpacity(cfg.color, 0.09) },
+          ]}
+        >
           <Text extraBold FONT_16 style={{ color: cfg.color }}>
             {bloodType}
           </Text>
         </View>
 
         <View style={styles.cardInfo}>
-          <Text semiBold FONT_13 style={{ color: colors.text }} numberOfLines={1}>
+          <Text
+            semiBold
+            FONT_13
+            style={{ color: colors.text }}
+            numberOfLines={1}
+          >
             {patientName}
           </Text>
           <Text regular FONT_11 style={styles.hospitalText} numberOfLines={1}>
@@ -40,13 +50,23 @@ const RequestCard: React.FC<RequestCardProps> = ({
           </Text>
           <View style={styles.metaRow}>
             <View style={styles.metaChip}>
-              <AnyIcon type={Icons.Feather} name="droplet" size={moderateScale(10)} color={colors.textSecondary} />
+              <AnyIcon
+                type={Icons.Feather}
+                name="droplet"
+                size={moderateScale(10)}
+                color={colors.textSecondary}
+              />
               <Text regular FONT_10 style={{ color: colors.textSecondary }}>
                 {units} {units === 1 ? "unit" : "units"}
               </Text>
             </View>
             <View style={styles.metaChip}>
-              <AnyIcon type={Icons.Feather} name="map-pin" size={moderateScale(10)} color={colors.textSecondary} />
+              <AnyIcon
+                type={Icons.Feather}
+                name="map-pin"
+                size={moderateScale(10)}
+                color={colors.textSecondary}
+              />
               <Text regular FONT_10 style={{ color: colors.textSecondary }}>
                 {distance}
               </Text>
@@ -55,7 +75,12 @@ const RequestCard: React.FC<RequestCardProps> = ({
         </View>
 
         <View style={styles.cardRight}>
-          <View style={[styles.urgencyPill, { backgroundColor: withOpacity(cfg.color, 0.1) }]}>
+          <View
+            style={[
+              styles.urgencyPill,
+              { backgroundColor: withOpacity(cfg.color, 0.1) },
+            ]}
+          >
             <View style={[styles.urgencyDot, { backgroundColor: cfg.color }]} />
             <Text semiBold FONT_10 style={{ color: cfg.color }}>
               {cfg.label}
@@ -74,13 +99,23 @@ const RequestCard: React.FC<RequestCardProps> = ({
           <Text semiBold FONT_12 style={{ color: colors.primary }}>
             View Details
           </Text>
-          <AnyIcon type={Icons.Feather} name="arrow-right" size={moderateScale(13)} color={colors.primary} />
+          <AnyIcon
+            type={Icons.Feather}
+            name="arrow-right"
+            size={moderateScale(13)}
+            color={colors.primary}
+          />
         </TouchableOpacity>
 
         <View style={styles.actionDivider} />
 
         <TouchableOpacity style={styles.shareBtn} activeOpacity={0.7}>
-          <AnyIcon type={Icons.Feather} name="share-2" size={moderateScale(13)} color={colors.gray600} />
+          <AnyIcon
+            type={Icons.Feather}
+            name="share-2"
+            size={moderateScale(13)}
+            color={colors.gray600}
+          />
           <Text medium FONT_11 style={{ color: colors.gray600 }}>
             Share
           </Text>

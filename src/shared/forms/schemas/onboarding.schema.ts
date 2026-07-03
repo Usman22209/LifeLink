@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const getOnboardingSchema = (t: any) => z.object({
+export const getOnboardingSchema = (t: any) =>
+  z.object({
     full_name: z.string().min(3, t("errors.nameTooShort")),
     email: z.string().email(t("errors.invalidEmail")),
     phone: z.string().min(10, t("errors.invalidPhone")),
@@ -12,9 +13,10 @@ export const getOnboardingSchema = (t: any) => z.object({
     blood_group: z.string().min(1, t("errors.bloodGroupRequired")),
     profile_image: z.string().optional(),
     confirmed_data: z.boolean().refine((val) => val === true, {
-        message: t("errors.confirmRequired"),
+      message: t("errors.confirmRequired"),
     }),
-});
+  });
 
-export type OnboardingFormValues = z.infer<ReturnType<typeof getOnboardingSchema>>;
-
+export type OnboardingFormValues = z.infer<
+  ReturnType<typeof getOnboardingSchema>
+>;

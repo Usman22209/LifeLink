@@ -21,9 +21,9 @@ import { styles } from "./FeedScreen.styles";
 
 const FeedScreen = () => {
   const navigation = useNavigation<any>();
-  const [searchQuery, setSearchQuery]   = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [sheetVisible, setSheetVisible] = useState(false);
-  const [filters, setFilters]           = useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
   const activeFilterCount = countActiveFilters(filters);
 
@@ -44,8 +44,8 @@ const FeedScreen = () => {
       <AppText medium FONT_12 style={{ color: colors.textSecondary }}>
         <AppText semiBold FONT_12 style={{ color: colors.text }}>
           {filteredData.length}
-        </AppText>
-        {" "}requests found
+        </AppText>{" "}
+        requests found
       </AppText>
       <View style={styles.sortPill}>
         <AnyIcon
@@ -87,7 +87,9 @@ const FeedScreen = () => {
           ListHeaderComponent={ListHeader}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={{ height: verticalScale(10) }} />}
+          ItemSeparatorComponent={() => (
+            <View style={{ height: verticalScale(10) }} />
+          )}
           ListFooterComponent={<View style={{ height: verticalScale(28) }} />}
         />
       </ScreenWrapper>

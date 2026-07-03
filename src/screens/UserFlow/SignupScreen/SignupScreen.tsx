@@ -37,7 +37,8 @@ const SignupScreen = () => {
     formState: { errors },
   } = useSignupForm();
   const { mutate: signupMutate, isPending: signupPending } = useSignup();
-  const { mutate: googleLoginMutate, isPending: googleLoginPending } = useGoogleLogin();
+  const { mutate: googleLoginMutate, isPending: googleLoginPending } =
+    useGoogleLogin();
   const { signIn } = useGoogleSignIn();
 
   const handleSignup = (data: SignupFormValues) => {
@@ -114,7 +115,9 @@ const SignupScreen = () => {
           />
 
           <View style={styles.dividerContainer}>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
             <Text
               medium
               FONT_12
@@ -122,7 +125,9 @@ const SignupScreen = () => {
             >
               {t("signup.or")}
             </Text>
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
           </View>
 
           <TouchableOpacity
@@ -149,7 +154,9 @@ const SignupScreen = () => {
               FONT_14
               style={[styles.googleText, { color: colors.text }]}
             >
-              {googleLoginPending ? t("signup.loading") : t("signup.continueWithGoogle")}
+              {googleLoginPending
+                ? t("signup.loading")
+                : t("signup.continueWithGoogle")}
             </Text>
           </TouchableOpacity>
 

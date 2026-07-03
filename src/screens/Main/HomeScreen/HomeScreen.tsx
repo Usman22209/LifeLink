@@ -50,11 +50,19 @@ const HomeScreen = () => {
         <InspirationalQuoteCard />
       </View>
 
-      <View style={[styles.sectionHeader, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+      <View
+        style={[
+          styles.sectionHeader,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
         <AppText semiBold FONT_16 style={{ color: colors.text }}>
           {t("home.urgentRequests")}
         </AppText>
-        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.FEED)}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate(ROUTES.FEED)}
+        >
           <AppText semiBold FONT_12 style={{ color: colors.primary }}>
             {t("home.seeAll")}
           </AppText>

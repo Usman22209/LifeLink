@@ -100,7 +100,12 @@ export const styles = StyleSheet.create({
     borderColor: colors.gray300,
     overflow: "hidden",
     ...Platform.select({
-      ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6 },
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+      },
       android: { elevation: 2 },
     }),
   },
@@ -202,7 +207,12 @@ export const sheetStyles = StyleSheet.create({
     paddingHorizontal: scale(20),
     paddingTop: verticalScale(6),
     ...Platform.select({
-      ios:     { shadowColor: "#000", shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 10 },
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+      },
       android: { elevation: 10 },
     }),
   },

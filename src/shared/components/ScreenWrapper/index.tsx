@@ -47,7 +47,6 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   const Container = scrollable ? ScrollView : View;
   const bgColor = backgroundColor || colors.background;
 
-
   return (
     <>
       <StatusBar
@@ -85,9 +84,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
         </Container>
 
         {loading && (
-          <View
-            style={styles.loadingOverlay}
-          >
+          <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.text }]}>
               {loadingText}
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
-    width: '100%',
+    width: "100%",
     zIndex: 10,
   },
   container: {
