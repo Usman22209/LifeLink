@@ -1,53 +1,21 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity, I18nManager } from "react-native";
-import { scale, moderateScale, verticalScale } from "react-native-size-matters";
+import { View, ScrollView, TouchableOpacity, I18nManager } from "react-native";
+import { verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
-import Text from "@components/AppText";
-import ScreenWrapper from "@components/ScreenWrapper";
 import { useSelector } from "react-redux";
+import ScreenWrapper from "@components/ScreenWrapper";
+import AppText from "@components/AppText";
 import { selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
+
 import HomeHeader from "./components/HomeHeader";
 import BloodTypeCard from "./components/BloodTypeCard";
 import InspirationalQuoteCard from "./components/InspirationalQuoteCard";
 import UrgentRequestCard from "./components/UrgentRequestCard";
-import type { UrgentRequestData } from "./components/UrgentRequestCard";
-import useTranslation from "@shared/hooks/useTranslation";
-
-
-const MOCK_URGENT_REQUESTS: UrgentRequestData[] = [
-  {
-    id: "1",
-    bloodType: "B+",
-    hospital: "Mayo Hospital",
-    city: "Lahore",
-    units: 3,
-    urgency: "critical",
-    time: "2h ago",
-    distance: "3.2 km",
-  },
-  {
-    id: "2",
-    bloodType: "A-",
-    hospital: "Jinnah Hospital",
-    city: "Lahore",
-    units: 2,
-    urgency: "urgent",
-    time: "4h ago",
-    distance: "5.1 km",
-  },
-  {
-    id: "3",
-    bloodType: "O-",
-    hospital: "Services Hospital",
-    city: "Lahore",
-    units: 1,
-    urgency: "normal",
-    time: "6h ago",
-    distance: "1.8 km",
-  },
-];
+import { MOCK_URGENT_REQUESTS } from "./types";
+import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
@@ -70,7 +38,6 @@ const HomeScreen = () => {
         />
       }
     >
-
       <BloodTypeCard
         bloodType="O+"
         subtitle="Universal Donor"
@@ -79,26 +46,20 @@ const HomeScreen = () => {
         lastDonated="Mar 12"
       />
 
-
       <View style={styles.sectionGap}>
         <InspirationalQuoteCard />
       </View>
 
-
       <View style={[styles.sectionHeader, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
-        <Text semiBold FONT_16 style={{ color: colors.text }}>
+        <AppText semiBold FONT_16 style={{ color: colors.text }}>
           {t("home.urgentRequests")}
-        </Text>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate(ROUTES.FEED)}
-        >
-          <Text semiBold FONT_12 style={{ color: colors.primary }}>
+        </AppText>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate(ROUTES.FEED)}>
+          <AppText semiBold FONT_12 style={{ color: colors.primary }}>
             {t("home.seeAll")}
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </View>
-
 
       <View style={styles.urgentScrollWrapper}>
         <ScrollView
@@ -119,26 +80,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  wrapper: { flex: 1 },
-  sectionGap: {
-    marginTop: verticalScale(12),
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: verticalScale(20),
-    marginBottom: verticalScale(12),
-  },
-  urgentScrollWrapper: {
-    marginHorizontal: -moderateScale(16),
-    marginVertical: -verticalScale(6),
-  },
-  urgentScroll: {
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: verticalScale(6),
-    gap: scale(6),
-  },
-});
