@@ -1,6 +1,6 @@
 import React from "react";
 import ENV from "@config/env";
-import UserNavigation from "./UserFlow";
+import UserNavigation from "./Auth";
 import BloodBankNavigation from "./BloodBankFlow";
 const AppNavigation: React.FC = () => {
   const { APP_FLAVOR } = ENV;
