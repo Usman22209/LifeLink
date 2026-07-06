@@ -37,6 +37,7 @@ export const fontSize = {
   FONT_20: moderateScale(20),
   FONT_18: moderateScale(18),
   FONT_16: moderateScale(16),
+  FONT_15: moderateScale(15),
   FONT_14: moderateScale(14),
   FONT_13: moderateScale(13),
   FONT_12: moderateScale(12),

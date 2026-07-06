@@ -33,6 +33,7 @@ interface Props extends TextProps {
   FONT_20?: boolean;
   FONT_18?: boolean;
   FONT_16?: boolean;
+  FONT_15?: boolean;
   FONT_14?: boolean;
   FONT_13?: boolean;
   FONT_12?: boolean;
@@ -72,6 +73,7 @@ const Text = (props: Props) => {
     FONT_20,
     FONT_18,
     FONT_16,
+    FONT_15,
     FONT_14,
     FONT_13,
     FONT_12,
@@ -87,8 +89,7 @@ const Text = (props: Props) => {
   let fontFamily = fm.REGULAR;
 
   if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
-  else if (extraLight)
-    fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
+  else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
   else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
   else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
   else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;
@@ -113,6 +114,7 @@ const Text = (props: Props) => {
   else if (FONT_20) fontSize = fs.FONT_20;
   else if (FONT_18) fontSize = fs.FONT_18;
   else if (FONT_16) fontSize = fs.FONT_16;
+  else if (FONT_15) fontSize = fs.FONT_15;
   else if (FONT_14) fontSize = fs.FONT_14;
   else if (FONT_13) fontSize = fs.FONT_13;
   else if (FONT_12) fontSize = fs.FONT_12;
