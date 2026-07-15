@@ -127,6 +127,11 @@
     "stateRequired": "صوبے کا انتخاب ضروری ہے",
     "countryRequired": "ملک کا انتخاب ضروری ہے",
     "bloodGroupRequired": "بلڈ گروپ کا انتخاب ضروری ہے",
+    "invalidBloodGroup": "منتخب کردہ بلڈ گروپ غلط ہے",
+    "unitsMustBeInteger": "یونٹس کا عدد ہونا ضروری ہے",
+    "unitsMinOne": "کم از کم 1 یونٹ درکار ہے",
+    "hospitalNameRequired": "ہسپتال کا نام ضروری ہے (کم از کم 3 حروف)",
+    "descriptionTooLong": "تفصیل 500 حروف سے زیادہ نہیں ہونی چاہیے",
     "confirmRequired": "آپ کو تصدیق کرنی ہوگی کہ معلومات درست ہیں"
   },
   "onboarding": {
@@ -186,6 +191,37 @@
     "request": "درخواست",
     "alerts": "الرٹس",
     "profile": "پروفائل",
-    "chats": "چیٹس"
+    "chats": "Chats"
+  },
+  "requestForm": {
+    "title": "درخواست تخلیق کریں",
+    "subtitle": "قریب ترین مطابقت رکھنے والے خون کے عطیہ دہندگان کو تلاش کرنے کے لیے ایک درخواست جمع کروائیں",
+    "patientName": "مریض کا نام",
+    "patientNamePlaceholder": "مریض کا نام درج کریں (اختیاری)",
+    "contactNumber": "رابطہ نمبر",
+    "contactNumberPlaceholder": "مثال کے طور پر +92 300 1234567",
+    "bloodGroup": "بلڈ گروپ",
+    "units": "ضروری بوتلیں (یونٹس)",
+    "hospitalName": "ہسپتال کا نام",
+    "hospitalNamePlaceholder": "مثال کے طور پر میو ہسپتال",
+    "hospitalAddress": "ہسپتال کا پتہ",
+    "hospitalAddressPlaceholder": "ہسپتال کا تفصیلی پتہ درج کریں (اختیاری)",
+    "urgency": "فوری ضرورت کی سطح",
+    "urgencyNormal": "معمولی",
+    "urgencyHigh": "فوری",
+    "urgencyCritical": "انتہائی فوری",
+    "description": "طبی تفصیلات (اضافی معلومات)",
+    "descriptionPlaceholder": "طبی تفصیلات، سرجری کا شیڈول، وغیرہ فراہم کریں (اختیاری)",
+    "submit": "خون کی درخواست جمع کروائیں",
+    "submitting": "درخواست جمع کی جا رہی ہے...",
+    "successMessage": "درخواست کامیابی کے ساتھ تخلیق ہو گئی ہے!",
+    "state": "صوبہ / ریاست",
+    "selectState": "صوبہ منتخب کریں",
+    "city": "شہر",
+    "selectCity": "شہر منتخب کریں",
+    "selectOnMap": "نقشے پر مقام منتخب کریں",
+    "confirmLocation": "منتخب مقام کی تصدیق کریں",
+    "locationSelected": "مقام کامیابی سے منتخب ہو گیا ہے",
+    "useCurrentLocation": "میری لوکیشن"
   }
 }

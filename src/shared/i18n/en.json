@@ -127,6 +127,11 @@
     "stateRequired": "State is required",
     "countryRequired": "Country is required",
     "bloodGroupRequired": "Blood group is required",
+    "invalidBloodGroup": "Invalid blood group selected",
+    "unitsMustBeInteger": "Units must be a whole number",
+    "unitsMinOne": "At least 1 unit is required",
+    "hospitalNameRequired": "Hospital name is required (minimum 3 characters)",
+    "descriptionTooLong": "Description must not exceed 500 characters",
     "confirmRequired": "You must confirm the information is correct"
   },
   "onboarding": {
@@ -180,5 +185,36 @@
     "alerts": "Alerts",
     "profile": "Profile",
     "chats": "Chats"
+  },
+  "requestForm": {
+    "title": "Create Request",
+    "subtitle": "Submit a request to find compatible blood donors nearby",
+    "patientName": "Patient Name",
+    "patientNamePlaceholder": "Enter patient name (optional)",
+    "contactNumber": "Contact Number",
+    "contactNumberPlaceholder": "e.g. +92 300 1234567",
+    "bloodGroup": "Blood Group",
+    "units": "Units Required",
+    "hospitalName": "Hospital Name",
+    "hospitalNamePlaceholder": "e.g. Mayo Hospital",
+    "hospitalAddress": "Hospital Address",
+    "hospitalAddressPlaceholder": "Enter hospital detailed address (optional)",
+    "urgency": "Urgency Level",
+    "urgencyNormal": "Normal",
+    "urgencyHigh": "Urgent",
+    "urgencyCritical": "Critical",
+    "description": "Additional Case Summary",
+    "descriptionPlaceholder": "Provide medical details, surgery schedule, etc. (optional)",
+    "submit": "Submit Blood Request",
+    "submitting": "Submitting Request...",
+    "successMessage": "Request created successfully!",
+    "state": "State / Province",
+    "selectState": "Select State / Province",
+    "city": "City",
+    "selectCity": "Select City",
+    "selectOnMap": "Pin Location on Map",
+    "confirmLocation": "Confirm Selected Location",
+    "locationSelected": "Location pinned successfully",
+    "useCurrentLocation": "Locate Me"
   }
 }

@@ -368,7 +368,7 @@ const CompleteProfileScreen = () => {
                 <AnyIcon
                   type={Icons.MaterialIcons}
                   name="person"
-                  size={moderateScale(55)}
+                  size={moderateScale(45)}
                   color={colors.placeholder}
                 />
               </View>
@@ -395,7 +395,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -440,7 +440,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.gender")}
@@ -469,7 +469,7 @@ const CompleteProfileScreen = () => {
                 />
                 <Text
                   semiBold
-                  FONT_14
+                  FONT_13
                   style={[
                     styles.genderText,
                     watch("gender") === g
@@ -501,7 +501,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.dob")}
@@ -522,7 +522,7 @@ const CompleteProfileScreen = () => {
             >
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   watch("dob")
                     ? { color: colors.text }
@@ -568,7 +568,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -579,7 +579,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.country")}
@@ -618,7 +618,7 @@ const CompleteProfileScreen = () => {
                   />
                 )}
               </View>
-              <Text regular FONT_14 style={{ color: colors.text }}>
+              <Text regular FONT_13 style={{ color: colors.text }}>
                 {selectedCountry
                   ? t(`onboarding.${selectedCountry.toLowerCase()}`)
                   : t("onboarding.pakistan")}
@@ -628,7 +628,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.state")} {t("onboarding.provinceLabel")}
@@ -659,7 +659,7 @@ const CompleteProfileScreen = () => {
               />
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   selectedProvince
                     ? { color: colors.text }
@@ -694,7 +694,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.city")}
@@ -732,7 +732,7 @@ const CompleteProfileScreen = () => {
               />
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   selectedCity
                     ? { color: colors.text }
@@ -768,7 +768,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -778,7 +778,7 @@ const CompleteProfileScreen = () => {
           </Text>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.selectBloodGroup")}
@@ -803,7 +803,7 @@ const CompleteProfileScreen = () => {
               >
                 <Text
                   bold
-                  FONT_14
+                  FONT_13
                   style={[
                     watch("blood_group") === group
                       ? { color: colors.white }
