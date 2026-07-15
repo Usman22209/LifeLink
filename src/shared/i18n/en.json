@@ -177,6 +177,7 @@
     "feed": "Feed",
     "request": "Request",
     "alerts": "Alerts",
-    "profile": "Profile"
+    "profile": "Profile",
+    "chats": "Chats"
   }
 }

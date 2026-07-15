@@ -8,6 +8,7 @@ export type UserStackParamList = {
   [ROUTES.REQUEST_DETAIL]: { request: BloodRequest };
   [ROUTES.EDIT_PROFILE]: { isEditing?: boolean };
   [ROUTES.CHAT]: { request: BloodRequest };
+  [ROUTES.NOTIFICATIONS]: undefined;
 };
 
 export type AuthStackParamList = {
@@ -26,7 +27,7 @@ export type MainTabParamList = {
   [ROUTES.HOME]: undefined;
   [ROUTES.FEED]: undefined;
   [ROUTES.REQUEST]: undefined;
-  [ROUTES.NOTIFICATIONS]: undefined;
+  [ROUTES.CHATS_LIST]: undefined;
   [ROUTES.PROFILE]: undefined;
   [ROUTES.SETTINGS]: undefined;
 };

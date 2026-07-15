@@ -5,7 +5,7 @@ import { ROUTES } from "@utils/Routes";
 import HomeScreen from "@screens/Main/HomeScreen";
 import FeedScreen from "@screens/Main/FeedScreen";
 import RequestScreen from "@screens/Main/RequestScreen";
-import NotificationsScreen from "@screens/Main/NotificationsScreen";
+import ChatsListScreen from "@screens/Main/ChatsListScreen";
 import ProfileScreen from "@screens/Main/ProfileScreen";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import AnimatedTabBar from "./AnimatedTabBar";
@@ -70,14 +70,14 @@ const MainFlow = () => {
         }}
       />
       <Tab.Screen
-        name={ROUTES.NOTIFICATIONS}
-        component={NotificationsScreen}
+        name={ROUTES.CHATS_LIST}
+        component={ChatsListScreen}
         options={{
-          tabBarLabel: t("tabs.alerts"),
+          tabBarLabel: t("tabs.chats"),
           tabBarIcon: ({ color, size }) => (
             <AnyIcon
               type={Icons.Feather}
-              name="bell"
+              name="message-square"
               size={size || TAB_ICON_SIZE}
               color={color}
             />

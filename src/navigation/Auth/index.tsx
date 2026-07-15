@@ -5,6 +5,7 @@ import MainFlow from "./Main";
 import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileScreen";
 import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import ChatScreen from "@screens/Main/ChatScreen";
+import NotificationsScreen from "@screens/Main/NotificationsScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -40,6 +41,10 @@ export default function UserNavigation() {
             initialParams={{ isEditing: true }}
           />
           <Stack.Screen name={ROUTES.CHAT} component={ChatScreen} />
+          <Stack.Screen
+            name={ROUTES.NOTIFICATIONS}
+            component={NotificationsScreen}
+          />
         </>
       )}
     </Stack.Navigator>
