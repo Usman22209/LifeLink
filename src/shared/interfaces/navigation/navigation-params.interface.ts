@@ -10,6 +10,8 @@ export type UserStackParamList = {
   [ROUTES.CHAT]: { request: BloodRequest };
   [ROUTES.NOTIFICATIONS]: undefined;
   [ROUTES.MY_DONATIONS]: undefined;
+  [ROUTES.HELP_SUPPORT]: undefined;
+  [ROUTES.PRIVACY_POLICY]: undefined;
 };
 
 export type AuthStackParamList = {

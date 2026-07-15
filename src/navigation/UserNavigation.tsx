@@ -7,6 +7,8 @@ import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import ChatScreen from "@screens/Main/ChatScreen";
 import NotificationsScreen from "@screens/Main/NotificationsScreen";
 import MyDonationsScreen from "@screens/Main/MyDonationsScreen";
+import HelpSupportScreen from "@screens/Main/HelpSupportScreen";
+import PrivacyPolicyScreen from "@screens/Main/PrivacyPolicyScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -49,6 +51,14 @@ export default function UserNavigation() {
           <Stack.Screen
             name={ROUTES.MY_DONATIONS}
             component={MyDonationsScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.HELP_SUPPORT}
+            component={HelpSupportScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.PRIVACY_POLICY}
+            component={PrivacyPolicyScreen}
           />
         </>
       )}
