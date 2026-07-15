@@ -9,6 +9,7 @@ export type UserStackParamList = {
   [ROUTES.EDIT_PROFILE]: { isEditing?: boolean };
   [ROUTES.CHAT]: { request: BloodRequest };
   [ROUTES.NOTIFICATIONS]: undefined;
+  [ROUTES.MY_DONATIONS]: undefined;
 };
 
 export type AuthStackParamList = {

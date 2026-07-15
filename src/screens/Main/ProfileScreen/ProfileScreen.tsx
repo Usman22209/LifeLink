@@ -83,7 +83,7 @@ const ProfileScreen = () => {
               iconName="droplet"
               label={t("profile.myDonations") || "My Donation History"}
               onPress={() => {
-                Alert.alert("Information", "Donation History tracker coming soon!");
+                navigation.navigate(ROUTES.MY_DONATIONS as any);
               }}
             />
             <SettingItem

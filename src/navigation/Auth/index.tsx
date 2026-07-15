@@ -6,6 +6,7 @@ import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileS
 import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import ChatScreen from "@screens/Main/ChatScreen";
 import NotificationsScreen from "@screens/Main/NotificationsScreen";
+import MyDonationsScreen from "@screens/Main/MyDonationsScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -44,6 +45,10 @@ export default function UserNavigation() {
           <Stack.Screen
             name={ROUTES.NOTIFICATIONS}
             component={NotificationsScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.MY_DONATIONS}
+            component={MyDonationsScreen}
           />
         </>
       )}
