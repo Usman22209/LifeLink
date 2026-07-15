@@ -5,6 +5,7 @@ import {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   SENTRY_DSN,
+  MAP_API_KEY,
 } from "@env";
 
 interface EnvConfig {
@@ -14,6 +15,7 @@ interface EnvConfig {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   SENTRY_DSN?: string;
+  MAP_API_KEY?: string;
 }
 
 const ENV: EnvConfig = {
@@ -23,6 +25,7 @@ const ENV: EnvConfig = {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   SENTRY_DSN,
+  MAP_API_KEY,
 };
 
 export default ENV;

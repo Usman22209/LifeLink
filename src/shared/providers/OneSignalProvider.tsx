@@ -1,6 +1,11 @@
 import React, { useEffect, ReactNode } from "react";
 import { useSelector } from "react-redux";
-import { OneSignal, LogLevel, NotificationWillDisplayEvent, NotificationClickEvent } from "react-native-onesignal";
+import {
+  OneSignal,
+  LogLevel,
+  NotificationWillDisplayEvent,
+  NotificationClickEvent,
+} from "react-native-onesignal";
 import { showInfoToast } from "@components/Toast";
 import { selectUser } from "@store/slices/authSlice";
 import ENV from "@config/env";
@@ -26,9 +31,12 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
       },
     );
 
-    OneSignal.Notifications.addEventListener("click", (event: NotificationClickEvent) => {
-      console.log("Notification opened:", event.notification);
-    });
+    OneSignal.Notifications.addEventListener(
+      "click",
+      (event: NotificationClickEvent) => {
+        console.log("Notification opened:", event.notification);
+      },
+    );
   }, []);
 
   useEffect(() => {

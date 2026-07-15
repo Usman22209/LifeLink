@@ -1,78 +1,102 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
+import { View, ScrollView, TouchableOpacity, I18nManager } from "react-native";
+import { verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import Text from "@components/AppText";
-import ScreenWrapper from "@components/ScreenWrapper";
-import AppButton from "@components/AppButton";
 import { useSelector } from "react-redux";
+import ScreenWrapper from "@components/ScreenWrapper";
+import AppText from "@components/AppText";
 import { selectUser } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
-import { useLogout } from "@shared/query/auth/useLogout";
-import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+import useTranslation from "@shared/hooks/useTranslation";
 
-type HomeScreenNavigationProp = StackNavigationProp<
-  MainStackParamList,
-  typeof ROUTES.HOME
->;
+import HomeHeader from "./components/HomeHeader";
+import BloodTypeCard from "./components/BloodTypeCard";
+import InspirationalQuoteCard from "./components/InspirationalQuoteCard";
+import UrgentRequestCard from "./components/UrgentRequestCard";
+import { MOCK_URGENT_REQUESTS } from "./types";
+import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const navigation = useNavigation<any>();
   const user = useSelector(selectUser);
-  const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
-
-  const handleLogout = async () => {
-    logoutMutate();
-  };
-
-  const handleGoToProfile = () => {
-    navigation.navigate(ROUTES.PROFILE);
-  };
+  const { t } = useTranslation();
+  const isRtl = I18nManager.isRTL;
 
   return (
     <ScreenWrapper
       backgroundColor={colors.background}
       safeArea
+      scrollable
       style={styles.wrapper}
+      header={
+        <HomeHeader
+          userName={user?.full_name || user?.email || "User"}
+          notificationCount={3}
+          onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
+          onProfilePress={() => navigation.navigate(ROUTES.PROFILE)}
+        />
+      }
     >
-      <View style={styles.container}>
-        <Text bold FONT_24 style={{ color: colors.text, marginBottom: verticalScale(20) }}>
-          Welcome Home
-        </Text>
-        {user && (
-          <Text
-            FONT_16
-            style={{ color: colors.textSecondary, marginBottom: verticalScale(20) }}
-          >
-            Hello, {user.full_name || user.email}!
-          </Text>
-        )}
-        <AppButton
-          title="Go to Profile"
-          onPress={handleGoToProfile}
-          style={{ marginTop: verticalScale(20) }}
-        />
-        <AppButton
-          title="Logout"
-          onPress={handleLogout}
-          loading={logoutPending}
-          style={{ marginTop: verticalScale(20) }}
-        />
+      <BloodTypeCard
+        bloodType="O+"
+        subtitle="Universal Donor"
+        donations={5}
+        livesSaved={12}
+        lastDonated="Mar 12"
+      />
+
+      <View style={styles.sectionGap}>
+        <InspirationalQuoteCard />
       </View>
+
+      <View
+        style={[
+          styles.sectionHeader,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
+        <AppText semiBold FONT_16 style={{ color: colors.text }}>
+          {t("home.urgentRequests")}
+        </AppText>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate(ROUTES.FEED)}
+        >
+          <AppText semiBold FONT_12 style={{ color: colors.primary }}>
+            {t("home.seeAll")}
+          </AppText>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.urgentScrollWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.urgentScroll}
+          style={isRtl && { transform: [{ scaleX: -1 }] }}
+        >
+          {MOCK_URGENT_REQUESTS.map((request) => (
+            <UrgentRequestCard
+              key={request.id}
+              {...request}
+              onPress={() =>
+                navigation.navigate(ROUTES.REQUEST_DETAIL, {
+                  request: {
+                    ...request,
+                    patientName: "Anonymous Patient",
+                    distance: request.distance || "0 km",
+                  },
+                })
+              }
+            />
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={{ height: verticalScale(30) }} />
     </ScreenWrapper>
   );
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  wrapper: { flex: 1 },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: scale(16),
-  },
-});

@@ -11,8 +11,21 @@ export const ROUTES = {
   FORGOT_PASSWORD: "ForgotPassword",
   RESET_PASSWORD: "ResetPassword",
 
-  // Main
+  // Main (Tab Navigation)
   HOME: "Home",
+  FEED: "Feed",
+  REQUEST: "Request",
+  NOTIFICATIONS: "Notifications",
   PROFILE: "Profile",
   SETTINGS: "Settings",
+
+  // Details
+  REQUEST_DETAIL: "RequestDetail",
+
+  // Profile
+  EDIT_PROFILE: "EditProfile",
+
+  // Chat
+  CHAT: "Chat",
+  CHATS_LIST: "ChatsList",
 } as const;

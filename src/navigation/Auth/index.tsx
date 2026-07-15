@@ -3,6 +3,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AuthFlow from "./Auth";
 import MainFlow from "./Main";
 import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileScreen";
+import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
+import ChatScreen from "@screens/Main/ChatScreen";
+import NotificationsScreen from "@screens/Main/NotificationsScreen";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
@@ -21,10 +24,30 @@ export default function UserNavigation() {
       {!token ? (
         <Stack.Screen name={ROUTES.AUTH_FLOW} component={AuthFlow} />
       ) : !isOnboarded ? (
-        <Stack.Screen name={ROUTES.ONBOARDING} component={CompleteProfileScreen} />
+        <Stack.Screen
+          name={ROUTES.ONBOARDING}
+          component={CompleteProfileScreen}
+        />
       ) : (
-        <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+        <>
+          <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+          <Stack.Screen
+            name={ROUTES.REQUEST_DETAIL}
+            component={RequestDetailScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.EDIT_PROFILE}
+            component={CompleteProfileScreen}
+            initialParams={{ isEditing: true }}
+          />
+          <Stack.Screen name={ROUTES.CHAT} component={ChatScreen} />
+          <Stack.Screen
+            name={ROUTES.NOTIFICATIONS}
+            component={NotificationsScreen}
+          />
+        </>
       )}
     </Stack.Navigator>
   );
 }
+

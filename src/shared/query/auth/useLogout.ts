@@ -8,40 +8,40 @@ import Toast from "react-native-toast-message";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export const useLogout = () => {
-    const dispatch = useDispatch();
-    const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
-    const fullCleanup = async () => {
-        try {
-            await Promise.allSettled([
-                tokenStorage.clearToken(),
-                GoogleSignin.signOut(),
-            ]);
-            dispatch(logoutAction());
-            queryClient.clear();
-        } catch (error) {
-            console.error("Cleanup error during logout:", error);
-        }
-    };
+  const fullCleanup = async () => {
+    try {
+      await Promise.allSettled([
+        tokenStorage.clearToken(),
+        GoogleSignin.signOut(),
+      ]);
+      dispatch(logoutAction());
+      queryClient.clear();
+    } catch (error) {
+      console.error("Cleanup error during logout:", error);
+    }
+  };
 
-    return useMutation({
-        mutationKey: ["logout"],
-        mutationFn: () => AUTH_SERVICE.logout(),
-        onSuccess: async () => {
-            await fullCleanup();
-            Toast.show({
-                type: "success",
-                text2: "Logged out successfully",
-            });
-        },
-        onError: async (error: any) => {
-            console.error("Logout error:", error);
-            // Even if the API call fails, we always want to clear the local state
-            await fullCleanup();
-            Toast.show({
-                type: "error",
-                text2: "Logged out from session",
-            });
-        },
-    });
+  return useMutation({
+    mutationKey: ["logout"],
+    mutationFn: () => AUTH_SERVICE.logout(),
+    onSuccess: async () => {
+      await fullCleanup();
+      Toast.show({
+        type: "success",
+        text2: "Logged out successfully",
+      });
+    },
+    onError: async (error: any) => {
+      console.error("Logout error:", error);
+      // Even if the API call fails, we always want to clear the local state
+      await fullCleanup();
+      Toast.show({
+        type: "error",
+        text2: "Logged out from session",
+      });
+    },
+  });
 };

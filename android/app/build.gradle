@@ -60,6 +60,17 @@ react {
  */
 def enableProguardInReleaseBuilds = false
 
+def env = [:]
+def envFile = rootProject.file("../.env")
+if (envFile.exists()) {
+    envFile.eachLine { line ->
+        def parts = line.split("=", 2)
+        if (parts.length == 2) {
+            env[parts[0].trim()] = parts[1].trim()
+        }
+    }
+}
+
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
  *
@@ -90,6 +101,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        resValue "string", "google_maps_api_key", (env["MAP_API_KEY"] ?: "")
         ndk {
               abiFilters "armeabi-v7a", "arm64-v8a"
              }

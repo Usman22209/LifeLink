@@ -25,7 +25,6 @@ export const useForgotPassword = () => {
         type: "success",
         text2: message,
       });
-
     },
 
     onError: (error: any) => {

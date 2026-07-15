@@ -63,7 +63,25 @@
     "donate": "خون عطیہ کریں",
     "emergencyRequest": "ایمرجنسی درخواست",
     "bloodBanks": "بلڈ بینک",
-    "myDonations": "میری عطیات"
+    "myDonations": "میری عطیات",
+    "yourBloodType": "آپ کا بلڈ گروپ",
+    "universalDonor": "یونیورسل ڈونر",
+    "donations": "عطیات",
+    "livesSaved": "زندگیاں بچائیں",
+    "lastDonated": "آخری عطیہ",
+    "urgentRequests": "فوری درخواستیں",
+    "seeAll": "سب دیکھیں",
+    "goodMorning": "صبح بخیر",
+    "goodAfternoon": "سہ پہر بخیر",
+    "goodEvening": "شام بخیر",
+    "critical": "انتہائی نازک",
+    "urgent": "فوری",
+    "normal": "عام",
+    "respond": "جواب دیں",
+    "share": "شیئر کریں",
+    "tapForTip": "مزید معلومات کے لیے کلک کریں",
+    "unit": "یونٹ",
+    "units": "یونٹ"
   },
   "profile": {
     "title": "پروفائل",
@@ -72,7 +90,8 @@
     "settings": "ترتیبات",
     "logout": "لاگ آؤٹ",
     "language": "زبان",
-    "notifications": "اطلاعات"
+    "notifications": "اطلاعات",
+    "saveChanges": "تبدیلیاں محفوظ کریں"
   },
   "common": {
     "save": "محفوظ کریں",
@@ -149,5 +168,23 @@
       "Balochistan": "بلوچستان",
       "Islamabad Capital Territory": "اسلام آباد"
     }
+  },
+  "quotes": {
+    "factText1": "خون کا ایک عطیہ تین قیمتی زندگیاں بچا سکتا ہے۔",
+    "factAuthor1": "ریڈ کراس حقیقت",
+    "factText2": "کسی کو دوبارہ زندگی کی طرف لائیں۔ آپ کا خون ان کی امید ہے۔",
+    "factAuthor2": "حوصلہ افزائی",
+    "factText3": "ہر خون کا عطیہ دہندہ ایک ہیرو ہے۔ آپ کا تعاون کسی کو کل کی امید دیتا ہے۔",
+    "factAuthor3": "روزانہ کا محرک",
+    "factText4": "عطیہ کے اہل لوگوں میں سے صرف 3٪ لوگ خون عطیہ کرتے ہیں۔ آپ کا فیصلہ آپ کو خاص بناتا ہے۔",
+    "factAuthor4": "معاشرتی اثر"
+  },
+  "tabs": {
+    "home": "ہوم",
+    "feed": "فیڈ",
+    "request": "درخواست",
+    "alerts": "الرٹس",
+    "profile": "پروفائل",
+    "chats": "چیٹس"
   }
 }

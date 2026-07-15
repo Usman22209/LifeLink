@@ -30,6 +30,8 @@ export const AUTH_SERVICE = {
   },
   refresh: (refreshToken: string) => {
     const url = API_CONFIG.AUTH.refresh;
-    return axios.post(`${API_CONFIG.BASE_URL}${url}`, { refresh_token: refreshToken });
+    return axios.post(`${API_CONFIG.BASE_URL}${url}`, {
+      refresh_token: refreshToken,
+    });
   },
 };

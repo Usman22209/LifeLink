@@ -14,11 +14,11 @@ export const useDeviceInfo = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       const brand = DeviceInfo.getBrand();
-      const model = await DeviceInfo.getModel();
+      const model = DeviceInfo.getModel();
       const systemName = DeviceInfo.getSystemName();
-      const systemVersion = await DeviceInfo.getSystemVersion();
-      const appVersion = await DeviceInfo.getVersion();
-      const deviceId = await DeviceInfo.getDeviceId();
+      const systemVersion = DeviceInfo.getSystemVersion();
+      const appVersion = DeviceInfo.getVersion();
+      const deviceId = DeviceInfo.getDeviceId();
 
       setDeviceInfo({
         brand,
