@@ -12,6 +12,7 @@ interface SettingItemProps {
   onPress?: () => void;
   isLast?: boolean;
   iconColor?: string;
+  textColor?: string;
   valueLabel?: string;
   hasSwitch?: boolean;
   switchValue?: boolean;
@@ -24,6 +25,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
   onPress,
   isLast = false,
   iconColor = colors.primary,
+  textColor,
   valueLabel,
   hasSwitch = false,
   switchValue = false,
@@ -46,7 +48,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
               color={iconColor}
             />
           </View>
-          <Text medium FONT_13 style={styles.itemLabel}>
+          <Text medium FONT_13 style={[styles.itemLabel, textColor && { color: textColor }]}>
             {label}
           </Text>
         </View>
