@@ -21,4 +21,7 @@ export const ROUTES = {
 
   // Details
   REQUEST_DETAIL: "RequestDetail",
+
+  // Profile
+  EDIT_PROFILE: "EditProfile",
 } as const;

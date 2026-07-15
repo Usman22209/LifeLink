@@ -33,8 +33,14 @@ export default function UserNavigation() {
             name={ROUTES.REQUEST_DETAIL}
             component={RequestDetailScreen}
           />
+          <Stack.Screen
+            name={ROUTES.EDIT_PROFILE}
+            component={CompleteProfileScreen}
+            initialParams={{ isEditing: true }}
+          />
         </>
       )}
     </Stack.Navigator>
   );
 }
+

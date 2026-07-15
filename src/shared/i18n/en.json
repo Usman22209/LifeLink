@@ -90,7 +90,8 @@
     "settings": "Settings",
     "logout": "Logout",
     "language": "Language",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "saveChanges": "Save Changes"
   },
   "common": {
     "save": "Save",

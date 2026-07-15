@@ -90,7 +90,8 @@
     "settings": "ترتیبات",
     "logout": "لاگ آؤٹ",
     "language": "زبان",
-    "notifications": "اطلاعات"
+    "notifications": "اطلاعات",
+    "saveChanges": "تبدیلیاں محفوظ کریں"
   },
   "common": {
     "save": "محفوظ کریں",

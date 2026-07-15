@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, Alert, View } from "react-native";
 import { useSelector } from "react-redux";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppButton from "@components/AppButton";
@@ -10,6 +11,8 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
+import { ROUTES } from "@utils/Routes";
+import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { styles } from "./ProfileScreen.styles";
 import ProfileHeaderCard from "./components/ProfileHeaderCard";
 import StatsSection from "./components/StatsSection";
@@ -21,6 +24,7 @@ const ProfileScreen = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
+  const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
@@ -72,7 +76,7 @@ const ProfileScreen = () => {
               iconName="user"
               label={t("profile.editProfile") || "Personal Information"}
               onPress={() => {
-                Alert.alert("Information", "Personal Information settings coming soon!");
+                navigation.navigate({ name: ROUTES.EDIT_PROFILE, params: { isEditing: true } });
               }}
             />
             <SettingItem

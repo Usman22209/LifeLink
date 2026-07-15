@@ -6,7 +6,9 @@ import {
   OnboardingFormValues,
 } from "../schemas/onboarding.schema";
 
-export const useOnboardingForm = (): UseFormReturn<OnboardingFormValues> => {
+export const useOnboardingForm = (
+  initialValues?: Partial<OnboardingFormValues>,
+): UseFormReturn<OnboardingFormValues> => {
   const { t } = useTranslation();
   return useForm<OnboardingFormValues>({
     resolver: zodResolver(getOnboardingSchema(t)),
@@ -24,6 +26,7 @@ export const useOnboardingForm = (): UseFormReturn<OnboardingFormValues> => {
       blood_group: "",
       profile_image: "",
       confirmed_data: true,
+      ...initialValues,
     },
   });
 };

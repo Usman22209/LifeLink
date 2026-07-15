@@ -6,6 +6,7 @@ export type UserStackParamList = {
   [ROUTES.MAIN_FLOW]: undefined;
   [ROUTES.ONBOARDING]: undefined;
   [ROUTES.REQUEST_DETAIL]: { request: BloodRequest };
+  [ROUTES.EDIT_PROFILE]: { isEditing?: boolean };
 };
 
 export type AuthStackParamList = {

@@ -50,8 +50,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   return (
     <>
       <StatusBar
-        backgroundColor={statusBarColor || colors.background}
-        barStyle={statusBarStyle || "dark-content"}
+        backgroundColor={statusBarColor || colors.primary}
+        barStyle={statusBarStyle || "light-content"}
       />
       <View
         style={[

@@ -5,11 +5,10 @@ import {
   Platform,
   Image,
   I18nManager,
-  StatusBar,
   PermissionsAndroid,
 } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -44,21 +43,46 @@ type CompleteProfileNavigationProp = StackNavigationProp<
   typeof ROUTES.ONBOARDING
 >;
 
+type CompleteProfileRouteProp = RouteProp<UserStackParamList, typeof ROUTES.EDIT_PROFILE> & {
+  params?: { isEditing?: boolean };
+};
+
 const COUNTRIES = [{ name: "Pakistan", code: "PK", flag: "🇵🇰" }];
 
 const CompleteProfileScreen = () => {
   const navigation = useNavigation<CompleteProfileNavigationProp>();
+  const route = useRoute<CompleteProfileRouteProp>();
+  const isEditing = (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const selectedLang = useSelector(selectLanguage);
   const { t, i18n } = useTranslation();
+
+  // Build initial values from user data when editing
+  const editDefaults = useMemo(() => {
+    if (!isEditing || !user) return undefined;
+    return {
+      full_name: user.full_name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      gender: (user.gender || "male") as OnboardingFormValues["gender"],
+      dob: user.dob || "",
+      city: user.city_id || "",
+      state: user.state || "",
+      country: user.country || "Pakistan",
+      blood_group: user.blood_group || "",
+      profile_image: user.profile_image || "",
+      confirmed_data: true,
+    };
+  }, [isEditing, user]);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-  } = useOnboardingForm();
+  } = useOnboardingForm(editDefaults);
 
   const [loading, setLoading] = useState(false);
   const { mutateAsync: uploadImage, isPending: isUploading } = useUploadImage();
@@ -153,12 +177,30 @@ const CompleteProfileScreen = () => {
       } as any);
 
       if (response.data.success) {
-        dispatch(
-          updateUser({
-            is_onboarded: true,
-          }),
-        );
-        // Navigation handles itself via UserNavigation
+        if (isEditing) {
+          // Update Redux with the edited profile fields and navigate back
+          dispatch(
+            updateUser({
+              full_name: data.full_name,
+              phone: data.phone,
+              gender: data.gender as "male" | "female",
+              dob: data.dob,
+              blood_group: data.blood_group,
+              country: data.country,
+              state: data.state,
+              city_id: data.city,
+              profile_image: data.profile_image,
+            }),
+          );
+          navigation.goBack();
+        } else {
+          dispatch(
+            updateUser({
+              is_onboarded: true,
+            }),
+          );
+          // Navigation handles itself via UserNavigation
+        }
       }
     } catch (error) {
       console.error("[CompleteProfile] Update error:", error);
@@ -209,6 +251,13 @@ const CompleteProfileScreen = () => {
   }, [user?.email, setValue]);
 
   useEffect(() => {
+    // Skip location fetch in edit mode — user already has location data
+    if (isEditing) {
+      if (user?.latitude && user?.longitude) {
+        setLocation({ latitude: user.latitude, longitude: user.longitude });
+      }
+      return;
+    }
     const fetchLocation = async () => {
       try {
         const coords = await getCurrentLocation();
@@ -221,7 +270,7 @@ const CompleteProfileScreen = () => {
       }
     };
     fetchLocation();
-  }, []);
+  }, [isEditing]);
 
   const pickImage = async (type: "camera" | "gallery") => {
     setImageModalVisible(false);
@@ -264,10 +313,15 @@ const CompleteProfileScreen = () => {
     <ScreenWrapper
       backgroundColor={colors.background}
       safeArea
-      header={<AppHeader title={t("onboarding.title")} hasBorder />}
+      header={
+        <AppHeader
+          title={isEditing ? (t("profile.editProfile") || "Edit Profile") : t("onboarding.title")}
+          hasBorder
+          showBackButton={isEditing}
+        />
+      }
       style={styles.container}
     >
-      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -778,7 +832,7 @@ const CompleteProfileScreen = () => {
         </View>
 
         <AppButton
-          title={t("onboarding.completeButton")}
+          title={isEditing ? (t("profile.saveChanges") || "Save Changes") : t("onboarding.completeButton")}
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={styles.submitButton}

@@ -3,6 +3,17 @@ export interface User {
   email: string;
   full_name: string;
   is_onboarded: boolean;
+  phone?: string;
+  gender?: "male" | "female";
+  dob?: string;
+  blood_group?: string;
+  country?: string;
+  state?: string;
+  city_id?: string;
+  latitude?: number;
+  longitude?: number;
+  profile_image?: string;
+  language_preference?: string;
 }
 
 export interface Profile {
