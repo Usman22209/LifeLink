@@ -92,7 +92,11 @@
     "language": "Language",
     "notifications": "Notifications",
     "saveChanges": "Save Changes",
-    "myDonationsTitle": "My Donations"
+    "myDonationsTitle": "My Donations",
+    "deleteAccount": "Delete Account",
+    "deleteAccountConfirm": "Are you sure you want to permanently delete your account? This action is irreversible and all your health and donation history records will be completely removed.",
+    "deleteAccountConfirmButton": "Delete permanently",
+    "deleteAccountSuccess": "Your account has been deleted successfully."
   },
   "common": {
     "save": "Save",
@@ -216,5 +220,32 @@
     "confirmLocation": "Confirm Selected Location",
     "locationSelected": "Location pinned successfully",
     "useCurrentLocation": "Locate Me"
+  },
+  "helpSupport": {
+    "title": "Help & Support",
+    "contactUs": "Contact Support",
+    "contactSubtitle": "Have questions or feedback about LifeLink? Reach out to our support team.",
+    "emailSupport": "Email Support",
+    "faqTitle": "Frequently Asked Questions",
+    "faqQuestion1": "Who can donate blood?",
+    "faqAnswer1": "Anyone aged 18-65, weighing over 50kg, and in good general health with no active infections can donate.",
+    "faqQuestion2": "How often can I donate?",
+    "faqAnswer2": "You can safely donate whole blood once every 90 days (3 months) to allow your body to fully replenish iron levels.",
+    "faqQuestion3": "Is my personal data secure?",
+    "faqAnswer3": "Yes, your contact details are encrypted and only shown to verified requesters when you explicitly choose to respond to a request.",
+    "faqQuestion4": "How do I request blood?",
+    "faqAnswer4": "Navigate to the 'Request' tab, fill in the patient details, select the blood type and hospital, and submit. Matched donors nearby will be notified."
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: July 15, 2026",
+    "sectionTitle1": "1. Information We Collect",
+    "sectionBody1": "We collect personal information that you choose to provide when registering on LifeLink, including your name, email address, contact phone number, date of birth, biological gender, blood group, and location details.",
+    "sectionTitle2": "2. How We Use Your Information",
+    "sectionBody2": "Your blood group and location details are utilized to match you with critical blood requests in your region. Your contact details are stored securely and are only revealed to request coordinators when you explicitly agree to coordinate a donation.",
+    "sectionTitle3": "3. Share & Data Control",
+    "sectionBody3": "LifeLink will never sell, lease, or distribute your personal metrics, geolocation tracks, or contact configurations to third-party marketing networks. All stored information is protected using state-of-the-art security layers.",
+    "sectionTitle4": "4. Account Deletion",
+    "sectionBody4": "You hold the full right to edit your health metrics or permanently purge your account datasets at any time. Tapping the Delete Account button in settings will immediately remove all your records from our databases."
   }
 }
