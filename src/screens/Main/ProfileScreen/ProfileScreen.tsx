@@ -45,6 +45,30 @@ const ProfileScreen = () => {
     );
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t("profile.deleteAccount") || "Delete Account",
+      t("profile.deleteAccountConfirm") || "Are you sure you want to permanently delete your account? This action is irreversible.",
+      [
+        { text: t("common.cancel") || "Cancel", style: "cancel" },
+        {
+          text: t("profile.deleteAccountConfirmButton") || "Delete",
+          style: "destructive",
+          onPress: () => {
+            logoutMutate(undefined, {
+              onSuccess: () => {
+                Alert.alert(
+                  t("common.success") || "Success",
+                  t("profile.deleteAccountSuccess") || "Your account has been deleted successfully."
+                );
+              }
+            });
+          },
+        },
+      ],
+    );
+  };
+
   const openLanguageModal = () => {
     setTempLanguage(language);
     setModalVisible(true);
@@ -110,18 +134,18 @@ const ProfileScreen = () => {
               iconColor={colors.primary}
               valueLabel={language === "en" ? "English" : "اردو"}
             />
-            <SettingItem
+             <SettingItem
               iconName="help-circle"
               label="Help & Support"
               onPress={() => {
-                Alert.alert("Information", "Frequently Asked Questions coming soon!");
+                navigation.navigate(ROUTES.HELP_SUPPORT as any);
               }}
             />
             <SettingItem
               iconName="shield"
               label="Privacy Policy"
               onPress={() => {
-                Alert.alert("Information", "Privacy Policy coming soon!");
+                navigation.navigate(ROUTES.PRIVACY_POLICY as any);
               }}
             />
             <SettingItem
@@ -129,12 +153,19 @@ const ProfileScreen = () => {
               label="About LifeLink"
               onPress={() => {
                 Alert.alert(
-                  "LifeLink",
+                  "About LifeLink",
                   "LifeLink v1.0.0 - Connecting Lives through Blood Donations.",
                 );
               }}
-              isLast={true}
               iconColor={colors.success}
+            />
+            <SettingItem
+              iconName="trash-2"
+              label={t("profile.deleteAccount") || "Delete Account"}
+              onPress={handleDeleteAccount}
+              iconColor={colors.error}
+              textColor={colors.error}
+              isLast={true}
             />
           </View>
         </View>
