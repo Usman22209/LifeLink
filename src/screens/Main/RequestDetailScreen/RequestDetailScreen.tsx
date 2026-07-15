@@ -56,53 +56,8 @@ const RequestDetailScreen = () => {
   }, [request, cfg]);
 
   const handleContact = useCallback(() => {
-    const message = `Hi, I saw your urgent blood request on LifeLink for ${request.bloodType} blood for patient ${request.patientName} at ${request.hospital}. I would like to help!`;
-    const phone = "+9242111222333";
-
-    Alert.alert(
-      "Contact Recipient",
-      "Choose how you want to reach out to the requester:",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Direct Phone Call",
-          onPress: () => {
-            Linking.openURL(`tel:${phone}`).catch(() => {
-              Alert.alert("Error", "Could not initiate call.");
-            });
-          },
-        },
-        {
-          text: "Send SMS Text",
-          onPress: () => {
-            const smsUrl = `sms:${phone}${
-              Platform.OS === "ios" ? "&" : "?"
-            }body=${encodeURIComponent(message)}`;
-            Linking.openURL(smsUrl).catch(() => {
-              Alert.alert("Error", "Could not open messaging client.");
-            });
-          },
-        },
-        {
-          text: "WhatsApp Message",
-          onPress: () => {
-            const waUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(
-              message,
-            )}`;
-            Linking.openURL(waUrl).catch(() => {
-              const waWebUrl = `https://wa.me/${phone.replace(
-                "+",
-                "",
-              )}?text=${encodeURIComponent(message)}`;
-              Linking.openURL(waWebUrl).catch(() => {
-                Alert.alert("Error", "Could not open WhatsApp.");
-              });
-            });
-          },
-        },
-      ],
-    );
-  }, [request]);
+    (navigation as any).navigate(ROUTES.CHAT, { request });
+  }, [navigation, request]);
 
   const handleConfirmMatch = useCallback(() => {
     setMatchSheetVisible(false);

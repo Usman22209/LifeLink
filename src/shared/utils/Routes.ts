@@ -24,4 +24,8 @@ export const ROUTES = {
 
   // Profile
   EDIT_PROFILE: "EditProfile",
+
+  // Chat
+  CHAT: "Chat",
+  CHATS_LIST: "ChatsList",
 } as const;
