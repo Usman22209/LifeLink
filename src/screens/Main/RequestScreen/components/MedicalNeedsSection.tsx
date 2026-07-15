@@ -7,6 +7,7 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import { BloodRequestFormValues } from "@shared/forms/schemas/blood-request.schema";
 import { UrgencyLevel } from "@shared/interfaces/models/blood-request.interface";
+import { BLOOD_GROUPS, getUrgencyLevels } from "@shared/constants/blood";
 import { styles } from "../RequestScreen.styles";
 
 interface MedicalNeedsSectionProps {
@@ -19,8 +20,6 @@ interface MedicalNeedsSectionProps {
   t: (key: string) => string;
 }
 
-const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-
 const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
   errors,
   selectedBloodGroup,
@@ -29,6 +28,7 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
   setValue,
   t,
 }) => {
+  const urgencyLevels = getUrgencyLevels(t);
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
@@ -140,26 +140,7 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
           {t("requestForm.urgency") || "Urgency Level"}
         </AppText>
         <View style={styles.urgencyContainer}>
-          {[
-            {
-              value: UrgencyLevel.NORMAL,
-              label: t("requestForm.urgencyNormal") || "Normal",
-              color: colors.success,
-              icon: "check-circle",
-            },
-            {
-              value: UrgencyLevel.HIGH,
-              label: t("requestForm.urgencyHigh") || "Urgent",
-              color: colors.warning,
-              icon: "alert-circle",
-            },
-            {
-              value: UrgencyLevel.CRITICAL,
-              label: t("requestForm.urgencyCritical") || "Critical",
-              color: colors.error,
-              icon: "alert-triangle",
-            },
-          ].map((urg) => {
+          {urgencyLevels.map((urg) => {
             const isActive = selectedUrgency === urg.value;
             return (
               <TouchableOpacity

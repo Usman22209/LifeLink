@@ -23,6 +23,7 @@ import { ROUTES } from "@utils/Routes";
 import { useOnboardingForm } from "@shared/forms/hooks/useOnboardingForm";
 import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
+import { BLOOD_GROUPS } from "@shared/constants/blood";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
 import { useDispatch, useSelector } from "react-redux";
@@ -307,7 +308,7 @@ const CompleteProfileScreen = () => {
     }
   };
 
-  const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
 
   return (
     <ScreenWrapper
@@ -789,7 +790,7 @@ const CompleteProfileScreen = () => {
               { flexDirection: isRtl ? "row-reverse" : "row" },
             ]}
           >
-            {bloodGroups.map((group) => (
+            {BLOOD_GROUPS.map((group) => (
               <TouchableOpacity
                 key={group}
                 onPress={() =>

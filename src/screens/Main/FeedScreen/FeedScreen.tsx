@@ -17,6 +17,7 @@ import {
   FilterState,
   DEFAULT_FILTERS,
   countActiveFilters,
+  BloodRequest,
 } from "./types";
 import { styles } from "./FeedScreen.styles";
 
@@ -125,7 +126,7 @@ const FeedScreen = () => {
   };
 
   const filteredData = searchQuery.trim()
-    ? MOCK_REQUESTS.filter(({ city, hospital, patientName, bloodType }) => {
+    ? MOCK_REQUESTS.filter(({ city, hospital, patientName, bloodType }: BloodRequest) => {
         const q = searchQuery.toLowerCase();
         return (
           city.toLowerCase().includes(q) ||

@@ -14,7 +14,7 @@ import HomeHeader from "./components/HomeHeader";
 import BloodTypeCard from "./components/BloodTypeCard";
 import InspirationalQuoteCard from "./components/InspirationalQuoteCard";
 import UrgentRequestCard from "./components/UrgentRequestCard";
-import { MOCK_URGENT_REQUESTS } from "./types";
+import { MOCK_URGENT_REQUESTS, UrgentRequest } from "./types";
 import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
@@ -76,7 +76,7 @@ const HomeScreen = () => {
           contentContainerStyle={styles.urgentScroll}
           style={isRtl && { transform: [{ scaleX: -1 }] }}
         >
-          {MOCK_URGENT_REQUESTS.map((request) => (
+          {MOCK_URGENT_REQUESTS.map((request: UrgentRequest) => (
             <UrgentRequestCard
               key={request.id}
               {...request}

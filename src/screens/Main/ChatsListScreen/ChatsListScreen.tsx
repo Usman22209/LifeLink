@@ -9,75 +9,7 @@ import { styles } from "./ChatsListScreen.styles";
 
 import ChatItem, { ChatThread } from "./components/ChatItem";
 import EmptyChats from "./components/EmptyChats";
-
-const MOCK_THREADS: ChatThread[] = [
-  {
-    id: "thread_1",
-    request: {
-      id: "1",
-      bloodType: "B+",
-      patientName: "Ahmed Khan",
-      hospital: "Mayo Hospital",
-      city: "Lahore",
-      patientImage:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
-      units: 3,
-      urgency: "critical",
-      time: "2h ago",
-      distance: "3.2 km",
-      latitude: 31.5723,
-      longitude: 74.3213,
-    },
-    lastMessage: "We urgently need 3 units at Mayo Hospital. Are you available?",
-    time: "2h ago",
-    unreadCount: 2,
-    isOnline: true,
-  },
-  {
-    id: "thread_2",
-    request: {
-      id: "4",
-      bloodType: "AB-",
-      patientName: "Bilal Raza",
-      hospital: "Shaukat Khanum",
-      city: "Lahore",
-      patientImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
-      units: 4,
-      urgency: "critical",
-      time: "30m ago",
-      distance: "7.0 km",
-      latitude: 31.4285,
-      longitude: 74.2796,
-    },
-    lastMessage: "Bless you! What time are you planning to visit?",
-    time: "30m ago",
-    unreadCount: 0,
-    isOnline: true,
-  },
-  {
-    id: "thread_3",
-    request: {
-      id: "2",
-      bloodType: "A-",
-      patientName: "Sara Malik",
-      hospital: "Jinnah Hospital",
-      city: "Lahore",
-      patientImage:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-      units: 2,
-      urgency: "urgent",
-      time: "4h ago",
-      distance: "5.1 km",
-      latitude: 31.4806,
-      longitude: 74.303,
-    },
-    lastMessage: "Thank you so much! Please coordinate with the receptionist.",
-    time: "Yesterday",
-    unreadCount: 0,
-    isOnline: false,
-  },
-];
+import { MOCK_THREADS } from "@shared/constants/mockData";
 
 const ChatsListScreen = () => {
   const navigation = useNavigation();
