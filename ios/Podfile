@@ -37,11 +37,11 @@ target 'LifeLink' do
       File.delete(react_jsitooling_public_modulemap)
     end
 
-    # Remove references to React-jsitooling.modulemap in xcconfigs
+    # Remove -Xcc and -fmodule-map-file reference for React-jsitooling.modulemap in xcconfigs
     Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig").each do |xcconfig_path|
       if File.exist?(xcconfig_path)
         xcconfig_content = File.read(xcconfig_path)
-        modified_content = xcconfig_content.gsub('-fmodule-map-file="${PODS_ROOT}/Headers/Public/react_runtime/React-jsitooling.modulemap"', '')
+        modified_content = xcconfig_content.gsub(/\s*-Xcc\s+-fmodule-map-file="\$\{PODS_ROOT\}\/Headers\/Public\/react_runtime\/React-jsitooling\.modulemap"/, '')
         if modified_content != xcconfig_content
           File.write(xcconfig_path, modified_content)
         end
@@ -80,11 +80,11 @@ target 'LifeLink' do
       File.delete(react_runtime_apple_public_modulemap)
     end
 
-    # Remove references to React-RuntimeApple.modulemap in xcconfigs
+    # Remove -Xcc and -fmodule-map-file reference for React-RuntimeApple.modulemap in xcconfigs
     Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig").each do |xcconfig_path|
       if File.exist?(xcconfig_path)
         xcconfig_content = File.read(xcconfig_path)
-        modified_content = xcconfig_content.gsub('-fmodule-map-file="${PODS_ROOT}/Headers/Public/ReactCommon/React-RuntimeApple.modulemap"', '')
+        modified_content = xcconfig_content.gsub(/\s*-Xcc\s+-fmodule-map-file="\$\{PODS_ROOT\}\/Headers\/Public\/ReactCommon\/React-RuntimeApple\.modulemap"/, '')
         if modified_content != xcconfig_content
           File.write(xcconfig_path, modified_content)
         end
