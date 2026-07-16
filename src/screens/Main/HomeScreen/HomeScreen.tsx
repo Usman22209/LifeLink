@@ -27,6 +27,7 @@ const HomeScreen = () => {
     <ScreenWrapper
       backgroundColor={colors.background}
       safeArea
+      disableBottomSafeArea={true}
       scrollable
       style={styles.wrapper}
       header={

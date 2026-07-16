@@ -145,7 +145,12 @@ const RequestScreen = () => {
   };
 
   return (
-    <ScreenWrapper backgroundColor={colors.white} safeArea style={styles.wrapper}>
+    <ScreenWrapper
+      backgroundColor={colors.white}
+      safeArea
+      disableBottomSafeArea={true}
+      style={styles.wrapper}
+    >
       <AppHeader
         showBackButton
         title={t("requestForm.title") || "Create Request"}

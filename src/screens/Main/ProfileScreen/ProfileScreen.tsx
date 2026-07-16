@@ -80,7 +80,11 @@ const ProfileScreen = () => {
   };
 
   return (
-    <ScreenWrapper backgroundColor={colors.background} safeArea>
+    <ScreenWrapper
+      backgroundColor={colors.background}
+      safeArea
+      disableBottomSafeArea={true}
+    >
       <AppHeader title={t("profile.title") || "Profile"} showBackButton />
       <ScrollView
         style={{ flex: 1 }}

@@ -155,6 +155,7 @@ const FeedScreen = () => {
       <ScreenWrapper
         backgroundColor={colors.background}
         safeArea
+        disableBottomSafeArea={true}
         scrollable={false}
         style={styles.wrapper}
         header={
