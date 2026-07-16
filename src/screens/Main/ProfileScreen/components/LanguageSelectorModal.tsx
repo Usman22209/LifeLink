@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Modal, TouchableOpacity, Pressable } from "react-native";
+import { View, Modal, TouchableOpacity, StyleSheet } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AppButton from "@components/AppButton";
@@ -24,8 +24,13 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
 }) => {
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
-        <Pressable style={styles.modalContent} onPress={() => {}}>
+      <View style={styles.modalOverlay}>
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+        <View style={styles.modalContent}>
           <View style={styles.modalHandle} />
           <Text bold FONT_16 style={styles.modalTitle}>
             {t("selectLanguage") || "Select Language"}
@@ -82,8 +87,8 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
               style={styles.modalButton}
             />
           </View>
-        </Pressable>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   );
 };
