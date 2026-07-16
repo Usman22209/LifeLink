@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Text as RNText, TextProps } from "react-native";
+import { Text as RNText, TextProps, Platform } from "react-native";
 import { fontFamily as fm, fontSize as fs } from "@theme/fonts";
 import { colors } from "@theme/colors";
 import { useSelector } from "react-redux";
@@ -97,6 +97,11 @@ const Text = (props: Props) => {
   else if (bold) fontFamily = italic ? fm.BOLD_ITALIC : fm.BOLD;
   else if (extraBold) fontFamily = italic ? fm.EXTRABOLD_ITALIC : fm.EXTRABOLD;
   else if (black) fontFamily = italic ? fm.BLACK_ITALIC : fm.BLACK;
+
+  if (Platform.OS === "ios" && isRtl) {
+    const isBold = semiBold || bold || extraBold || black;
+    fontFamily = isBold ? "Arial-BoldMT" : "Arial";
+  }
 
   let fontSize = fs.FONT_14;
   if (FONT_48) fontSize = fs.FONT_48;
