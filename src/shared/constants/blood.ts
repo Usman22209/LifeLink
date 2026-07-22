@@ -10,7 +10,9 @@ export interface UrgencyLevelItem {
   icon: string;
 }
 
-export const getUrgencyLevels = (t: (key: string) => string): UrgencyLevelItem[] => [
+export const getUrgencyLevels = (
+  t: (key: string) => string,
+): UrgencyLevelItem[] => [
   {
     value: UrgencyLevel.NORMAL,
     label: t("requestForm.urgencyNormal") || "Normal",

@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
     marginBottom: verticalScale(8),
     opacity: 0.8,
   },
-  
+
   // Blood Group Grid
   bloodGroupGrid: {
     flexDirection: "row",

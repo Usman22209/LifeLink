@@ -9,10 +9,13 @@ import {
 } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AppButton from "@components/AppButton";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import {
   FilterState,
   DEFAULT_FILTERS,
@@ -29,6 +32,7 @@ interface OptionRowProps {
   options: string[];
   selected: string;
   onSelect: (v: string) => void;
+  getOptionLabel: (opt: string) => string;
 }
 
 const OptionRow: React.FC<OptionRowProps> = ({
@@ -37,45 +41,63 @@ const OptionRow: React.FC<OptionRowProps> = ({
   options,
   selected,
   onSelect,
-}) => (
-  <View style={s.group}>
-    <View style={s.groupHeader}>
-      <View style={s.groupIconWrap}>
-        <AnyIcon
-          type={Icons.Feather}
-          name={icon}
-          size={moderateScale(13)}
-          color={colors.primary}
-        />
+  getOptionLabel,
+}) => {
+  const isRtl = useSelector(selectIsRtl);
+  return (
+    <View style={s.group}>
+      <View
+        style={[
+          s.groupHeader,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
+        <View style={s.groupIconWrap}>
+          <AnyIcon
+            type={Icons.Feather}
+            name={icon}
+            size={moderateScale(13)}
+            color={colors.primary}
+          />
+        </View>
+        <Text semiBold FONT_13 style={{ color: colors.text }}>
+          {label}
+        </Text>
       </View>
-      <Text semiBold FONT_13 style={{ color: colors.text }}>
-        {label}
-      </Text>
-    </View>
-    <View style={s.optionWrap}>
-      {options.map((opt) => {
-        const active = selected === opt;
-        return (
-          <TouchableOpacity
-            key={opt}
-            style={[s.option, active && s.optionActive]}
-            onPress={() => onSelect(opt)}
-            activeOpacity={0.7}
-          >
-            {active && <View style={s.optionDot} />}
-            <Text
-              medium
-              FONT_12
-              style={{ color: active ? colors.primary : colors.gray600 }}
+      <View
+        style={[
+          s.optionWrap,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
+        {options.map((opt) => {
+          const active = selected === opt;
+          return (
+            <TouchableOpacity
+              key={opt}
+              style={[
+                s.option,
+                active && s.optionActive,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
+              onPress={() => onSelect(opt)}
+              activeOpacity={0.7}
             >
-              {opt}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+              {active && <View style={s.optionDot} />}
+              <Text
+                medium
+                FONT_12
+                style={{ color: active ? colors.primary : colors.gray600 }}
+              >
+                {getOptionLabel(opt)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 interface FilterSheetProps {
   visible: boolean;
@@ -91,6 +113,8 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
   setFilters,
 }) => {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
   const [draft, setDraft] = useState<FilterState>(filters);
 
   const panResponder = useRef(
@@ -108,6 +132,29 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     onClose();
   };
   const handleReset = () => setDraft(DEFAULT_FILTERS);
+
+  const translateOption = (opt: string) => {
+    switch (opt) {
+      case "All":
+        return t("feed.all");
+      case "Urgent":
+        return t("feed.urgent");
+      case "Critical":
+        return t("feed.critical");
+      case "Normal":
+        return t("feed.normal");
+      case "Newest First":
+        return t("feed.newestFirst");
+      case "Nearest First":
+        return t("feed.nearestFirst");
+      case "Most Units":
+        return t("feed.mostUnits");
+      case "Any":
+        return t("feed.any");
+      default:
+        return opt;
+    }
+  };
 
   return (
     <Modal
@@ -131,10 +178,19 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
             <View style={s.handle} />
           </View>
 
-          <View style={s.header}>
-            <View>
-              <Text bold FONT_16 style={{ color: colors.text }}>
-                Filter Requests
+          <View
+            style={[
+              s.header,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <View style={{ alignItems: isRtl ? "flex-end" : "flex-start" }}>
+              <Text
+                bold
+                FONT_16
+                style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
+              >
+                {t("feed.filterModalTitle")}
               </Text>
               <Text
                 regular
@@ -142,9 +198,10 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                 style={{
                   color: colors.textSecondary,
                   marginTop: verticalScale(1),
+                  textAlign: isRtl ? "right" : "left",
                 }}
               >
-                Narrow down by urgency, distance & more
+                {t("feed.filterModalSubtitle")}
               </Text>
             </View>
             <TouchableOpacity
@@ -164,37 +221,49 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           <View style={s.divider} />
 
           <OptionRow
-            label="Urgency"
+            label={t("feed.urgency")}
             icon="alert-circle"
             options={URGENCY_OPTIONS}
             selected={draft.urgency}
             onSelect={(v) => setDraft({ ...draft, urgency: v })}
+            getOptionLabel={translateOption}
           />
           <OptionRow
-            label="Sort By"
+            label={t("feed.sortBy")}
             icon="bar-chart-2"
             options={SORT_OPTIONS}
             selected={draft.sortBy}
             onSelect={(v) => setDraft({ ...draft, sortBy: v })}
+            getOptionLabel={translateOption}
           />
           <OptionRow
-            label="Distance"
+            label={t("feed.distance")}
             icon="map-pin"
             options={DISTANCE_OPTIONS}
             selected={draft.distance}
             onSelect={(v) => setDraft({ ...draft, distance: v })}
+            getOptionLabel={translateOption}
           />
           <OptionRow
-            label="Blood Type"
+            label={t("feed.bloodType")}
             icon="droplet"
             options={BLOOD_OPTIONS}
             selected={draft.bloodType}
             onSelect={(v) => setDraft({ ...draft, bloodType: v })}
+            getOptionLabel={translateOption}
           />
 
-          <View style={s.footer}>
+          <View
+            style={[
+              s.footer,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
             <TouchableOpacity
-              style={s.resetBtn}
+              style={[
+                s.resetBtn,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
               onPress={handleReset}
               activeOpacity={0.7}
             >
@@ -205,11 +274,11 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
                 color={colors.gray600}
               />
               <Text medium FONT_13 style={{ color: colors.gray600 }}>
-                Reset
+                {t("feed.reset")}
               </Text>
             </TouchableOpacity>
             <AppButton
-              title="Show Results"
+              title={t("feed.showResults")}
               onPress={handleApply}
               style={s.applyBtn}
               textStyle={{ fontSize: moderateScale(13) }}

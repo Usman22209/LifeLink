@@ -1,10 +1,12 @@
 import React from "react";
-import { View, StyleSheet, I18nManager } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 
 interface BloodTypeCardProps {
   bloodType?: string;
@@ -21,7 +23,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   livesSaved = 0,
   lastDonated = "N/A",
 }) => {
-  const isRtl = I18nManager.isRTL;
+  const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
 
   return (

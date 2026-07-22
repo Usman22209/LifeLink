@@ -1,14 +1,24 @@
 import React from "react";
 import { View } from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { styles } from "../ProfileScreen.styles";
 
 const StatsSection: React.FC = () => {
+  const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
   return (
-    <View style={styles.statsContainer}>
+    <View
+      style={[
+        styles.statsContainer,
+        { flexDirection: isRtl ? "row-reverse" : "row" },
+      ]}
+    >
       <View style={styles.statItem}>
         <View
           style={{
@@ -28,7 +38,7 @@ const StatsSection: React.FC = () => {
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>
-          Donations
+          {t("profile.stats.donations")}
         </Text>
       </View>
       <View style={styles.statDivider} />
@@ -51,7 +61,7 @@ const StatsSection: React.FC = () => {
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>
-          Lives Saved
+          {t("profile.stats.livesSaved")}
         </Text>
       </View>
       <View style={styles.statDivider} />
@@ -69,12 +79,16 @@ const StatsSection: React.FC = () => {
             size={moderateScale(13)}
             color={colors.success}
           />
-          <Text bold FONT_12 style={[styles.statValue, { color: colors.success }]}>
-            Eligible
+          <Text
+            bold
+            FONT_12
+            style={[styles.statValue, { color: colors.success }]}
+          >
+            {t("profile.stats.eligible")}
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>
-          Status
+          {t("profile.stats.status")}
         </Text>
       </View>
     </View>

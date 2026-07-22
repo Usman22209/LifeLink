@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, ScrollView, TouchableOpacity, Linking, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  StyleSheet,
+} from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
@@ -48,7 +54,9 @@ const HelpSupportScreen = () => {
   const { t } = useTranslation();
 
   const handleContactEmail = () => {
-    Linking.openURL("mailto:support@lifelink.org?subject=LifeLink Support Request");
+    Linking.openURL(
+      "mailto:support@lifelink.org?subject=LifeLink Support Request",
+    );
   };
 
   const faqs = [
@@ -79,7 +87,11 @@ const HelpSupportScreen = () => {
   ];
 
   return (
-    <ScreenWrapper backgroundColor={colors.white} safeArea style={styles.wrapper}>
+    <ScreenWrapper
+      backgroundColor={colors.white}
+      safeArea
+      style={styles.wrapper}
+    >
       <AppHeader
         title={t("helpSupport.title") || "Help & Support"}
         showBackButton

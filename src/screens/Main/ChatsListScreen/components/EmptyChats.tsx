@@ -4,9 +4,11 @@ import { moderateScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../ChatsListScreen.styles";
 
 const EmptyChats = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.emptyState}>
       <AnyIcon
@@ -16,10 +18,10 @@ const EmptyChats = () => {
         color={colors.gray300}
       />
       <AppText bold FONT_15 style={styles.emptyTitle}>
-        No Chats Yet
+        {t("chats.noMessages")}
       </AppText>
       <AppText regular FONT_12 style={styles.emptySubtitle}>
-        Browse requests in Feed and message requesters to start coordinates and saving lives.
+        {t("chats.noMessagesSub")}
       </AppText>
     </View>
   );

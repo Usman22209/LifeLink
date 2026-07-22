@@ -230,7 +230,8 @@ export const MOCK_THREADS: ChatThread[] = [
       latitude: 31.5723,
       longitude: 74.3213,
     },
-    lastMessage: "We urgently need 3 units at Mayo Hospital. Are you available?",
+    lastMessage:
+      "We urgently need 3 units at Mayo Hospital. Are you available?",
     time: "2h ago",
     unreadCount: 2,
     isOnline: true,

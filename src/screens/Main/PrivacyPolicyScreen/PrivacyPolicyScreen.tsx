@@ -27,7 +27,11 @@ const PrivacyPolicyScreen = () => {
   const { t } = useTranslation();
 
   return (
-    <ScreenWrapper backgroundColor={colors.white} safeArea style={styles.wrapper}>
+    <ScreenWrapper
+      backgroundColor={colors.white}
+      safeArea
+      style={styles.wrapper}
+    >
       <AppHeader
         title={t("privacyPolicy.title") || "Privacy Policy"}
         showBackButton
@@ -43,7 +47,9 @@ const PrivacyPolicyScreen = () => {
         </AppText>
 
         <PolicySection
-          title={t("privacyPolicy.sectionTitle1") || "1. Information We Collect"}
+          title={
+            t("privacyPolicy.sectionTitle1") || "1. Information We Collect"
+          }
           body={
             t("privacyPolicy.sectionBody1") ||
             "We collect personal information that you choose to provide when registering on LifeLink, including your name, email address, contact phone number, date of birth, biological gender, blood group, and location details."
@@ -51,7 +57,9 @@ const PrivacyPolicyScreen = () => {
         />
 
         <PolicySection
-          title={t("privacyPolicy.sectionTitle2") || "2. How We Use Your Information"}
+          title={
+            t("privacyPolicy.sectionTitle2") || "2. How We Use Your Information"
+          }
           body={
             t("privacyPolicy.sectionBody2") ||
             "Your blood group and location details are utilized to match you with critical blood requests in your region. Your contact details are stored securely and are only revealed to request coordinators when you explicitly agree to coordinate a donation."

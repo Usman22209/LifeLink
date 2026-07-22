@@ -102,7 +102,7 @@ export const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: "bold",
   },
-  
+
   // Empty State Styles
   emptyState: {
     flex: 1,

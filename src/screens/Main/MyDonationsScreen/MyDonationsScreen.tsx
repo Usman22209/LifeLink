@@ -67,10 +67,10 @@ const MyDonationsScreen = () => {
         />
       </View>
       <AppText bold FONT_15 style={styles.emptyTitle}>
-        No Donations Yet
+        {t("myDonations.emptyTitle")}
       </AppText>
       <AppText regular FONT_11 style={styles.emptySubtitle}>
-        Your donation history will appear here once you've helped save a life.
+        {t("myDonations.emptySubtitle")}
       </AppText>
     </View>
   );

@@ -23,7 +23,9 @@ import { Coords } from "@shared/utils/locationService";
 import CitiesData from "@shared/data/cities.json";
 
 import { styles } from "./RequestScreen.styles";
-import LocationPickerModal, { PlaceInfo } from "./components/LocationPickerModal";
+import LocationPickerModal, {
+  PlaceInfo,
+} from "./components/LocationPickerModal";
 import PatientDetailsSection from "./components/PatientDetailsSection";
 import MedicalNeedsSection from "./components/MedicalNeedsSection";
 import LocationDetailsSection from "./components/LocationDetailsSection";
@@ -57,42 +59,50 @@ const RequestScreen = () => {
   const selectedProvince = watch("state");
   const selectedCityId = watch("city_id");
 
-  const handleMapConfirm = useCallback((coords: Coords, placeInfo?: PlaceInfo) => {
-    setPinnedLocation(coords);
-    setValue("latitude", coords.latitude, { shouldValidate: true });
-    setValue("longitude", coords.longitude, { shouldValidate: true });
-    
-    if (placeInfo) {
-      if (placeInfo.name) {
-        setValue("hospital_name", placeInfo.name, { shouldValidate: true });
-      }
-      if (placeInfo.address) {
-        setValue("hospital_address", placeInfo.address, { shouldValidate: true });
-      }
-    }
+  const handleMapConfirm = useCallback(
+    (coords: Coords, placeInfo?: PlaceInfo) => {
+      setPinnedLocation(coords);
+      setValue("latitude", coords.latitude, { shouldValidate: true });
+      setValue("longitude", coords.longitude, { shouldValidate: true });
 
-    setMapVisible(false);
-    Toast.show({
-      type: "success",
-      text2: t("requestForm.locationSelected") || "Location pinned successfully",
-    });
-  }, [setValue, t]);
+      if (placeInfo) {
+        if (placeInfo.name) {
+          setValue("hospital_name", placeInfo.name, { shouldValidate: true });
+        }
+        if (placeInfo.address) {
+          setValue("hospital_address", placeInfo.address, {
+            shouldValidate: true,
+          });
+        }
+      }
+
+      setMapVisible(false);
+      Toast.show({
+        type: "success",
+        text2:
+          t("requestForm.locationSelected") || "Location pinned successfully",
+      });
+    },
+    [setValue, t],
+  );
 
   const provinces = useMemo(() => {
     const provinceSet = new Set(CitiesData.cities.map((item) => item.province));
     return Array.from(provinceSet)
       .sort()
       .map((p) => ({
-        label: t(`onboarding.provinces.${p}`) !== `onboarding.provinces.${p}`
-          ? t(`onboarding.provinces.${p}`)
-          : p,
+        label:
+          t(`onboarding.provinces.${p}`) !== `onboarding.provinces.${p}`
+            ? t(`onboarding.provinces.${p}`)
+            : p,
         value: p,
       }));
   }, [t]);
 
   const selectedProvinceLabel = useMemo(() => {
     if (!selectedProvince) return "";
-    return t(`onboarding.provinces.${selectedProvince}`) !== `onboarding.provinces.${selectedProvince}`
+    return t(`onboarding.provinces.${selectedProvince}`) !==
+      `onboarding.provinces.${selectedProvince}`
       ? t(`onboarding.provinces.${selectedProvince}`)
       : selectedProvince;
   }, [selectedProvince, t]);
@@ -130,7 +140,8 @@ const RequestScreen = () => {
       Toast.show({
         type: "success",
         text1: t("common.success") || "Success",
-        text2: t("requestForm.successMessage") || "Request created successfully!",
+        text2:
+          t("requestForm.successMessage") || "Request created successfully!",
       });
 
       reset();
@@ -171,7 +182,8 @@ const RequestScreen = () => {
             color={colors.primary}
           />
           <AppText regular FONT_12 style={styles.headerSubtitle}>
-            {t("requestForm.subtitle") || "Submit a request to find compatible blood donors nearby"}
+            {t("requestForm.subtitle") ||
+              "Submit a request to find compatible blood donors nearby"}
           </AppText>
         </View>
 

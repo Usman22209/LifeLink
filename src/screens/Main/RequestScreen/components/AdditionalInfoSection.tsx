@@ -43,7 +43,10 @@ const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
 
       <AppInput
         label={t("requestForm.description") || "Case Summary"}
-        placeholder={t("requestForm.descriptionPlaceholder") || "Provide medical details, surgery schedule, etc. (optional)"}
+        placeholder={
+          t("requestForm.descriptionPlaceholder") ||
+          "Provide medical details, surgery schedule, etc. (optional)"
+        }
         name="description"
         control={control}
         error={errors.description?.message}

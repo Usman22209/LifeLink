@@ -2,15 +2,16 @@ import React from "react";
 import {
   View,
   TouchableOpacity,
-  I18nManager,
   useWindowDimensions,
 } from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { UrgentRequest } from "../types";
 import { cardStyles as styles } from "../HomeScreen.styles";
 
@@ -35,7 +36,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   onPress,
 }) => {
   const config = URGENCY_CONFIG[urgency];
-  const isRtl = I18nManager.isRTL;
+  const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();

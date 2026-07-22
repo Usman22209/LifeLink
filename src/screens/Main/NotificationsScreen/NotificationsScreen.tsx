@@ -9,12 +9,14 @@ import AppText from "@components/AppText";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 
+import useTranslation from "@shared/hooks/useTranslation";
 import AlertCard from "./components/AlertCard";
 import EmptyAlerts from "./components/EmptyAlerts";
 import { Alert, MOCK_ALERTS } from "./types";
 import { styles } from "./NotificationsScreen.styles";
 
 const NotificationsScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
 
@@ -43,7 +45,7 @@ const NotificationsScreen = () => {
       style={styles.wrapper}
       header={
         <AppHeader
-          title="Notifications"
+          title={t("notifications.title")}
           showBackButton
           onBackPress={() => navigation.goBack()}
           rightComponent={
@@ -53,7 +55,7 @@ const NotificationsScreen = () => {
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <AppText semiBold FONT_12 style={{ color: colors.primary }}>
-                Clear all
+                {t("notifications.clearAll")}
               </AppText>
             </TouchableOpacity>
           }

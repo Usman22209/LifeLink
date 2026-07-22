@@ -72,7 +72,7 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           />
           <StatCard
             icon="calendar"
-            value={`${totalDonations > 0 ? Math.round(totalDonations / 5 * 12) : 0}mo`}
+            value={`${totalDonations > 0 ? Math.round((totalDonations / 5) * 12) : 0}mo`}
             label="Active Since"
             iconBg={withOpacity(colors.info, 0.08)}
             iconColor={colors.info}
@@ -96,7 +96,11 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           color={statusColor}
         />
         <View style={styles.eligibilityTextWrap}>
-          <AppText semiBold FONT_12 style={[styles.eligibilityTitle, { color: statusColor }]}>
+          <AppText
+            semiBold
+            FONT_12
+            style={[styles.eligibilityTitle, { color: statusColor }]}
+          >
             {isEligible ? "Eligible to Donate" : "Cooldown Period"}
           </AppText>
           <AppText regular FONT_10 style={styles.eligibilityDesc}>

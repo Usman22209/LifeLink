@@ -14,6 +14,7 @@ import AppButton from "@components/AppButton";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useForgotPasswordForm } from "@shared/forms/hooks/useForgotPasswordForm";
 import { useForgotPassword } from "@query/auth/useForgotPassword";
@@ -25,6 +26,7 @@ type ForgotPasswordScreenNavigationProp = StackNavigationProp<
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
+  const { t } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -55,29 +57,28 @@ const ForgotPasswordScreen = () => {
 
         <View style={styles.formContainer}>
           <Text bold FONT_18 style={[styles.title, { color: colors.text }]}>
-            Forgot Password?
+            {t("forgotPassword.title")}
           </Text>
           <Text
             FONT_14
             style={[styles.subtitle, { color: colors.textSecondary }]}
           >
-            Enter your email address and we'll send you a link to reset your
-            password.
+            {t("forgotPassword.subtitle")}
           </Text>
 
           <AppInput
             name="email"
             control={control}
-            label="Email"
+            label={t("forgotPassword.email")}
             iconType={Icons.Feather}
             iconName="mail"
-            placeholder="Enter your email"
+            placeholder={t("forgotPassword.emailPlaceholder")}
             keyboardType="email-address"
             error={errors.email?.message}
           />
 
           <AppButton
-            title="Send Reset Link"
+            title={t("forgotPassword.sendLink")}
             onPress={handleSubmit(handleResetPassword)}
             loading={isPending}
             style={{ marginTop: verticalScale(12) }}
@@ -85,14 +86,14 @@ const ForgotPasswordScreen = () => {
 
           <View style={styles.footer}>
             <Text FONT_14 style={{ color: colors.textSecondary }}>
-              Remember your password?{" "}
+              {t("forgotPassword.rememberPassword")}{" "}
             </Text>
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => navigation.navigate(ROUTES.LOGIN)}
             >
               <Text bold FONT_14 style={{ color: colors.primary }}>
-                Login
+                {t("forgotPassword.login")}
               </Text>
             </TouchableOpacity>
           </View>

@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
 
 export const headerStyles = StyleSheet.create({
   container: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: scale(16),
@@ -35,6 +36,7 @@ export const headerStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   profileSection: {
+    flexDirection: "row",
     flex: 1,
     alignItems: "center",
   },

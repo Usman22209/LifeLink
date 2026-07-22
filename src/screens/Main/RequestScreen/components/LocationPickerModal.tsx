@@ -64,7 +64,9 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [searching, setSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [selectedPlaceInfo, setSelectedPlaceInfo] = useState<PlaceInfo | undefined>(undefined);
+  const [selectedPlaceInfo, setSelectedPlaceInfo] = useState<
+    PlaceInfo | undefined
+  >(undefined);
 
   const [region, setRegion] = useState<Region>(() => ({
     latitude: initialCoords?.latitude ?? DEFAULT_REGION.latitude,
@@ -200,10 +202,20 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         style={{ marginRight: scale(10) }}
       />
       <View style={{ flex: 1 }}>
-        <AppText semiBold FONT_13 style={{ color: colors.text }} numberOfLines={1}>
+        <AppText
+          semiBold
+          FONT_13
+          style={{ color: colors.text }}
+          numberOfLines={1}
+        >
           {item.structured_formatting.main_text}
         </AppText>
-        <AppText regular FONT_11 style={{ color: colors.textSecondary }} numberOfLines={1}>
+        <AppText
+          regular
+          FONT_11
+          style={{ color: colors.textSecondary }}
+          numberOfLines={1}
+        >
           {item.structured_formatting.secondary_text}
         </AppText>
       </View>
@@ -327,7 +339,9 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           {/* Confirm Button */}
           <View style={styles.floatingConfirmContainer}>
             <AppButton
-              title={t("requestForm.confirmLocation") || "Confirm Selected Location"}
+              title={
+                t("requestForm.confirmLocation") || "Confirm Selected Location"
+              }
               onPress={handleConfirm}
               style={styles.confirmButton}
             />

@@ -73,7 +73,11 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
                 <AppText
                   bold
                   FONT_13
-                  style={isActive ? styles.bloodGroupTextActive : styles.bloodGroupText}
+                  style={
+                    isActive
+                      ? styles.bloodGroupTextActive
+                      : styles.bloodGroupText
+                  }
                 >
                   {group}
                 </AppText>
@@ -82,7 +86,10 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
           })}
         </View>
         {errors.blood_group && (
-          <AppText FONT_11 style={{ color: colors.error, marginTop: verticalScale(6) }}>
+          <AppText
+            FONT_11
+            style={{ color: colors.error, marginTop: verticalScale(6) }}
+          >
             {errors.blood_group.message}
           </AppText>
         )}
@@ -100,7 +107,9 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
             onPress={() => {
               const currentUnits = selectedUnits ?? 1;
               if (currentUnits > 1) {
-                setValue("units_required", currentUnits - 1, { shouldValidate: true });
+                setValue("units_required", currentUnits - 1, {
+                  shouldValidate: true,
+                });
               }
             }}
           >
@@ -113,7 +122,10 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
           </TouchableOpacity>
           <View style={styles.stepperValueContainer}>
             <AppText bold FONT_15 style={styles.stepperValueText}>
-              {selectedUnits ?? 1} {(selectedUnits ?? 1) === 1 ? t("home.unit") || "Unit" : t("home.units") || "Units"}
+              {selectedUnits ?? 1}{" "}
+              {(selectedUnits ?? 1) === 1
+                ? t("home.unit") || "Unit"
+                : t("home.units") || "Units"}
             </AppText>
           </View>
           <TouchableOpacity
@@ -121,7 +133,9 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
             style={styles.stepperButton}
             onPress={() => {
               const currentUnits = selectedUnits ?? 1;
-              setValue("units_required", currentUnits + 1, { shouldValidate: true });
+              setValue("units_required", currentUnits + 1, {
+                shouldValidate: true,
+              });
             }}
           >
             <AnyIcon
@@ -153,7 +167,9 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
                     backgroundColor: withOpacity(urg.color, 0.05),
                   },
                 ]}
-                onPress={() => setValue("urgency", urg.value, { shouldValidate: true })}
+                onPress={() =>
+                  setValue("urgency", urg.value, { shouldValidate: true })
+                }
               >
                 <AnyIcon
                   type={Icons.Feather}
@@ -164,10 +180,7 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
                 <AppText
                   bold={isActive}
                   FONT_11
-                  style={[
-                    styles.urgencyText,
-                    isActive && { color: urg.color },
-                  ]}
+                  style={[styles.urgencyText, isActive && { color: urg.color }]}
                 >
                   {urg.label}
                 </AppText>

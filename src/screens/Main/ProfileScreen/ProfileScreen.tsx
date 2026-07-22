@@ -7,6 +7,7 @@ import ScreenWrapper from "@components/ScreenWrapper";
 import AppButton from "@components/AppButton";
 import AppHeader from "@components/AppHeader";
 import { selectUser } from "@store/slices/authSlice";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
@@ -21,6 +22,7 @@ import LanguageSelectorModal from "./components/LanguageSelectorModal";
 
 const ProfileScreen = () => {
   const user = useSelector(selectUser);
+  const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
@@ -48,7 +50,8 @@ const ProfileScreen = () => {
   const handleDeleteAccount = () => {
     Alert.alert(
       t("profile.deleteAccount") || "Delete Account",
-      t("profile.deleteAccountConfirm") || "Are you sure you want to permanently delete your account? This action is irreversible.",
+      t("profile.deleteAccountConfirm") ||
+        "Are you sure you want to permanently delete your account? This action is irreversible.",
       [
         { text: t("common.cancel") || "Cancel", style: "cancel" },
         {
@@ -59,9 +62,10 @@ const ProfileScreen = () => {
               onSuccess: () => {
                 Alert.alert(
                   t("common.success") || "Success",
-                  t("profile.deleteAccountSuccess") || "Your account has been deleted successfully."
+                  t("profile.deleteAccountSuccess") ||
+                    "Your account has been deleted successfully.",
                 );
-              }
+              },
             });
           },
         },
@@ -96,27 +100,37 @@ const ProfileScreen = () => {
         <StatsSection />
 
         <View style={styles.section}>
-          <Text bold FONT_10 style={styles.sectionTitle}>
-            {t("profile.settings") || "ACCOUNT SETTINGS"}
+          <Text
+            bold
+            FONT_10
+            style={[
+              styles.sectionTitle,
+              { textAlign: isRtl ? "right" : "left" },
+            ]}
+          >
+            {t("profile.accountSettings")}
           </Text>
           <View style={styles.card}>
             <SettingItem
               iconName="user"
-              label={t("profile.editProfile") || "Personal Information"}
+              label={t("profile.editProfile")}
               onPress={() => {
-                navigation.navigate({ name: ROUTES.EDIT_PROFILE, params: { isEditing: true } });
+                navigation.navigate({
+                  name: ROUTES.EDIT_PROFILE,
+                  params: { isEditing: true },
+                });
               }}
             />
             <SettingItem
               iconName="droplet"
-              label={t("profile.myDonations") || "My Donation History"}
+              label={t("profile.myDonations")}
               onPress={() => {
                 navigation.navigate(ROUTES.MY_DONATIONS as any);
               }}
             />
             <SettingItem
               iconName="bell"
-              label={t("profile.notifications") || "Notification Settings"}
+              label={t("profile.notifications")}
               isLast={true}
               iconColor={colors.primary}
               hasSwitch={true}
@@ -127,45 +141,49 @@ const ProfileScreen = () => {
         </View>
 
         <View style={styles.section}>
-          <Text bold FONT_10 style={styles.sectionTitle}>
-            {t("preferences") || "PREFERENCES & SUPPORT"}
+          <Text
+            bold
+            FONT_10
+            style={[
+              styles.sectionTitle,
+              { textAlign: isRtl ? "right" : "left" },
+            ]}
+          >
+            {t("profile.preferences")}
           </Text>
           <View style={styles.card}>
             <SettingItem
               iconName="globe"
-              label={t("profile.language") || "Change Language"}
+              label={t("profile.language")}
               onPress={openLanguageModal}
               iconColor={colors.primary}
               valueLabel={language === "en" ? "English" : "اردو"}
             />
-             <SettingItem
+            <SettingItem
               iconName="help-circle"
-              label="Help & Support"
+              label={t("helpSupport.title")}
               onPress={() => {
                 navigation.navigate(ROUTES.HELP_SUPPORT as any);
               }}
             />
             <SettingItem
               iconName="shield"
-              label="Privacy Policy"
+              label={t("privacyPolicy.title")}
               onPress={() => {
                 navigation.navigate(ROUTES.PRIVACY_POLICY as any);
               }}
             />
             <SettingItem
               iconName="info"
-              label="About LifeLink"
+              label={t("profile.aboutApp")}
               onPress={() => {
-                Alert.alert(
-                  "About LifeLink",
-                  "LifeLink v1.0.0 - Connecting Lives through Blood Donations.",
-                );
+                Alert.alert(t("profile.aboutApp"), t("profile.aboutAppDesc"));
               }}
               iconColor={colors.success}
             />
             <SettingItem
               iconName="trash-2"
-              label={t("profile.deleteAccount") || "Delete Account"}
+              label={t("profile.deleteAccount")}
               onPress={handleDeleteAccount}
               iconColor={colors.error}
               textColor={colors.error}
@@ -175,7 +193,7 @@ const ProfileScreen = () => {
         </View>
 
         <AppButton
-          title={t("profile.logout") || "Sign Out"}
+          title={t("profile.logout")}
           onPress={handleLogout}
           loading={logoutPending}
           style={styles.logoutBtn}

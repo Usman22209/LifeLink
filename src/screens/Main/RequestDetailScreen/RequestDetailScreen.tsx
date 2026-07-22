@@ -21,6 +21,7 @@ import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { ROUTES } from "@utils/Routes";
 import { URGENCY_CONFIG } from "../FeedScreen/types";
@@ -35,6 +36,7 @@ const RequestDetailScreen = () => {
   const route = useRoute<RequestDetailScreenRouteProp>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { request } = route.params;
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
@@ -157,7 +159,7 @@ const RequestDetailScreen = () => {
         scrollable={false}
         header={
           <AppHeader
-            title="Request Details"
+            title={t("requestDetail.title")}
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={

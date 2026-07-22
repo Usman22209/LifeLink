@@ -21,6 +21,10 @@ import {
 } from "./types";
 import { styles } from "./FeedScreen.styles";
 
+import { useSelector } from "react-redux";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
+
 interface ListHeaderProps {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -31,10 +35,31 @@ interface ListHeaderProps {
 
 const ListHeader: React.FC<ListHeaderProps> = React.memo(
   ({ searchQuery, setSearchQuery, resultsCount, sortBy, onSortToggle }) => {
+    const { t } = useTranslation();
+    const isRtl = useSelector(selectIsRtl);
+
+    const getSortByLabel = (sortVal: string) => {
+      switch (sortVal) {
+        case "Newest First":
+          return t("feed.newestFirst");
+        case "Nearest First":
+          return t("feed.nearestFirst");
+        case "Most Units":
+          return t("feed.mostUnits");
+        default:
+          return sortVal;
+      }
+    };
+
     return (
       <View>
         <View style={[styles.searchRow, { paddingHorizontal: 0 }]}>
-          <View style={styles.searchBox}>
+          <View
+            style={[
+              styles.searchBox,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
             <AnyIcon
               type={Icons.Feather}
               name="search"
@@ -42,8 +67,11 @@ const ListHeader: React.FC<ListHeaderProps> = React.memo(
               color={colors.textSecondary}
             />
             <TextInput
-              style={styles.searchInput}
-              placeholder="Search by city, hospital or name…"
+              style={[
+                styles.searchInput,
+                { textAlign: isRtl ? "right" : "left" },
+              ]}
+              placeholder={t("feed.searchPlaceholder")}
               placeholderTextColor={colors.placeholder}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -67,15 +95,23 @@ const ListHeader: React.FC<ListHeaderProps> = React.memo(
           </View>
         </View>
 
-        <View style={styles.resultsBar}>
+        <View
+          style={[
+            styles.resultsBar,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           <AppText medium FONT_12 style={{ color: colors.textSecondary }}>
             <AppText semiBold FONT_12 style={{ color: colors.text }}>
               {resultsCount}
             </AppText>{" "}
-            requests found
+            {t("feed.requestsFound")}
           </AppText>
           <TouchableOpacity
-            style={styles.sortPill}
+            style={[
+              styles.sortPill,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
             onPress={onSortToggle}
             activeOpacity={0.7}
           >
@@ -86,7 +122,7 @@ const ListHeader: React.FC<ListHeaderProps> = React.memo(
               color={colors.gray600}
             />
             <AppText medium FONT_11 style={{ color: colors.gray600 }}>
-              {sortBy}
+              {getSortByLabel(sortBy)}
             </AppText>
           </TouchableOpacity>
         </View>
@@ -96,6 +132,7 @@ const ListHeader: React.FC<ListHeaderProps> = React.memo(
 );
 
 const FeedScreen = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const listRef = useRef<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -126,15 +163,17 @@ const FeedScreen = () => {
   };
 
   const filteredData = searchQuery.trim()
-    ? MOCK_REQUESTS.filter(({ city, hospital, patientName, bloodType }: BloodRequest) => {
-        const q = searchQuery.toLowerCase();
-        return (
-          city.toLowerCase().includes(q) ||
-          hospital.toLowerCase().includes(q) ||
-          patientName.toLowerCase().includes(q) ||
-          bloodType.toLowerCase().includes(q)
-        );
-      })
+    ? MOCK_REQUESTS.filter(
+        ({ city, hospital, patientName, bloodType }: BloodRequest) => {
+          const q = searchQuery.toLowerCase();
+          return (
+            city.toLowerCase().includes(q) ||
+            hospital.toLowerCase().includes(q) ||
+            patientName.toLowerCase().includes(q) ||
+            bloodType.toLowerCase().includes(q)
+          );
+        },
+      )
     : MOCK_REQUESTS;
 
   const sortedData = [...filteredData].sort((a, b) => {
@@ -160,7 +199,7 @@ const FeedScreen = () => {
         style={styles.wrapper}
         header={
           <AppHeader
-            title="Blood Requests"
+            title={t("feed.title")}
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={

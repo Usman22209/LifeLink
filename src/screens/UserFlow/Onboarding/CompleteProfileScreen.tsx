@@ -44,7 +44,10 @@ type CompleteProfileNavigationProp = StackNavigationProp<
   typeof ROUTES.ONBOARDING
 >;
 
-type CompleteProfileRouteProp = RouteProp<UserStackParamList, typeof ROUTES.EDIT_PROFILE> & {
+type CompleteProfileRouteProp = RouteProp<
+  UserStackParamList,
+  typeof ROUTES.EDIT_PROFILE
+> & {
   params?: { isEditing?: boolean };
 };
 
@@ -308,15 +311,17 @@ const CompleteProfileScreen = () => {
     }
   };
 
-
-
   return (
     <ScreenWrapper
       backgroundColor={colors.background}
       safeArea
       header={
         <AppHeader
-          title={isEditing ? (t("profile.editProfile") || "Edit Profile") : t("onboarding.title")}
+          title={
+            isEditing
+              ? t("profile.editProfile") || "Edit Profile"
+              : t("onboarding.title")
+          }
           hasBorder
           showBackButton={isEditing}
         />
@@ -833,7 +838,11 @@ const CompleteProfileScreen = () => {
         </View>
 
         <AppButton
-          title={isEditing ? (t("profile.saveChanges") || "Save Changes") : t("onboarding.completeButton")}
+          title={
+            isEditing
+              ? t("profile.saveChanges") || "Save Changes"
+              : t("onboarding.completeButton")
+          }
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={styles.submitButton}

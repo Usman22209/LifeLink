@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppText from "@components/AppText";
 import { selectUser } from "@store/slices/authSlice";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
@@ -21,7 +22,7 @@ const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const user = useSelector(selectUser);
   const { t } = useTranslation();
-  const isRtl = I18nManager.isRTL;
+  const isRtl = useSelector(selectIsRtl);
 
   return (
     <ScreenWrapper
@@ -33,6 +34,7 @@ const HomeScreen = () => {
       header={
         <HomeHeader
           userName={user?.full_name || user?.email || "User"}
+          profileImage={user?.profile_image}
           notificationCount={3}
           onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
           onProfilePress={() => navigation.navigate(ROUTES.PROFILE)}
@@ -74,8 +76,11 @@ const HomeScreen = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.urgentScroll}
-          style={isRtl && { transform: [{ scaleX: -1 }] }}
+          contentContainerStyle={[
+            styles.urgentScroll,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+          contentOffset={isRtl ? { x: 9999, y: 0 } : { x: 0, y: 0 }}
         >
           {MOCK_URGENT_REQUESTS.map((request: UrgentRequest) => (
             <UrgentRequestCard

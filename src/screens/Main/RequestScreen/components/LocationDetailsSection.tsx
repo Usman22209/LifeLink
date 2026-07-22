@@ -73,7 +73,12 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
             { flexDirection: isRtl ? "row-reverse" : "row" },
           ]}
         >
-          <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+          <View
+            style={[
+              styles.pickerValueContainer,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
             <AnyIcon
               type={Icons.MaterialIcons}
               name="map"
@@ -84,9 +89,15 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
             <AppText
               regular
               FONT_13
-              style={selectedProvince ? { color: colors.text } : { color: colors.placeholder }}
+              style={
+                selectedProvince
+                  ? { color: colors.text }
+                  : { color: colors.placeholder }
+              }
             >
-              {selectedProvinceLabel || t("requestForm.selectState") || "Select Province"}
+              {selectedProvinceLabel ||
+                t("requestForm.selectState") ||
+                "Select Province"}
             </AppText>
           </View>
           <AnyIcon
@@ -118,7 +129,12 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
             },
           ]}
         >
-          <View style={[styles.pickerValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+          <View
+            style={[
+              styles.pickerValueContainer,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
             <AnyIcon
               type={Icons.MaterialIcons}
               name="location-city"
@@ -129,7 +145,11 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
             <AppText
               regular
               FONT_13
-              style={selectedCityId ? { color: colors.text } : { color: colors.placeholder }}
+              style={
+                selectedCityId
+                  ? { color: colors.text }
+                  : { color: colors.placeholder }
+              }
             >
               {selectedCityName || t("requestForm.selectCity") || "Select City"}
             </AppText>
@@ -145,7 +165,9 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
 
       <AppInput
         label={t("requestForm.hospitalName") || "Hospital Name"}
-        placeholder={t("requestForm.hospitalNamePlaceholder") || "e.g. Mayo Hospital"}
+        placeholder={
+          t("requestForm.hospitalNamePlaceholder") || "e.g. Mayo Hospital"
+        }
         name="hospital_name"
         control={control}
         error={errors.hospital_name?.message}
@@ -155,7 +177,10 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
 
       <AppInput
         label={t("requestForm.hospitalAddress") || "Hospital Address"}
-        placeholder={t("requestForm.hospitalAddressPlaceholder") || "Enter hospital detailed address (optional)"}
+        placeholder={
+          t("requestForm.hospitalAddressPlaceholder") ||
+          "Enter hospital detailed address (optional)"
+        }
         name="hospital_address"
         control={control}
         error={errors.hospital_address?.message}
@@ -179,7 +204,12 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
           },
         ]}
       >
-        <View style={[styles.mapSelectValueContainer, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        <View
+          style={[
+            styles.mapSelectValueContainer,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           <AnyIcon
             type={Icons.MaterialIcons}
             name={pinnedLocation ? "location-on" : "add-location-alt"}
@@ -190,7 +220,9 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
           <AppText
             regular
             FONT_13
-            style={{ color: pinnedLocation ? colors.success : colors.placeholder }}
+            style={{
+              color: pinnedLocation ? colors.success : colors.placeholder,
+            }}
           >
             {pinnedLocation
               ? `${pinnedLocation.latitude.toFixed(4)}, ${pinnedLocation.longitude.toFixed(4)}`

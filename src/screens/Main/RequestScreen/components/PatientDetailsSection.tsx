@@ -43,7 +43,10 @@ const PatientDetailsSection: React.FC<PatientDetailsSectionProps> = ({
 
       <AppInput
         label={t("requestForm.patientName") || "Patient Name"}
-        placeholder={t("requestForm.patientNamePlaceholder") || "Enter patient name (optional)"}
+        placeholder={
+          t("requestForm.patientNamePlaceholder") ||
+          "Enter patient name (optional)"
+        }
         name="patient_name"
         control={control}
         error={errors.patient_name?.message}
@@ -53,7 +56,9 @@ const PatientDetailsSection: React.FC<PatientDetailsSectionProps> = ({
 
       <AppInput
         label={t("requestForm.contactNumber") || "Contact Number"}
-        placeholder={t("requestForm.contactNumberPlaceholder") || "e.g. +92 300 1234567"}
+        placeholder={
+          t("requestForm.contactNumberPlaceholder") || "e.g. +92 300 1234567"
+        }
         name="contact_number"
         control={control}
         keyboardType="phone-pad"

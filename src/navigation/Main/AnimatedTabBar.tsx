@@ -53,11 +53,9 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
       previousIndex.current = state.index;
     }
 
-    const isRtl = I18nManager.isRTL;
     if (!isCenter) {
-      const visualIndex = isRtl ? TAB_COUNT - 1 - state.index : state.index;
       const target =
-        visualIndex * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2;
+        state.index * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2;
 
       Animated.parallel([
         Animated.spring(indicatorX, {
@@ -119,7 +117,6 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
     inputRange: [0, 1],
     outputRange: ["0deg", "45deg"],
   });
-  const isRtl = I18nManager.isRTL;
 
   return (
     <View style={[styles.barContainer, { paddingBottom: bottomPadding }]}>
@@ -134,12 +131,10 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
         ]}
       />
 
-      {state.routes.map((_, index) => {
-        const originalIndex = isRtl ? TAB_COUNT - 1 - index : index;
-        const route = state.routes[originalIndex];
+      {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
-        const isFocused = state.index === originalIndex;
-        const isCenter = originalIndex === CENTER_INDEX;
+        const isFocused = state.index === index;
+        const isCenter = index === CENTER_INDEX;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -201,11 +196,11 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
           );
         }
 
-        const iconScale = tabScales[originalIndex].interpolate({
+        const iconScale = tabScales[index].interpolate({
           inputRange: [0, 1],
           outputRange: [1, 1.1],
         });
-        const labelOpacity = tabScales[originalIndex].interpolate({
+        const labelOpacity = tabScales[index].interpolate({
           inputRange: [0, 1],
           outputRange: [0.5, 1],
         });
@@ -270,6 +265,7 @@ const styles = StyleSheet.create({
   indicator: {
     position: "absolute",
     top: 0,
+    start: 0,
     height: verticalScale(3),
     borderBottomLeftRadius: 3,
     borderBottomRightRadius: 3,

@@ -5,6 +5,7 @@ import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "./ChatsListScreen.styles";
 
 import ChatItem, { ChatThread } from "./components/ChatItem";
@@ -13,6 +14,7 @@ import { MOCK_THREADS } from "@shared/constants/mockData";
 
 const ChatsListScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [threads, setThreads] = useState<ChatThread[]>(MOCK_THREADS);
 
   const handleThreadPress = (item: ChatThread) => {
@@ -31,7 +33,7 @@ const ChatsListScreen = () => {
       style={styles.wrapper}
       header={
         <AppHeader
-          title="Messages"
+          title={t("chats.title")}
           showBackButton={true}
           titleSize={15}
           hasBorder={true}
