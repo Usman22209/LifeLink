@@ -7,6 +7,8 @@ import AppInput from "@components/AppInput";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import { BloodRequestFormValues } from "@shared/forms/schemas/blood-request.schema";
+import { Controller } from "react-hook-form";
+import { formatPhoneNumber } from "@shared/utils/phoneUtils";
 import { styles } from "../RequestScreen.styles";
 
 interface PatientDetailsSectionProps {
@@ -54,17 +56,21 @@ const PatientDetailsSection: React.FC<PatientDetailsSectionProps> = ({
         iconName="user"
       />
 
-      <AppInput
-        label={t("requestForm.contactNumber") || "Contact Number"}
-        placeholder={
-          t("requestForm.contactNumberPlaceholder") || "e.g. +92 300 1234567"
-        }
-        name="contact_number"
+      <Controller
         control={control}
-        keyboardType="phone-pad"
-        error={errors.contact_number?.message}
-        iconType={Icons.Feather}
-        iconName="phone"
+        name="contact_number"
+        render={({ field: { onChange, value } }) => (
+          <AppInput
+            label={t("requestForm.contactNumber") || "Contact Number"}
+            placeholder="0303 1234567"
+            value={value}
+            onChangeText={(text) => onChange(formatPhoneNumber(text))}
+            keyboardType="phone-pad"
+            error={errors.contact_number?.message}
+            iconType={Icons.Feather}
+            iconName="phone"
+          />
+        )}
       />
     </View>
   );

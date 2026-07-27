@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { BLOOD_REQUEST_SERVICE } from "@shared/api/service/blood-request.service";
 import {
   CreateBloodRequestDto,
@@ -32,6 +32,41 @@ export const useBloodRequestFeed = (params?: PaginationParams) => {
     queryFn: async () => {
       const response = await BLOOD_REQUEST_SERVICE.getFeed(params);
       return response.data;
+    },
+  });
+};
+
+/**
+ * Get public blood request feed with infinite scroll pagination
+ */
+export const useInfiniteBloodRequestFeed = (
+  params?: Omit<PaginationParams, "page"> & {
+    blood_group?: string;
+    urgency?: string;
+    city_id?: string;
+    search?: string;
+    sort_by?: string;
+    lat?: number;
+    lng?: number;
+  },
+) => {
+  return useInfiniteQuery({
+    queryKey: bloodRequestKeys.feed(params),
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await BLOOD_REQUEST_SERVICE.getFeed({
+        ...params,
+        page: pageParam as number,
+        limit: params?.limit || 10,
+      });
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => {
+      const pagination = lastPage?.pagination || lastPage?.data?.pagination;
+      if (pagination && pagination.hasNext) {
+        return pagination.page + 1;
+      }
+      return undefined;
     },
   });
 };

@@ -25,6 +25,10 @@ import { useSelector } from "react-redux";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectIsRtl } from "@store/slices/appSlice";
 
+import { useInfiniteBloodRequestFeed } from "@shared/query/blood-requests/useBloodRequests";
+import { getCityNameById } from "@shared/utils/cityUtils";
+import { useUserLocation, calculateDistanceKm } from "@shared/utils/locationService";
+
 interface ListHeaderProps {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
@@ -32,6 +36,24 @@ interface ListHeaderProps {
   sortBy: string;
   onSortToggle: () => void;
 }
+
+const formatRelativeTime = (dateStr?: string): string => {
+  if (!dateStr) return "Recently";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "Recently";
+
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 30) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+};
 
 const ListHeader: React.FC<ListHeaderProps> = React.memo(
   ({ searchQuery, setSearchQuery, resultsCount, sortBy, onSortToggle }) => {
@@ -140,6 +162,29 @@ const FeedScreen = () => {
   const [sortVisible, setSortVisible] = useState(false);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
+  const userLocation = useUserLocation();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    refetch,
+  } = useInfiniteBloodRequestFeed({
+    limit: 10,
+    search: searchQuery.trim() || undefined,
+    blood_group: filters.bloodType !== "All" ? filters.bloodType : undefined,
+    urgency: filters.urgency !== "All" ? filters.urgency : undefined,
+    sort_by:
+      filters.sortBy === "Most Units"
+        ? "most_units"
+        : filters.sortBy === "Nearest First"
+        ? "nearest"
+        : "created_at",
+    lat: userLocation?.latitude,
+    lng: userLocation?.longitude,
+  });
+
   const activeFilterCount = countActiveFilters(filters);
 
   const handleSortToggle = useCallback(() => {
@@ -148,7 +193,6 @@ const FeedScreen = () => {
 
   const handleSelectSort = useCallback((val: string) => {
     setFilters((prev) => ({ ...prev, sortBy: val }));
-    // Wait a brief frame for layout diffing to settle, then scroll cleanly to top
     requestAnimationFrame(() => {
       listRef.current?.scrollToOffset({ offset: 0, animated: true });
     });
@@ -162,26 +206,103 @@ const FeedScreen = () => {
     return 999999;
   };
 
-  const filteredData = searchQuery.trim()
-    ? MOCK_REQUESTS.filter(
-        ({ city, hospital, patientName, bloodType }: BloodRequest) => {
-          const q = searchQuery.toLowerCase();
-          return (
-            city.toLowerCase().includes(q) ||
-            hospital.toLowerCase().includes(q) ||
-            patientName.toLowerCase().includes(q) ||
-            bloodType.toLowerCase().includes(q)
-          );
-        },
+  const fetchedItems = data?.pages
+    ? data.pages.flatMap((page: any) =>
+        page?.data?.requests
+          ? page.data.requests
+          : page?.requests
+          ? page.requests
+          : page?.data
+          ? page.data
+          : Array.isArray(page)
+          ? page
+          : [],
       )
-    : MOCK_REQUESTS;
+    : [];
+
+  const rawItems = fetchedItems.length > 0 ? fetchedItems : MOCK_REQUESTS;
+
+  const formattedRequests: BloodRequest[] = rawItems.map((item: any) => ({
+    id: String(item.id),
+    bloodType: item.blood_group || item.bloodType || "O+",
+    patientName: item.patient_name || item.patientName || "Anonymous Patient",
+    hospital: item.hospital_name || item.hospital || "Hospital",
+    city: item.city_id || item.city || "",
+    state: item.state || "",
+    patientImage: item.requester?.profile_image || item.patientImage,
+    units: item.units_required ?? item.units ?? 1,
+    urgency: item.urgency || "normal",
+    time: formatRelativeTime(item.created_at || item.time),
+    distance: item.distance || "",
+    latitude: item.latitude ? Number(item.latitude) : undefined,
+    longitude: item.longitude ? Number(item.longitude) : undefined,
+  }));
+
+  const filteredData = formattedRequests.filter((item: BloodRequest) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const resolvedCity = getCityNameById(item.city).toLowerCase();
+      const match =
+        resolvedCity.includes(q) ||
+        item.hospital.toLowerCase().includes(q) ||
+        item.patientName.toLowerCase().includes(q) ||
+        item.bloodType.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+
+    if (filters.bloodType !== "All") {
+      if (item.bloodType.toUpperCase() !== filters.bloodType.toUpperCase()) {
+        return false;
+      }
+    }
+
+    if (filters.urgency !== "All") {
+      const itemUrgency = item.urgency.toLowerCase();
+      const filterUrgency = filters.urgency.toLowerCase();
+      if (
+        itemUrgency !== filterUrgency &&
+        !(filterUrgency === "urgent" && itemUrgency === "high")
+      ) {
+        return false;
+      }
+    }
+
+    if (filters.distance !== "Any Distance") {
+      const matchNum = filters.distance.match(/\d+/);
+      const maxKm = matchNum ? parseInt(matchNum[0], 10) : Infinity;
+
+      let itemKm: number | null = null;
+      if (
+        userLocation?.latitude !== undefined &&
+        userLocation?.longitude !== undefined &&
+        item.latitude !== undefined &&
+        item.longitude !== undefined
+      ) {
+        itemKm = calculateDistanceKm(
+          userLocation.latitude,
+          userLocation.longitude,
+          item.latitude,
+          item.longitude,
+        );
+      } else if (item.distance) {
+        const parsed = parseFloat(item.distance);
+        if (!isNaN(parsed)) itemKm = parsed;
+      }
+
+      if (itemKm !== null && itemKm > maxKm) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (filters.sortBy === "Newest First") {
       return parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time);
     }
     if (filters.sortBy === "Nearest First") {
-      return parseFloat(a.distance) - parseFloat(b.distance);
+      return parseFloat(a.distance || "999") - parseFloat(b.distance || "999");
     }
     if (filters.sortBy === "Most Units") {
       return b.units - a.units;
@@ -229,6 +350,14 @@ const FeedScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <RequestCard {...item} />}
           estimatedItemSize={120}
+          refreshing={isLoading}
+          onRefresh={refetch}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.5}
           ListHeaderComponent={
             <ListHeader
               searchQuery={searchQuery}

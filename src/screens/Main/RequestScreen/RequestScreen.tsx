@@ -22,6 +22,7 @@ import { useGetProfile } from "@shared/query/profile/useProfile";
 import { useBloodRequestForm } from "@shared/forms/hooks/useBloodRequestForm";
 import { useCreateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { Coords } from "@shared/utils/locationService";
+import { formatPhoneNumber, toE164Phone } from "@shared/utils/phoneUtils";
 import CitiesData from "@shared/data/cities.json";
 
 import { styles } from "./RequestScreen.styles";
@@ -71,7 +72,9 @@ const RequestScreen = () => {
         setValue("patient_name", user.full_name, { shouldValidate: true });
       }
       if (user.phone && !watch("contact_number")) {
-        setValue("contact_number", user.phone, { shouldValidate: true });
+        setValue("contact_number", formatPhoneNumber(user.phone), {
+          shouldValidate: true,
+        });
       }
       if (user.blood_group && !watch("blood_group")) {
         setValue("blood_group", user.blood_group, { shouldValidate: true });
@@ -161,6 +164,9 @@ const RequestScreen = () => {
 
       const payload: any = {
         ...restData,
+        ...(data.contact_number && {
+          contact_number: toE164Phone(data.contact_number),
+        }),
         units_required: Number(data.units_required),
         required_date: formattedRequiredDate,
         ...(pinnedLocation && {

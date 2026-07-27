@@ -117,14 +117,16 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
           </View>
         </View>
 
-        <Text
-          semiBold
-          FONT_12
-          numberOfLines={2}
-          style={[styles.hospital, { textAlign: isRtl ? "right" : "left" }]}
-        >
-          {hospital}
-        </Text>
+        <View style={[styles.hospitalContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
+          <Text
+            semiBold
+            FONT_12
+            numberOfLines={2}
+            style={[styles.hospital, { textAlign: isRtl ? "right" : "left" }]}
+          >
+            {hospital}
+          </Text>
+        </View>
 
         <View
           style={[

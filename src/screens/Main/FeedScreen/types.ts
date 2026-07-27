@@ -34,7 +34,13 @@ export const URGENCY_CONFIG: Record<
 
 export const SORT_OPTIONS = ["Newest First", "Nearest First", "Most Units"];
 export const URGENCY_OPTIONS = ["All", "Critical", "Urgent", "Normal"];
-export const DISTANCE_OPTIONS = ["Any Distance", "< 2 km", "< 5 km", "< 10 km"];
+export const DISTANCE_OPTIONS = [
+  "Any Distance",
+  "< 5 km",
+  "< 15 km",
+  "< 50 km",
+  "< 100 km",
+];
 export const BLOOD_OPTIONS = [
   "All",
   "A+",

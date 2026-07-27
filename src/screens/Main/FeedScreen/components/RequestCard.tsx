@@ -11,6 +11,7 @@ import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectIsRtl, selectLanguage } from "@store/slices/appSlice";
 import { getCityNameById } from "@shared/utils/cityUtils";
+import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { BloodRequest, URGENCY_CONFIG } from "../types";
 import { styles } from "../FeedScreen.styles";
 
@@ -35,9 +36,14 @@ const RequestCard: React.FC<RequestCardProps> = ({
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
   const selectedLang = useSelector(selectLanguage);
+  const userLocation = useUserLocation();
+
   const cityName = getCityNameById(city, selectedLang);
   const urgencyKey = (urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+
+  const computedDistance = formatDistance(userLocation, { latitude, longitude });
+  const validDistance = computedDistance || (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
 
   const getUrgencyText = (urgencyVal: string) => {
     switch (urgencyVal?.toLowerCase()) {
@@ -125,22 +131,24 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 {units} {units === 1 ? t("feed.unit") : t("feed.units")}
               </Text>
             </View>
-            <View
-              style={[
-                styles.metaChip,
-                { flexDirection: isRtl ? "row-reverse" : "row" },
-              ]}
-            >
-              <AnyIcon
-                type={Icons.Feather}
-                name="map-pin"
-                size={moderateScale(10)}
-                color={colors.textSecondary}
-              />
-              <Text regular FONT_10 style={{ color: colors.textSecondary }}>
-                {distance}
-              </Text>
-            </View>
+            {validDistance ? (
+              <View
+                style={[
+                  styles.metaChip,
+                  { flexDirection: isRtl ? "row-reverse" : "row" },
+                ]}
+              >
+                <AnyIcon
+                  type={Icons.Feather}
+                  name="map-pin"
+                  size={moderateScale(10)}
+                  color={colors.textSecondary}
+                />
+                <Text regular FONT_10 style={{ color: colors.textSecondary }}>
+                  {validDistance}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
 

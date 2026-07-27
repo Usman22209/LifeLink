@@ -131,9 +131,13 @@ export const cardStyles = StyleSheet.create({
   badge: {
     alignItems: "center",
   },
+  hospitalContainer: {
+    height: verticalScale(36),
+    justifyContent: "center",
+    marginBottom: verticalScale(4),
+  },
   hospital: {
     color: colors.text,
-    marginBottom: verticalScale(4),
     lineHeight: verticalScale(17),
   },
   metaRow: {

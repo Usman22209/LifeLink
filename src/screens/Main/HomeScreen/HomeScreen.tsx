@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, ScrollView, TouchableOpacity, I18nManager } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppText from "@components/AppText";
-import { selectUser } from "@store/slices/authSlice";
+import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectIsRtl } from "@store/slices/appSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
@@ -22,6 +22,7 @@ import { MOCK_URGENT_REQUESTS, UrgentRequest } from "./types";
 import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation<any>();
   const reduxUser = useSelector(selectUser);
   const { t } = useTranslation();
@@ -31,11 +32,26 @@ const HomeScreen = () => {
   const { data: urgentRequestsData } = useUrgentBloodRequests();
   const { data: unreadCount = 0 } = useUnreadNotificationCount();
 
+  useEffect(() => {
+    if (profile) {
+      dispatch(updateUser(profile));
+    }
+  }, [profile, dispatch]);
+
   const user = profile || reduxUser;
+  const displayName =
+    user?.full_name ||
+    user?.name ||
+    (user?.email ? user.email.split("@")[0] : "User");
+
+  const rawUrgent = Array.isArray(urgentRequestsData?.data)
+    ? urgentRequestsData.data
+    : Array.isArray(urgentRequestsData)
+    ? urgentRequestsData
+    : [];
+
   const urgentRequests: UrgentRequest[] =
-    urgentRequestsData && Array.isArray(urgentRequestsData) && urgentRequestsData.length > 0
-      ? urgentRequestsData
-      : MOCK_URGENT_REQUESTS;
+    rawUrgent.length > 0 ? rawUrgent : MOCK_URGENT_REQUESTS;
 
   const stats = user?.stats || {};
   const bloodType = user?.blood_group || "O+";
@@ -52,7 +68,7 @@ const HomeScreen = () => {
       style={styles.wrapper}
       header={
         <HomeHeader
-          userName={user?.full_name || user?.email || "User"}
+          userName={displayName}
           profileImage={user?.profile_image}
           notificationCount={unreadCount}
           onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
