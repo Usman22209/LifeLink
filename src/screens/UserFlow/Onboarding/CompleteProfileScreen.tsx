@@ -26,6 +26,7 @@ import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import { BLOOD_GROUPS } from "@shared/constants/blood";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
+import { useUpdateProfile } from "@shared/query/profile/useProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
@@ -59,6 +60,7 @@ const CompleteProfileScreen = () => {
   const isEditing = (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t, i18n } = useTranslation();
 
@@ -179,7 +181,7 @@ const CompleteProfileScreen = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, confirmed_data, city, ...sanitizedData } = data;
 
-      const response = await PROFILE_SERVICE.updateProfile({
+      await updateProfileMutate({
         ...sanitizedData,
         city_id: data.city, // 'city' in form holds the ID
         state: data.state, // Send state/province to match DB schema
@@ -189,31 +191,14 @@ const CompleteProfileScreen = () => {
         longitude: finalLocation?.longitude,
       } as any);
 
-      if (response.data.success) {
-        if (isEditing) {
-          // Update Redux with the edited profile fields and navigate back
-          dispatch(
-            updateUser({
-              full_name: data.full_name,
-              phone: data.phone,
-              gender: data.gender as "male" | "female",
-              dob: data.dob,
-              blood_group: data.blood_group,
-              country: data.country,
-              state: data.state,
-              city_id: data.city,
-              profile_image: data.profile_image,
-            }),
-          );
-          navigation.goBack();
-        } else {
-          dispatch(
-            updateUser({
-              is_onboarded: true,
-            }),
-          );
-          // Navigation handles itself via UserNavigation
-        }
+      if (isEditing) {
+        navigation.goBack();
+      } else {
+        dispatch(
+          updateUser({
+            is_onboarded: true,
+          }),
+        );
       }
     } catch (error) {
       console.error("[CompleteProfile] Update error:", error);

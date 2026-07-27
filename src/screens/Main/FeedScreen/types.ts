@@ -24,12 +24,16 @@ export interface FilterState {
 }
 
 export const URGENCY_CONFIG: Record<
-  "critical" | "urgent" | "normal",
+  string,
   { color: string; label: string }
 > = {
   critical: { color: colors.danger, label: "Critical" },
+  emergency: { color: colors.danger, label: "Critical" },
   urgent: { color: colors.warning, label: "Urgent" },
-  normal: { color: colors.success, label: "Normal" },
+  high: { color: colors.warning, label: "Urgent" },
+  medium: { color: colors.info, label: "Normal" },
+  normal: { color: colors.info, label: "Normal" },
+  low: { color: colors.info, label: "Normal" },
 };
 
 export const SORT_OPTIONS = ["Newest First", "Nearest First", "Most Units"];

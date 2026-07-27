@@ -79,10 +79,10 @@ const RequestCard: React.FC<RequestCardProps> = ({
         <View
           style={[
             styles.bloodBadge,
-            { backgroundColor: withOpacity(cfg.color, 0.09) },
+            { backgroundColor: withOpacity(colors.primary, 0.09) },
           ]}
         >
-          <Text extraBold FONT_16 style={{ color: cfg.color }}>
+          <Text extraBold FONT_16 style={{ color: colors.primary }}>
             {bloodType}
           </Text>
         </View>

@@ -5,6 +5,8 @@ import { logout } from "@store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import Toast from "react-native-toast-message";
 
+import { updateUser } from "@store/slices/authSlice";
+
 export const profileKeys = {
   all: ["profile"] as const,
   me: () => [...profileKeys.all, "me"] as const,
@@ -18,6 +20,23 @@ export const useGetProfile = (enabled = true) => {
       return response.data?.data || response.data;
     },
     enabled,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const response = await PROFILE_SERVICE.updateProfile(data);
+      return response.data?.data || response.data;
+    },
+    onSuccess: (updatedProfile) => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.me() });
+      if (updatedProfile) {
+        store.dispatch(updateUser(updatedProfile));
+      }
+    },
   });
 };
 

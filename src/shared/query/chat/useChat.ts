@@ -34,14 +34,24 @@ export const useSendMessage = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: { thread_id: string; text: string }) => {
+    mutationFn: async (data: {
+      thread_id?: string;
+      request_id?: string;
+      text: string;
+    }) => {
       const response = await CHAT_SERVICE.sendMessage(data);
       return response.data?.data || response.data;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: chatKeys.messages(variables.thread_id),
-      });
+    onSuccess: (resData, variables) => {
+      const activeThreadId =
+        variables.thread_id ||
+        (resData as any)?.thread_id ||
+        (resData as any)?.thread?.id;
+      if (activeThreadId) {
+        queryClient.invalidateQueries({
+          queryKey: chatKeys.messages(activeThreadId),
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: chatKeys.threads(),
       });

@@ -12,12 +12,12 @@ export const CHAT_SERVICE = {
 
     const queryString = queryParams.toString();
     const url = queryString
-      ? `${API_CONFIG.CHAT.messages}/${threadId}?${queryString}`
-      : `${API_CONFIG.CHAT.messages}/${threadId}`;
+      ? `${API_CONFIG.CHAT.threads}/${threadId}/messages?${queryString}`
+      : `${API_CONFIG.CHAT.threads}/${threadId}/messages`;
 
     return HTTP_CLIENT.get(url);
   },
-  sendMessage: (data: { thread_id: string; text: string }) => {
+  sendMessage: (data: { thread_id?: string; request_id?: string; text: string }) => {
     return HTTP_CLIENT.post(API_CONFIG.CHAT.messages, data);
   },
 };

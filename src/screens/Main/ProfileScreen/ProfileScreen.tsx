@@ -12,7 +12,7 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
-import { useDeleteAccount, useUpdateSettings } from "@shared/query/profile/useProfile";
+import { useDeleteAccount, useUpdateSettings, useGetProfile } from "@shared/query/profile/useProfile";
 import { ROUTES } from "@utils/Routes";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { styles } from "./ProfileScreen.styles";
@@ -22,7 +22,9 @@ import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
 
 const ProfileScreen = () => {
-  const user = useSelector(selectUser);
+  const reduxUser = useSelector(selectUser);
+  const { data: profile } = useGetProfile();
+  const user = profile || reduxUser;
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
@@ -99,7 +101,7 @@ const ProfileScreen = () => {
       >
         <ProfileHeaderCard user={user} />
 
-        <StatsSection />
+        <StatsSection stats={user?.stats} />
 
         <View style={styles.section}>
           <Text

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import { FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, View } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -8,6 +8,8 @@ import { UserStackParamList } from "@shared/interfaces/navigation/navigation-par
 import { ROUTES } from "@utils/Routes";
 import { styles } from "./ChatScreen.styles";
 
+import { useSelector } from "react-redux";
+import { selectUser } from "@store/slices/authSlice";
 import useTranslation from "@shared/hooks/useTranslation";
 import { useChatMessages, useSendMessage } from "@shared/query/chat/useChat";
 import ChatHeader from "./components/ChatHeader";
@@ -21,51 +23,41 @@ type ChatScreenRouteProp = RouteProp<UserStackParamList, typeof ROUTES.CHAT>;
 const ChatScreen = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation();
+  const user = useSelector(selectUser);
   const { request } = route.params;
-  const threadId = (route.params as any)?.threadId || request?.id || "thread_1";
+  const threadId = (route.params as any)?.threadId || request?.id || "";
 
   const flatListRef = useRef<FlatList>(null);
   const [inputText, setInputText] = useState("");
 
-  const { data: remoteMessagesData } = useChatMessages(threadId);
+  const { data: remoteMessagesData, isLoading } = useChatMessages(threadId);
   const { mutate: sendMessageMutate } = useSendMessage();
 
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
 
   const messages: Message[] = useMemo(() => {
-    if (remoteMessagesData?.messages && Array.isArray(remoteMessagesData.messages) && remoteMessagesData.messages.length > 0) {
-      return remoteMessagesData.messages.map((m: any) => ({
-        id: m.id,
-        text: m.text,
-        createdAt: new Date(m.sent_at || m.created_at || Date.now()),
-        senderId: m.sender_id === "me" || m.sender_id === request.id ? "me" : "them",
-      }));
-    }
+    const rawMsgs =
+      remoteMessagesData?.messages ||
+      (Array.isArray(remoteMessagesData) ? remoteMessagesData : []);
 
-    if (localMessages.length > 0) {
-      return localMessages;
-    }
+    const serverFormatted: Message[] = rawMsgs.map((m: any) => ({
+      id: String(m.id),
+      text: m.text,
+      createdAt: new Date(m.sent_at || m.created_at || Date.now()),
+      senderId: m.sender_id === user?.id ? "me" : "them",
+    }));
 
-    return [
-      {
-        id: "1",
-        text: `Hi, thank you for reaching out regarding the ${request.bloodType} blood request for ${request.patientName}.`,
-        createdAt: new Date(Date.now() - 3600000),
-        senderId: "them",
-      },
-      {
-        id: "2",
-        text: `We urgently need ${request.units} units at ${request.hospital}. Are you eligible and available to donate?`,
-        createdAt: new Date(Date.now() - 3500000),
-        senderId: "them",
-      },
-    ];
-  }, [remoteMessagesData, localMessages, request]);
+    // Merge server messages with unsynced local optimistic messages for instant 0ms UI feedback
+    const serverTexts = new Set(serverFormatted.map((m) => m.text));
+    const pendingLocal = localMessages.filter((m) => !serverTexts.has(m.text));
+
+    return [...serverFormatted, ...pendingLocal];
+  }, [remoteMessagesData, localMessages, user]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated });
-    }, 150);
+    }, 100);
   }, []);
 
   const handleSend = () => {
@@ -74,16 +66,25 @@ const ChatScreen = () => {
     const textToSend = inputText.trim();
     setInputText("");
 
-    const newMessage: Message = {
-      id: Math.random().toString(),
+    // 1. Optimistic Message (0ms latency UI update)
+    const optimisticMessage: Message = {
+      id: `temp_${Date.now()}`,
       text: textToSend,
       createdAt: new Date(),
       senderId: "me",
     };
 
-    setLocalMessages((prev) => [...prev, newMessage]);
-    sendMessageMutate({ thread_id: threadId, text: textToSend });
-    scrollToBottom();
+    setLocalMessages((prev) => [...prev, optimisticMessage]);
+
+    // 2. Background API Call
+    const payload = {
+      ...(threadId ? { thread_id: threadId } : {}),
+      ...(request?.id ? { request_id: request.id } : {}),
+      text: textToSend,
+    };
+
+    sendMessageMutate(payload);
+    scrollToBottom(true);
   };
 
   return (
@@ -110,18 +111,30 @@ const ChatScreen = () => {
           hospital={request.hospital}
         />
 
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <MessageItem item={item} patientImage={request.patientImage} />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollToBottom(true)}
-          onLayout={() => scrollToBottom(false)}
-        />
+        {isLoading && messages.length === 0 ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={({ item }) => (
+              <MessageItem item={item} patientImage={request.patientImage} />
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => scrollToBottom(true)}
+            onLayout={() => scrollToBottom(false)}
+          />
+        )}
 
         <MessageInput
           inputText={inputText}

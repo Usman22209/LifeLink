@@ -9,9 +9,23 @@ import useTranslation from "@shared/hooks/useTranslation";
 import { selectIsRtl } from "@store/slices/appSlice";
 import { styles } from "../ProfileScreen.styles";
 
-const StatsSection: React.FC = () => {
+interface StatsSectionProps {
+  stats?: {
+    donations_count?: number;
+    lives_saved?: number;
+    is_eligible?: boolean;
+    next_eligible_date?: string | null;
+  };
+}
+
+const StatsSection: React.FC<StatsSectionProps> = ({ stats }) => {
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
+
+  const donationsCount = stats?.donations_count ?? 0;
+  const livesSaved = stats?.lives_saved ?? 0;
+  const isEligible = stats?.is_eligible ?? true;
+
   return (
     <View
       style={[
@@ -34,7 +48,7 @@ const StatsSection: React.FC = () => {
             color={colors.primary}
           />
           <Text bold FONT_15 style={styles.statValue}>
-            4
+            {donationsCount}
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>
@@ -57,7 +71,7 @@ const StatsSection: React.FC = () => {
             color={colors.primary}
           />
           <Text bold FONT_15 style={styles.statValue}>
-            12
+            {livesSaved}
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>
@@ -75,16 +89,21 @@ const StatsSection: React.FC = () => {
         >
           <AnyIcon
             type={Icons.Feather}
-            name="calendar"
+            name={isEligible ? "check-circle" : "clock"}
             size={moderateScale(13)}
-            color={colors.success}
+            color={isEligible ? colors.success : colors.warning}
           />
           <Text
             bold
             FONT_12
-            style={[styles.statValue, { color: colors.success }]}
+            style={[
+              styles.statValue,
+              { color: isEligible ? colors.success : colors.warning },
+            ]}
           >
-            {t("profile.stats.eligible")}
+            {isEligible
+              ? t("profile.stats.eligible") || "Eligible"
+              : t("profile.stats.ineligible") || "Ineligible"}
           </Text>
         </View>
         <Text regular FONT_10 style={styles.statLabel}>

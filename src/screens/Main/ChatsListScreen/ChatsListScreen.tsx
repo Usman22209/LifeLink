@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { FlatList } from "react-native";
+import React from "react";
+import { FlatList, View, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
@@ -11,18 +11,18 @@ import { styles } from "./ChatsListScreen.styles";
 
 import ChatItem, { ChatThread } from "./components/ChatItem";
 import EmptyChats from "./components/EmptyChats";
-import { MOCK_THREADS } from "@shared/constants/mockData";
 
 const ChatsListScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
 
-  const { data: chatThreadsData } = useChatThreads();
+  const { data: chatThreadsData, isLoading, refetch } = useChatThreads();
 
-  const threads: ChatThread[] =
-    chatThreadsData && Array.isArray(chatThreadsData) && chatThreadsData.length > 0
-      ? chatThreadsData
-      : MOCK_THREADS;
+  const threads: ChatThread[] = Array.isArray(chatThreadsData?.data)
+    ? chatThreadsData.data
+    : Array.isArray(chatThreadsData)
+    ? chatThreadsData
+    : [];
 
   const handleThreadPress = (item: ChatThread) => {
     (navigation as any).navigate(ROUTES.CHAT, {
@@ -47,16 +47,30 @@ const ChatsListScreen = () => {
         />
       }
     >
-      <FlatList
-        data={threads}
-        renderItem={({ item }) => (
-          <ChatItem item={item} onPress={handleThreadPress} />
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<EmptyChats />}
-      />
+      {isLoading && threads.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <FlatList
+          data={threads}
+          renderItem={({ item }) => (
+            <ChatItem item={item} onPress={handleThreadPress} />
+          )}
+          keyExtractor={(item) => item.id}
+          refreshing={isLoading}
+          onRefresh={refetch}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<EmptyChats />}
+        />
+      )}
     </ScreenWrapper>
   );
 };
