@@ -165,6 +165,15 @@ const CompleteProfileScreen = () => {
   const onSubmit = async (data: OnboardingFormValues) => {
     setLoading(true);
     try {
+      let finalLocation = location;
+      if (!finalLocation) {
+        try {
+          finalLocation = await getCurrentLocation(true);
+        } catch {
+          finalLocation = null;
+        }
+      }
+
       // Remove fields that are not in the profiles table schema
       // We only store city_id now, and derive state/city name on frontend
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -176,8 +185,8 @@ const CompleteProfileScreen = () => {
         state: data.state, // Send state/province to match DB schema
         language_preference: selectedLang,
         is_onboarded: true,
-        latitude: location?.latitude,
-        longitude: location?.longitude,
+        latitude: finalLocation?.latitude,
+        longitude: finalLocation?.longitude,
       } as any);
 
       if (response.data.success) {
@@ -264,7 +273,8 @@ const CompleteProfileScreen = () => {
     }
     const fetchLocation = async () => {
       try {
-        const coords = await getCurrentLocation();
+        // Only fetch if permission is ALREADY granted — never open permission dialogs during screen mount
+        const coords = await getCurrentLocation(false);
         if (coords) {
           setLocation(coords);
           console.log("[CompleteProfile] Location captured:", coords);
@@ -564,7 +574,11 @@ const CompleteProfileScreen = () => {
             mode="date"
             onConfirm={handleConfirmDate}
             onCancel={() => setDatePickerVisibility(false)}
-            date={watch("dob") ? new Date(watch("dob")) : maxDate}
+            date={
+              watch("dob") && !isNaN(Date.parse(watch("dob")))
+                ? new Date(watch("dob"))
+                : maxDate
+            }
             maximumDate={maxDate}
             accentColor={colors.primary}
             buttonTextColorIOS={colors.primary}

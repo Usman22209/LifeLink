@@ -16,15 +16,40 @@ interface BloodTypeCardProps {
   lastDonated?: string;
 }
 
+const getBloodGroupSubtitle = (bloodGroup?: string): string => {
+  switch (bloodGroup?.toUpperCase().trim()) {
+    case "O-":
+      return "Universal Donor";
+    case "O+":
+      return "Universal Red Cell Donor";
+    case "AB+":
+      return "Universal Recipient";
+    case "AB-":
+      return "Universal Plasma Donor";
+    case "A+":
+      return "Donates to A+ & AB+";
+    case "A-":
+      return "Donates to A± & AB±";
+    case "B+":
+      return "Donates to B+ & AB+";
+    case "B-":
+      return "Donates to B± & AB±";
+    default:
+      return "Blood Donor";
+  }
+};
+
 const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   bloodType = "O+",
-  subtitle = "Universal Donor",
+  subtitle,
   donations = 0,
   livesSaved = 0,
   lastDonated = "N/A",
 }) => {
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
+
+  const displaySubtitle = subtitle || getBloodGroupSubtitle(bloodType);
 
   return (
     <View style={styles.card}>
@@ -61,9 +86,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
               marginTop: verticalScale(2),
             }}
           >
-            {subtitle === "Universal Donor"
-              ? t("home.universalDonor")
-              : subtitle}
+            {displaySubtitle}
           </Text>
         </View>
         <View style={styles.iconContainer}>

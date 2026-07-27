@@ -9,7 +9,8 @@ import { colors } from "@theme/colors";
 import { withOpacity } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
-import { selectIsRtl } from "@store/slices/appSlice";
+import { selectIsRtl, selectLanguage } from "@store/slices/appSlice";
+import { getCityNameById } from "@shared/utils/cityUtils";
 import { BloodRequest, URGENCY_CONFIG } from "../types";
 import { styles } from "../FeedScreen.styles";
 
@@ -33,6 +34,8 @@ const RequestCard: React.FC<RequestCardProps> = ({
   const navigation = useNavigation<any>();
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
+  const selectedLang = useSelector(selectLanguage);
+  const cityName = getCityNameById(city, selectedLang);
   const urgencyKey = (urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
@@ -98,7 +101,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
             style={[styles.hospitalText, { textAlign: isRtl ? "right" : "left" }]}
             numberOfLines={1}
           >
-            {hospital} · {city}
+            {hospital} · {cityName}
           </Text>
           <View
             style={[

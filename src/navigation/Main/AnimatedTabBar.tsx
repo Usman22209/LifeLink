@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { colors } from "@theme/colors";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
@@ -28,6 +30,7 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const insets = useSafeAreaInsets();
+  const isRtl = useSelector(selectIsRtl);
   const previousIndex = useRef(0);
 
   const indicatorX = useRef(new Animated.Value(0)).current;
@@ -54,8 +57,9 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
     }
 
     if (!isCenter) {
-      const target =
+      const rawTarget =
         state.index * TAB_WIDTH + (TAB_WIDTH - INDICATOR_WIDTH) / 2;
+      const target = isRtl ? -rawTarget : rawTarget;
 
       Animated.parallel([
         Animated.spring(indicatorX, {
@@ -104,6 +108,7 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
     });
   }, [
     state.index,
+    isRtl,
     indicatorX,
     indicatorOpacity,
     fabScale,
@@ -119,13 +124,22 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
   });
 
   return (
-    <View style={[styles.barContainer, { paddingBottom: bottomPadding }]}>
+    <View
+      style={[
+        styles.barContainer,
+        {
+          paddingBottom: bottomPadding,
+          flexDirection: isRtl ? "row-reverse" : "row",
+        },
+      ]}
+    >
       <Animated.View
         style={[
           styles.indicator,
           {
             width: INDICATOR_WIDTH,
             opacity: indicatorOpacity,
+            [isRtl ? "right" : "left"]: 0,
             transform: [{ translateX: indicatorX }],
           },
         ]}
@@ -265,7 +279,6 @@ const styles = StyleSheet.create({
   indicator: {
     position: "absolute",
     top: 0,
-    start: 0,
     height: verticalScale(3),
     borderBottomLeftRadius: 3,
     borderBottomRightRadius: 3,

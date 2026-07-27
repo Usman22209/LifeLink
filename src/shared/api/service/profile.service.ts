@@ -11,4 +11,15 @@ export const PROFILE_SERVICE = {
     const url = API_CONFIG.PROFILE.me;
     return HTTP_CLIENT.get(url);
   },
+  deleteAccount: () => {
+    const url = API_CONFIG.PROFILE.delete;
+    return HTTP_CLIENT.delete(url);
+  },
+  updateSettings: (data: {
+    notifications_enabled?: boolean;
+    language_preference?: string;
+  }) => {
+    const url = API_CONFIG.PROFILE.settings;
+    return HTTP_CLIENT.patch(url, data);
+  },
 };

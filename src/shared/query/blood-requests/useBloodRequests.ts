@@ -15,6 +15,8 @@ export const bloodRequestKeys = {
   all: ["blood-requests"] as const,
   feed: (params?: PaginationParams) =>
     [...bloodRequestKeys.all, "feed", params] as const,
+  urgent: (params?: { limit?: number; lat?: number; lng?: number }) =>
+    [...bloodRequestKeys.all, "urgent", params] as const,
   myRequests: (params?: PaginationParams) =>
     [...bloodRequestKeys.all, "my", params] as const,
   detail: (id: string) => [...bloodRequestKeys.all, "detail", id] as const,
@@ -110,6 +112,28 @@ export const useUpdateBloodRequest = () => {
         queryKey: bloodRequestKeys.myRequests(),
       });
       queryClient.invalidateQueries({ queryKey: bloodRequestKeys.feed() });
+    },
+  });
+};
+
+/**
+  * Get urgent blood requests for HomeScreen
+  */
+export const useUrgentBloodRequests = (params?: {
+  limit?: number;
+  lat?: number;
+  lng?: number;
+}) => {
+  return useQuery({
+    queryKey: bloodRequestKeys.urgent(params),
+    queryFn: async () => {
+      try {
+        const response = await BLOOD_REQUEST_SERVICE.getUrgentRequests(params);
+        return response.data?.data || response.data;
+      } catch (error) {
+        console.warn("[useUrgentBloodRequests] Backend returned error, falling back:", error);
+        return [];
+      }
     },
   });
 };

@@ -4,6 +4,7 @@ export interface UrgentRequest {
   hospital: string;
   city: string;
   state?: string;
+  patientName?: string;
   patientImage?: string;
   units: number;
   urgency: "critical" | "urgent" | "normal";

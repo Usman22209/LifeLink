@@ -20,6 +20,10 @@ import AppHeader from "@components/AppHeader";
 import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
+import { useSelector } from "react-redux";
+import { selectLanguage } from "@store/slices/appSlice";
+import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
+import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
@@ -37,7 +41,25 @@ const RequestDetailScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const selectedLang = useSelector(selectLanguage);
+  const userLocation = useUserLocation();
   const { request } = route.params;
+
+  const cityName = getCityNameById(request.city, selectedLang);
+  const provinceName = request.state || getProvinceByCityId(request.city) || "Punjab";
+
+  const computedDist = formatDistance(userLocation, {
+    latitude: request.latitude,
+    longitude: request.longitude,
+  });
+
+  const displayDistance = computedDist
+    ? `${computedDist} away`
+    : request.distance && request.distance !== "N/A" && request.distance !== "0 km"
+    ? `${request.distance} away`
+    : "";
+
+  const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
   const [checked1, setChecked1] = useState(false);
@@ -45,17 +67,18 @@ const RequestDetailScreen = () => {
   const [checked3, setChecked3] = useState(false);
 
   const isFormValid = checked1 && checked2 && checked3;
-  const cfg = URGENCY_CONFIG[request.urgency];
+  const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
-        message: `🚨 URGENT BLOOD REQUEST 🚨\n\nPatient Name: ${request.patientName}\nBlood Type Required: ${request.bloodType}\nRequired Units: ${request.units}\nHospital: ${request.hospital}, ${request.city}\nUrgency: ${cfg.label}\n\nPlease share this message or contact the hospital immediately!`,
+        message: `🚨 URGENT BLOOD REQUEST 🚨\n\nPatient Name: ${request.patientName}\nBlood Type Required: ${request.bloodType}\nRequired Units: ${request.units}\nHospital: ${request.hospital}, ${cityName}\nUrgency: ${cfg.label}\n\nPlease share this message or contact the hospital immediately!`,
       });
     } catch (error: any) {
       console.log("Error sharing request:", error.message);
     }
-  }, [request, cfg]);
+  }, [request, cfg, cityName]);
 
   const handleContact = useCallback(() => {
     (navigation as any).navigate(ROUTES.CHAT, { request });
@@ -244,7 +267,7 @@ const RequestDetailScreen = () => {
                   color={colors.textSecondary}
                 />
                 <AppText semiBold FONT_10 style={styles.distanceText}>
-                  {request.distance} away
+                  {displayDistance || "Nearby"}
                 </AppText>
               </View>
             </View>
@@ -316,11 +339,11 @@ const RequestDetailScreen = () => {
             )}
             {renderInfoRow("clock", "Time Requested", request.time)}
             {renderInfoRow("home", "Hospital", request.hospital)}
-            {renderInfoRow("navigation", "City", request.city)}
+            {renderInfoRow("navigation", "City", cityName)}
             {renderInfoRow(
               "map",
               "State / Province",
-              request.state || "Punjab",
+              provinceName,
               true,
             )}
           </View>
@@ -385,7 +408,7 @@ const RequestDetailScreen = () => {
                     {request.hospital}
                   </AppText>
                   <AppText regular style={styles.mapOverlayDistance}>
-                    {request.city} · {request.distance} away
+                    {mapOverlayText}
                   </AppText>
                 </View>
                 <TouchableOpacity

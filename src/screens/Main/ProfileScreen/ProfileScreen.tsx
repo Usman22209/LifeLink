@@ -12,6 +12,7 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
+import { useDeleteAccount, useUpdateSettings } from "@shared/query/profile/useProfile";
 import { ROUTES } from "@utils/Routes";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { styles } from "./ProfileScreen.styles";
@@ -26,11 +27,20 @@ const ProfileScreen = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
+  const { mutate: deleteAccountMutate } = useDeleteAccount();
+  const { mutate: updateSettingsMutate } = useUpdateSettings();
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    user?.notifications_enabled ?? true,
+  );
+
+  const handleNotificationToggle = (val: boolean) => {
+    setNotificationsEnabled(val);
+    updateSettingsMutate({ notifications_enabled: val });
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -58,15 +68,7 @@ const ProfileScreen = () => {
           text: t("profile.deleteAccountConfirmButton") || "Delete",
           style: "destructive",
           onPress: () => {
-            logoutMutate(undefined, {
-              onSuccess: () => {
-                Alert.alert(
-                  t("common.success") || "Success",
-                  t("profile.deleteAccountSuccess") ||
-                    "Your account has been deleted successfully.",
-                );
-              },
-            });
+            deleteAccountMutate();
           },
         },
       ],
@@ -135,7 +137,7 @@ const ProfileScreen = () => {
               iconColor={colors.primary}
               hasSwitch={true}
               switchValue={notificationsEnabled}
-              onSwitchValueChange={setNotificationsEnabled}
+              onSwitchValueChange={handleNotificationToggle}
             />
           </View>
         </View>

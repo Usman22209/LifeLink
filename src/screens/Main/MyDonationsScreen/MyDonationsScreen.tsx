@@ -10,6 +10,7 @@ import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+import { useMyDonations } from "@shared/query/donations/useDonations";
 import { styles } from "./MyDonationsScreen.styles";
 
 import DonationDashboard from "./components/DonationDashboard";
@@ -19,9 +20,24 @@ import { MOCK_DONATIONS } from "@shared/constants/mockData";
 const MyDonationsScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
-  const [donations] = useState<DonationLog[]>(MOCK_DONATIONS);
+
+  const { data: myDonationsData } = useMyDonations();
+
+  const donations: DonationLog[] =
+    myDonationsData?.history && Array.isArray(myDonationsData.history)
+      ? myDonationsData.history
+      : MOCK_DONATIONS;
 
   const stats = useMemo(() => {
+    if (myDonationsData?.stats) {
+      return {
+        totalDonations: myDonationsData.stats.totalDonations ?? donations.length,
+        livesSaved: myDonationsData.stats.livesSaved ?? (donations.length * 3),
+        isEligible: myDonationsData.stats.isEligible ?? true,
+        nextEligibleDateStr: myDonationsData.stats.nextEligibleDateStr || "",
+      };
+    }
+
     const totalDonations = donations.length;
     const totalUnits = donations.reduce((sum, item) => sum + item.units, 0);
     const livesSaved = totalUnits * 3;
@@ -37,7 +53,7 @@ const MyDonationsScreen = () => {
       const nextEligibleDate = new Date(latestDonationDate);
       nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
 
-      const today = new Date("2026-07-15");
+      const today = new Date();
       isEligible = today.getTime() >= nextEligibleDate.getTime();
 
       if (!isEligible) {
@@ -50,7 +66,7 @@ const MyDonationsScreen = () => {
     }
 
     return { totalDonations, livesSaved, isEligible, nextEligibleDateStr };
-  }, [donations]);
+  }, [myDonationsData, donations]);
 
   const handleItemPress = (item: DonationLog) => {
     navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });

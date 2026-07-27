@@ -15,42 +15,56 @@ const HTTP_CLIENT_UPLOAD: AxiosInstance = axios.create({
 HTTP_CLIENT_UPLOAD.interceptors.request.use(
   (config) => {
     const { accessToken } = store.getState().auth;
+    const fullUrl = `${config.baseURL || ""}${config.url || ""}`;
+
     console.log(
-      `[HTTP_CLIENT_UPLOAD] Request: ${config.method?.toUpperCase()} ${config.url}`,
+      `📤 [HTTP_CLIENT_UPLOAD Request] ${config.method?.toUpperCase()} ${fullUrl}`,
     );
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
       console.log(
-        `[HTTP_CLIENT_UPLOAD] Authorization header set from Redux token (ends with ...${accessToken.slice(-10)})`,
+        `🔑 [HTTP_CLIENT_UPLOAD Auth] Attached Token (ends with ...${accessToken.slice(-10)})`,
       );
     } else {
-      console.warn("[HTTP_CLIENT_UPLOAD] No accessToken found in Redux store");
+      console.warn("⚠️ [HTTP_CLIENT_UPLOAD Auth] No accessToken found in Redux store");
     }
     return config;
   },
   (error) => {
-    console.error("[HTTP_CLIENT_UPLOAD] Request error:", error);
+    console.error("❌ [HTTP_CLIENT_UPLOAD Request Error]:", error);
     return Promise.reject(error);
   },
 );
 
 HTTP_CLIENT_UPLOAD.interceptors.response.use(
   (response) => {
+    const fullUrl = `${response.config.baseURL || ""}${response.config.url || ""}`;
     console.log(
-      `[HTTP_CLIENT_UPLOAD] Response: ${response.status} from ${response.config.url}`,
+      `✅ [HTTP_CLIENT_UPLOAD Response] ${response.status} ${response.statusText} from ${fullUrl}`,
     );
+    console.log(`📥 [HTTP_CLIENT_UPLOAD Data]:`, response.data);
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    console.warn(
-      `[HTTP_CLIENT_UPLOAD] Error: ${error.response?.status} from ${originalRequest.url}`,
+    const fullUrl = `${originalRequest?.baseURL || ""}${originalRequest?.url || ""}`;
+
+    console.error(
+      `❌ [HTTP_CLIENT_UPLOAD Error] ${error.response?.status || "UPLOAD_ERROR"} from ${fullUrl}`,
     );
+
+    if (error.response?.data) {
+      console.error(
+        `🚨 [HTTP_CLIENT_UPLOAD Error Response Body]:`,
+        error.response.data,
+      );
+    }
 
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
+        console.log("🔄 [HTTP_CLIENT_UPLOAD] Attempting 401 token refresh...");
         const token = await refreshTokenFlow();
         originalRequest.headers.Authorization = `Bearer ${token}`;
         return HTTP_CLIENT_UPLOAD(originalRequest);

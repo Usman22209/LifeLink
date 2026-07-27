@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { FlatList, KeyboardAvoidingView, Platform } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { verticalScale } from "react-native-size-matters";
@@ -8,6 +8,8 @@ import { UserStackParamList } from "@shared/interfaces/navigation/navigation-par
 import { ROUTES } from "@utils/Routes";
 import { styles } from "./ChatScreen.styles";
 
+import useTranslation from "@shared/hooks/useTranslation";
+import { useChatMessages, useSendMessage } from "@shared/query/chat/useChat";
 import ChatHeader from "./components/ChatHeader";
 import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
@@ -20,14 +22,31 @@ const ChatScreen = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation();
   const { request } = route.params;
+  const threadId = (route.params as any)?.threadId || request?.id || "thread_1";
 
   const flatListRef = useRef<FlatList>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => {
-    const initialMessages: Message[] = [
+  const { data: remoteMessagesData } = useChatMessages(threadId);
+  const { mutate: sendMessageMutate } = useSendMessage();
+
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
+
+  const messages: Message[] = useMemo(() => {
+    if (remoteMessagesData?.messages && Array.isArray(remoteMessagesData.messages) && remoteMessagesData.messages.length > 0) {
+      return remoteMessagesData.messages.map((m: any) => ({
+        id: m.id,
+        text: m.text,
+        createdAt: new Date(m.sent_at || m.created_at || Date.now()),
+        senderId: m.sender_id === "me" || m.sender_id === request.id ? "me" : "them",
+      }));
+    }
+
+    if (localMessages.length > 0) {
+      return localMessages;
+    }
+
+    return [
       {
         id: "1",
         text: `Hi, thank you for reaching out regarding the ${request.bloodType} blood request for ${request.patientName}.`,
@@ -41,8 +60,7 @@ const ChatScreen = () => {
         senderId: "them",
       },
     ];
-    setMessages(initialMessages);
-  }, [request]);
+  }, [remoteMessagesData, localMessages, request]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
@@ -53,48 +71,19 @@ const ChatScreen = () => {
   const handleSend = () => {
     if (!inputText.trim()) return;
 
+    const textToSend = inputText.trim();
+    setInputText("");
+
     const newMessage: Message = {
       id: Math.random().toString(),
-      text: inputText.trim(),
+      text: textToSend,
       createdAt: new Date(),
       senderId: "me",
     };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setInputText("");
+    setLocalMessages((prev) => [...prev, newMessage]);
+    sendMessageMutate({ thread_id: threadId, text: textToSend });
     scrollToBottom();
-
-    simulateReply();
-  };
-
-  const simulateReply = () => {
-    setTimeout(() => {
-      setIsTyping(true);
-      scrollToBottom();
-
-      setTimeout(() => {
-        setIsTyping(false);
-
-        const replies = [
-          `Thank you so much! The patient's family is at ${request.hospital} right now. Please coordinate with the receptionist or call us when you are nearby.`,
-          `That is wonderful news! Let me know if you need any directions to ${request.hospital}. They are expecting donors at the Emergency Ward.`,
-          `Bless you! Your compatibility match looks perfect. Please let me know what time you can visit so we can notify the duty coordinator.`,
-          `Thank you for saving a life. When you reach ${request.hospital}, please mention the request ID #${request.id} at the blood bank reception.`,
-        ];
-
-        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-
-        const responseMessage: Message = {
-          id: Math.random().toString(),
-          text: randomReply,
-          createdAt: new Date(),
-          senderId: "them",
-        };
-
-        setMessages((prev) => [...prev, responseMessage]);
-        scrollToBottom();
-      }, 2000);
-    }, 1000);
   };
 
   return (
@@ -132,12 +121,6 @@ const ChatScreen = () => {
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => scrollToBottom(true)}
           onLayout={() => scrollToBottom(false)}
-          ListFooterComponent={
-            <TypingBubble
-              patientImage={request.patientImage}
-              isTyping={isTyping}
-            />
-          }
         />
 
         <MessageInput

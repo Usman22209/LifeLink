@@ -10,6 +10,11 @@ import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 
 import useTranslation from "@shared/hooks/useTranslation";
+import {
+  useNotifications,
+  useMarkNotificationRead,
+  useClearAllNotifications,
+} from "@shared/query/notifications/useNotifications";
 import AlertCard from "./components/AlertCard";
 import EmptyAlerts from "./components/EmptyAlerts";
 import { Alert, MOCK_ALERTS } from "./types";
@@ -18,24 +23,30 @@ import { styles } from "./NotificationsScreen.styles";
 const NotificationsScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
-  const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
+
+  const { data: notificationsData } = useNotifications();
+  const { mutate: markRead } = useMarkNotificationRead();
+  const { mutate: clearAll } = useClearAllNotifications();
+
+  const alerts: Alert[] =
+    notificationsData && Array.isArray(notificationsData) && notificationsData.length > 0
+      ? notificationsData
+      : MOCK_ALERTS;
 
   const handlePress = useCallback(
     (item: Alert) => {
-      setAlerts((prev) =>
-        prev.map((a) => (a.id === item.id ? { ...a, read: true } : a)),
-      );
+      markRead(item.id);
 
       if (item.type === "blood_request" || item.type === "donation_match") {
         navigation.navigate(ROUTES.FEED);
       }
     },
-    [navigation],
+    [navigation, markRead],
   );
 
   const handleClearAll = useCallback(() => {
-    setAlerts((prev) => prev.map((a) => ({ ...a, read: true })));
-  }, []);
+    clearAll();
+  }, [clearAll]);
 
   return (
     <ScreenWrapper

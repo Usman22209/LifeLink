@@ -10,6 +10,9 @@ import { selectIsRtl } from "@store/slices/appSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { useGetProfile } from "@shared/query/profile/useProfile";
+import { useUrgentBloodRequests } from "@shared/query/blood-requests/useBloodRequests";
+import { useUnreadNotificationCount } from "@shared/query/notifications/useNotifications";
 
 import HomeHeader from "./components/HomeHeader";
 import BloodTypeCard from "./components/BloodTypeCard";
@@ -20,9 +23,25 @@ import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
-  const user = useSelector(selectUser);
+  const reduxUser = useSelector(selectUser);
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
+
+  const { data: profile } = useGetProfile();
+  const { data: urgentRequestsData } = useUrgentBloodRequests();
+  const { data: unreadCount = 0 } = useUnreadNotificationCount();
+
+  const user = profile || reduxUser;
+  const urgentRequests: UrgentRequest[] =
+    urgentRequestsData && Array.isArray(urgentRequestsData) && urgentRequestsData.length > 0
+      ? urgentRequestsData
+      : MOCK_URGENT_REQUESTS;
+
+  const stats = user?.stats || {};
+  const bloodType = user?.blood_group || "O+";
+  const donationsCount = stats.donations_count ?? 0;
+  const livesSaved = stats.lives_saved ?? (donationsCount * 3);
+  const lastDonated = stats.last_donated_at || "N/A";
 
   return (
     <ScreenWrapper
@@ -35,18 +54,17 @@ const HomeScreen = () => {
         <HomeHeader
           userName={user?.full_name || user?.email || "User"}
           profileImage={user?.profile_image}
-          notificationCount={3}
+          notificationCount={unreadCount}
           onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
           onProfilePress={() => navigation.navigate(ROUTES.PROFILE)}
         />
       }
     >
       <BloodTypeCard
-        bloodType="O+"
-        subtitle="Universal Donor"
-        donations={5}
-        livesSaved={12}
-        lastDonated="Mar 12"
+        bloodType={bloodType}
+        donations={donationsCount}
+        livesSaved={livesSaved}
+        lastDonated={lastDonated}
       />
 
       <View style={styles.sectionGap}>
@@ -82,7 +100,7 @@ const HomeScreen = () => {
           ]}
           contentOffset={isRtl ? { x: 9999, y: 0 } : { x: 0, y: 0 }}
         >
-          {MOCK_URGENT_REQUESTS.map((request: UrgentRequest) => (
+          {urgentRequests.map((request: UrgentRequest) => (
             <UrgentRequestCard
               key={request.id}
               {...request}
@@ -90,7 +108,7 @@ const HomeScreen = () => {
                 navigation.navigate(ROUTES.REQUEST_DETAIL, {
                   request: {
                     ...request,
-                    patientName: "Anonymous Patient",
+                    patientName: request.patientName || "Anonymous Patient",
                     distance: request.distance || "0 km",
                   },
                 })

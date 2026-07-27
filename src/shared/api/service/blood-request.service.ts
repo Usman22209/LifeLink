@@ -75,4 +75,21 @@ export const BLOOD_REQUEST_SERVICE = {
       data,
     );
   },
+
+  /**
+   * Get urgent blood requests for HomeScreen
+   */
+  getUrgentRequests: (params?: { limit?: number; lat?: number; lng?: number }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.lat) queryParams.append("lat", params.lat.toString());
+    if (params?.lng) queryParams.append("lng", params.lng.toString());
+
+    const queryString = queryParams.toString();
+    const url = queryString
+      ? `${API_CONFIG.BLOOD_REQUESTS.urgent}?${queryString}`
+      : API_CONFIG.BLOOD_REQUESTS.urgent;
+
+    return HTTP_CLIENT.get(url);
+  },
 };

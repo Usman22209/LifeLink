@@ -14,6 +14,7 @@ import AppButton from "@components/AppButton";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { useFaqs, useContactSupport } from "@shared/query/support/useSupport";
 import { styles } from "./HelpSupportScreen.styles";
 
 interface FAQItemProps {
@@ -53,13 +54,20 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 const HelpSupportScreen = () => {
   const { t } = useTranslation();
 
+  const { data: remoteFaqs } = useFaqs();
+  const { mutate: submitContact, isPending: isSubmitting } = useContactSupport();
+
   const handleContactEmail = () => {
+    submitContact({
+      subject: "LifeLink Support Request",
+      message: "User initiated contact support request from HelpSupportScreen",
+    });
     Linking.openURL(
       "mailto:support@lifelink.org?subject=LifeLink Support Request",
     );
   };
 
-  const faqs = [
+  const defaultFaqs = [
     {
       question: t("helpSupport.faqQuestion1") || "Who can donate blood?",
       answer:
@@ -85,6 +93,8 @@ const HelpSupportScreen = () => {
         "Navigate to the 'Request' tab, fill in the patient details, select the blood type and hospital, and submit. Matched donors nearby will be notified.",
     },
   ];
+
+  const faqs = remoteFaqs && Array.isArray(remoteFaqs) && remoteFaqs.length > 0 ? remoteFaqs : defaultFaqs;
 
   return (
     <ScreenWrapper

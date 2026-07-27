@@ -17,6 +17,8 @@ import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectLanguage } from "@store/slices/appSlice";
+import { selectUser } from "@store/slices/authSlice";
+import { useGetProfile } from "@shared/query/profile/useProfile";
 import { useBloodRequestForm } from "@shared/forms/hooks/useBloodRequestForm";
 import { useCreateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { Coords } from "@shared/utils/locationService";
@@ -36,6 +38,9 @@ const RequestScreen = () => {
   const navigation = useNavigation<any>();
   const selectedLang = useSelector(selectLanguage);
   const isRtl = useSelector((state: any) => state.app?.isRtl ?? false);
+  const reduxUser = useSelector(selectUser);
+  const { data: profile } = useGetProfile();
+  const user = profile || reduxUser;
 
   const {
     control,
@@ -58,6 +63,27 @@ const RequestScreen = () => {
   const selectedUrgency = watch("urgency");
   const selectedProvince = watch("state");
   const selectedCityId = watch("city_id");
+
+  // Prefill user data (name, contact number, blood group, state, city)
+  React.useEffect(() => {
+    if (user) {
+      if (user.full_name && !watch("patient_name")) {
+        setValue("patient_name", user.full_name, { shouldValidate: true });
+      }
+      if (user.phone && !watch("contact_number")) {
+        setValue("contact_number", user.phone, { shouldValidate: true });
+      }
+      if (user.blood_group && !watch("blood_group")) {
+        setValue("blood_group", user.blood_group, { shouldValidate: true });
+      }
+      if (user.state && !watch("state")) {
+        setValue("state", user.state, { shouldValidate: true });
+      }
+      if (user.city_id && !watch("city_id")) {
+        setValue("city_id", user.city_id, { shouldValidate: true });
+      }
+    }
+  }, [user, setValue, watch]);
 
   const handleMapConfirm = useCallback(
     (coords: Coords, placeInfo?: PlaceInfo) => {
@@ -126,14 +152,29 @@ const RequestScreen = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      const payload = {
-        ...data,
+      const { state, required_date, ...restData } = data;
+
+      const formattedRequiredDate =
+        required_date && !isNaN(Date.parse(required_date))
+          ? new Date(required_date).toISOString()
+          : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+      const payload: any = {
+        ...restData,
         units_required: Number(data.units_required),
+        required_date: formattedRequiredDate,
         ...(pinnedLocation && {
           latitude: pinnedLocation.latitude,
           longitude: pinnedLocation.longitude,
         }),
       };
+
+      // Clean up empty optional fields
+      if (!payload.city_id) delete payload.city_id;
+      if (!payload.hospital_address) delete payload.hospital_address;
+      if (!payload.patient_name) delete payload.patient_name;
+      if (!payload.contact_number) delete payload.contact_number;
+      if (!payload.description) delete payload.description;
 
       await createRequestMutation.mutateAsync(payload);
 

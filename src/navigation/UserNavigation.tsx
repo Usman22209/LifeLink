@@ -26,14 +26,16 @@ export default function UserNavigation() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!token ? (
         <Stack.Screen name={ROUTES.AUTH_FLOW} component={AuthFlow} />
-      ) : !isOnboarded ? (
-        <Stack.Screen
-          name={ROUTES.ONBOARDING}
-          component={CompleteProfileScreen}
-        />
       ) : (
         <>
-          <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+          {!isOnboarded ? (
+            <Stack.Screen
+              name={ROUTES.ONBOARDING}
+              component={CompleteProfileScreen}
+            />
+          ) : (
+            <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+          )}
           <Stack.Screen
             name={ROUTES.REQUEST_DETAIL}
             component={RequestDetailScreen}
