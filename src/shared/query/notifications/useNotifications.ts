@@ -57,12 +57,3 @@ export const useClearAllNotifications = () => {
     },
   });
 };
-
-export const useRegisterDeviceToken = () => {
-  return useMutation({
-    mutationFn: async (data: { device_token: string; platform: string }) => {
-      const response = await NOTIFICATION_SERVICE.registerDeviceToken(data);
-      return response.data;
-    },
-  });
-};

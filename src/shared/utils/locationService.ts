@@ -28,19 +28,34 @@ export const getCurrentLocation = async (
             longitude: position.coords.longitude,
           });
         },
-        (error) => {
-          console.warn("[LocationService] Geolocation error:", error);
-          resolve(null);
+        () => {
+          // Fallback attempt with cached / network location if GPS provider times out
+          Geolocation.getCurrentPosition(
+            (fallbackPos) => {
+              resolve({
+                latitude: fallbackPos.coords.latitude,
+                longitude: fallbackPos.coords.longitude,
+              });
+            },
+            () => {
+              // Gracefully return null without spamming warning logs
+              resolve(null);
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 15000,
+              maximumAge: 300000, // 5 minute cached location fallback
+            },
+          );
         },
         {
           enableHighAccuracy: false,
           timeout: 10000,
-          maximumAge: 10000,
+          maximumAge: 60000,
         },
       );
     });
   } catch (err) {
-    console.warn("[LocationService] Request error:", err);
     return null;
   }
 };

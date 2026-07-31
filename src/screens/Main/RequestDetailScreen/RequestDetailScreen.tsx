@@ -28,6 +28,8 @@ import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { ROUTES } from "@utils/Routes";
+import { useAcceptBloodRequest } from "@shared/query/donations/useDonations";
+import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
 import { URGENCY_CONFIG } from "../FeedScreen/types";
 import { styles } from "./RequestDetailScreen.styles";
 
@@ -62,11 +64,9 @@ const RequestDetailScreen = () => {
   const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
-  const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(false);
-  const [checked3, setChecked3] = useState(false);
+  const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
+    useAcceptBloodRequest();
 
-  const isFormValid = checked1 && checked2 && checked3;
   const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
@@ -84,20 +84,27 @@ const RequestDetailScreen = () => {
     (navigation as any).navigate(ROUTES.CHAT, { request });
   }, [navigation, request]);
 
-  const handleConfirmMatch = useCallback(() => {
-    setMatchSheetVisible(false);
-    setChecked1(false);
-    setChecked2(false);
-    setChecked3(false);
+  const handleConfirmMatch = useCallback(async () => {
+    try {
+      await acceptBloodRequestMutate(request.id);
+      setMatchSheetVisible(false);
 
-    setTimeout(() => {
       Alert.alert(
-        "Match Confirmed! 🎉",
-        `Thank you for saving a life!\n\nYour profile info was shared with ${request.hospital}. Please coordinates with hospital reception or wait for contact request.`,
-        [{ text: "Okay" }],
+        "Donation Pledged! 🎉",
+        `Thank you for offering to save a life!\n\nWe have initiated a chat thread with the requester for ${request.hospital}.`,
+        [
+          {
+            text: "Open Chat",
+            onPress: () =>
+              (navigation as any).navigate(ROUTES.CHAT, { request }),
+          },
+        ],
       );
-    }, 400);
-  }, [request]);
+    } catch (err: any) {
+      setMatchSheetVisible(false);
+      Alert.alert("Error", err?.message || "Could not respond to request.");
+    }
+  }, [acceptBloodRequestMutate, request, navigation]);
 
   const handleNavigate = useCallback(() => {
     const query = encodeURIComponent(`${request.hospital}, ${request.city}`);
@@ -471,151 +478,12 @@ const RequestDetailScreen = () => {
         </View>
       </ScreenWrapper>
 
-      {/* Premium Match Screening Sheet Modal */}
-      <Modal
-        visible={matchSheetVisible}
-        transparent
-        animationType="slide"
-        statusBarTranslucent
-        onRequestClose={() => setMatchSheetVisible(false)}
-      >
-        <Pressable
-          style={styles.modalBackdrop}
-          onPress={() => setMatchSheetVisible(false)}
-        >
-          <Pressable
-            style={[
-              styles.sheetContainer,
-              { paddingBottom: Math.max(moderateScale(20), insets.bottom) },
-            ]}
-            onPress={() => {}}
-          >
-            {/* Modal Header */}
-            <View style={styles.sheetHeader}>
-              <View style={styles.sheetTitleRow}>
-                <AnyIcon
-                  type={Icons.Feather}
-                  name="shield"
-                  size={moderateScale(16)}
-                  color={colors.primary}
-                />
-                <AppText bold FONT_16 style={styles.sheetTitle}>
-                  Donor Screening
-                </AppText>
-              </View>
-              <TouchableOpacity
-                onPress={() => setMatchSheetVisible(false)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <AnyIcon
-                  type={Icons.Ionicons}
-                  name="close"
-                  size={moderateScale(18)}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <AppText regular FONT_12 style={styles.sheetSubText}>
-              Please verify your eligibility before committing to this match
-              coordinates for Mayo Emergency.
-            </AppText>
-
-            {/* Checklist */}
-            <View style={styles.checklist}>
-              {/* Check 1 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked1 && styles.checkRowChecked]}
-                onPress={() => setChecked1(!checked1)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked1 && styles.checkBoxChecked]}
-                >
-                  {checked1 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  My blood group is matching {request.bloodType}
-                </AppText>
-              </TouchableOpacity>
-
-              {/* Check 2 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked2 && styles.checkRowChecked]}
-                onPress={() => setChecked2(!checked2)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked2 && styles.checkBoxChecked]}
-                >
-                  {checked2 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  I feel fit and healthy today (no fever or cold)
-                </AppText>
-              </TouchableOpacity>
-
-              {/* Check 3 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked3 && styles.checkRowChecked]}
-                onPress={() => setChecked3(!checked3)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked3 && styles.checkBoxChecked]}
-                >
-                  {checked3 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  I haven't donated blood or gotten tattoos in last 3 months
-                </AppText>
-              </TouchableOpacity>
-            </View>
-
-            {/* CTA Confirm Button */}
-            <TouchableOpacity
-              style={[
-                styles.confirmBtn,
-                !isFormValid && styles.confirmBtnDisabled,
-              ]}
-              disabled={!isFormValid}
-              onPress={handleConfirmMatch}
-              activeOpacity={0.8}
-            >
-              <AnyIcon
-                type={Icons.Feather}
-                name="heart"
-                size={moderateScale(14)}
-                color={colors.white}
-              />
-              <AppText bold FONT_13 style={styles.confirmBtnText}>
-                Confirm Donation Match
-              </AppText>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <EligibilityChecklistModal
+        isVisible={matchSheetVisible}
+        onClose={() => setMatchSheetVisible(false)}
+        onConfirm={handleConfirmMatch}
+        isLoading={isAccepting}
+      />
     </View>
   );
 };

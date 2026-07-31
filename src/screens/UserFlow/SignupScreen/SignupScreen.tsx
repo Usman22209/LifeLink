@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet, I18nManager } from "react-native";
+import { View, TouchableOpacity, StyleSheet, I18nManager, Platform } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -21,6 +21,7 @@ import type { SignupFormValues } from "@shared/forms/schemas/signup.schema";
 import { useSignup } from "@shared/query/auth/useSignup";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import { colors } from "@theme/colors";
 
 type SignupScreenNavigationProp = StackNavigationProp<
@@ -49,8 +50,9 @@ const SignupScreen = () => {
     try {
       const result = await signIn();
       const idToken = result?.data?.idToken;
-      console.log("Google ID Token:", idToken);
-      googleLoginMutate({ idToken });
+      if (idToken) {
+        googleLoginMutate({ idToken });
+      }
     } catch (error) {
       console.error("Google sign-in failed:", error);
     }

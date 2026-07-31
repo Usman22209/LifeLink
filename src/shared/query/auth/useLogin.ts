@@ -5,9 +5,13 @@ import { AUTH_SERVICE } from "@api/service/auth.service";
 import { setAuth } from "@store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
+import { Platform } from "react-native";
+
 interface LoginPayload {
   email: string;
   password: string;
+  device_token?: string;
+  device_platform?: string;
 }
 
 interface LoginResponse {
@@ -32,7 +36,18 @@ export const useLogin = () => {
 
   return useMutation({
     mutationKey: ["login"],
-    mutationFn: (data: LoginPayload) => AUTH_SERVICE.login(data),
+    mutationFn: (data: LoginPayload) => {
+      const payload = {
+        ...data,
+        device_platform: data.device_platform || Platform.OS,
+      };
+      console.log("🔑 [useLogin] Executing login mutation with payload:", {
+        email: payload.email,
+        device_token: payload.device_token || "Not Provided",
+        device_platform: payload.device_platform,
+      });
+      return AUTH_SERVICE.login(payload);
+    },
 
     onSuccess: async (response) => {
       const { session, user } = response.data as LoginResponse;

@@ -14,7 +14,4 @@ export const NOTIFICATION_SERVICE = {
   readAll: () => {
     return HTTP_CLIENT.post(API_CONFIG.NOTIFICATIONS.readAll);
   },
-  registerDeviceToken: (data: { device_token: string; platform: string }) => {
-    return HTTP_CLIENT.post(API_CONFIG.NOTIFICATIONS.deviceToken, data);
-  },
 };
