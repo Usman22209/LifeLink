@@ -51,6 +51,10 @@ const SignupScreen = () => {
       const result = await signIn();
       const idToken = result?.data?.idToken || (result as any)?.idToken;
       const nonce = (result as any)?.rawNonce || result?.data?.nonce || (result as any)?.nonce;
+      console.log("🔑 [SignupScreen Debug] Sending payload to backend:", {
+        idTokenPreview: idToken ? `${idToken.substring(0, 25)}...` : "NONE",
+        nonce: nonce || "NONE",
+      });
       if (idToken) {
         googleLoginMutate({ idToken, nonce });
       }

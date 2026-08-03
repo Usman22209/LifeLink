@@ -31,15 +31,28 @@ const useGoogleSignIn = () => {
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15);
 
+      console.log("🔍 [GoogleSignin Debug] Generated rawNonce:", rawNonce);
+
       const user: any = await GoogleSignin.signIn({ nonce: rawNonce } as any);
       setUserInfo(user);
+
+      const idToken = user?.data?.idToken || user?.idToken;
+      const returnedNonce = user?.data?.nonce || user?.nonce;
+
+      console.log("🔍 [GoogleSignin Debug] Native response received:", {
+        hasData: !!user?.data,
+        hasIdToken: !!idToken,
+        idTokenPreview: idToken ? `${idToken.substring(0, 30)}...` : "NONE",
+        returnedNonce: returnedNonce || "NONE",
+        rawNonce,
+      });
 
       return {
         ...user,
         rawNonce,
       };
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
+    } catch (error: any) {
+      console.error("❌ [GoogleSignin Error]:", error?.message || error);
       throw error;
     }
   };
