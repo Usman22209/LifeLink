@@ -8,6 +8,7 @@ import { Platform } from "react-native";
 
 interface GoogleLoginPayload {
   idToken: string;
+  nonce?: string;
 }
 
 interface GoogleLoginResponse {
@@ -36,6 +37,7 @@ export const useGoogleLogin = () => {
       console.log("🔑 [useGoogleLogin] Executing Google Login mutation");
       return AUTH_SERVICE.googleLogin({
         idToken: data.idToken,
+        nonce: data.nonce,
         device_platform: Platform.OS,
       });
     },

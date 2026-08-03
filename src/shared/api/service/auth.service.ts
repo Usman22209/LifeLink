@@ -14,7 +14,7 @@ export const AUTH_SERVICE = {
     const url = API_CONFIG.AUTH.forgotPassword;
     return HTTP_CLIENT.post(url, data);
   },
-  googleLogin: (data: { idToken: string; device_platform?: string }) => {
+  googleLogin: (data: { idToken: string; nonce?: string; device_platform?: string }) => {
     const url = API_CONFIG.AUTH.googleLogin;
     return HTTP_CLIENT.post(url, data);
   },

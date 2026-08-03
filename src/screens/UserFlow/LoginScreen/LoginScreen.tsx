@@ -63,9 +63,10 @@ const LoginScreen = () => {
   const handleGoogleLogin = async () => {
     try {
       const result = await signIn();
-      const idToken = result.data?.idToken;
+      const idToken = result.data?.idToken || (result as any)?.idToken;
+      const nonce = result.data?.nonce || (result as any)?.nonce;
       if (idToken) {
-        googleLoginMutate({ idToken });
+        googleLoginMutate({ idToken, nonce });
       }
     } catch (error) {
       console.error("Google sign-in failed:", error);
