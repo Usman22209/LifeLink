@@ -7,6 +7,8 @@ import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import ChatScreen from "@screens/Main/ChatScreen";
 import NotificationsScreen from "@screens/Main/NotificationsScreen";
 import MyDonationsScreen from "@screens/Main/MyDonationsScreen";
+import MyRequestsScreen from "@screens/Main/MyRequestsScreen/MyRequestsScreen";
+import TrackRequestScreen from "@screens/Main/TrackRequestScreen/TrackRequestScreen";
 import HelpSupportScreen from "@screens/Main/HelpSupportScreen";
 import PrivacyPolicyScreen from "@screens/Main/PrivacyPolicyScreen";
 import { ROUTES } from "@utils/Routes";
@@ -53,6 +55,14 @@ export default function UserNavigation() {
           <Stack.Screen
             name={ROUTES.MY_DONATIONS}
             component={MyDonationsScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.MY_REQUESTS}
+            component={MyRequestsScreen}
+          />
+          <Stack.Screen
+            name={ROUTES.TRACK_REQUEST}
+            component={TrackRequestScreen}
           />
           <Stack.Screen
             name={ROUTES.HELP_SUPPORT}

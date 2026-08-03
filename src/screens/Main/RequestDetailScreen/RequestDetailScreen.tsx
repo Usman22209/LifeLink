@@ -306,30 +306,36 @@ const RequestDetailScreen = () => {
             <View style={styles.timelineHeader}>
               <AnyIcon
                 type={Icons.Feather}
-                name="activity"
+                name="clock"
                 size={moderateScale(14)}
                 color={colors.primary}
               />
               <AppText bold FONT_13 style={styles.timelineTitle}>
-                Request Timeline
+                Request Schedule & Timeline
               </AppText>
             </View>
             {renderTimelineStep(
-              "clock",
+              "calendar",
               "Request Broadcasted",
-              `Posted in Lahore feed (${request.time})`,
+              `Created & broadcasted to ${cityName} donors (${request.time || "Recently"})`,
               true,
             )}
             {renderTimelineStep(
-              "users",
-              "Compatible Matchmaking",
-              "Checking active donors matching blood profile",
+              "clock",
+              "Urgency & Expiry Window",
+              request.time_left
+                ? `Active countdown: ${request.time_left}`
+                : request.urgency === "critical"
+                ? "Emergency Request — Expires in 48 hours"
+                : "Standard Emergency — Active for 7 days",
               true,
             )}
             {renderTimelineStep(
               "heart",
-              "Donor Commitment",
-              "Awaiting blood matching coordinates",
+              "Donation Match Progress",
+              (request as any).fulfilled_units
+                ? `${(request as any).fulfilled_units} of ${request.units} Units Received`
+                : "Live Matchmaking Active — Donors being notified",
               false,
               true,
             )}
@@ -341,10 +347,11 @@ const RequestDetailScreen = () => {
             {renderInfoRow("droplet", "Blood Group", request.bloodType)}
             {renderInfoRow(
               "database",
-              "Units Needed",
+              "Units Required",
               `${request.units} ${request.units === 1 ? "Unit" : "Units"}`,
             )}
-            {renderInfoRow("clock", "Time Requested", request.time)}
+            {renderInfoRow("clock", "Time Posted", request.time || "Just now")}
+            {renderInfoRow("alert-circle", "Required Deadline", request.time_left ? `${request.time_left} remaining` : "Immediate")}
             {renderInfoRow("home", "Hospital", request.hospital)}
             {renderInfoRow("navigation", "City", cityName)}
             {renderInfoRow(

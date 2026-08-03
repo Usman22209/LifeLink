@@ -7,8 +7,6 @@ import { Platform } from "react-native";
 interface SignupPayload {
   email: string;
   password: string;
-  device_token?: string;
-  device_platform?: string;
 }
 
 interface SignupResponse {
@@ -24,16 +22,12 @@ export const useSignup = () => {
   return useMutation({
     mutationKey: ["signup"],
     mutationFn: (data: SignupPayload) => {
-      const payload = {
-        ...data,
-        device_platform: data.device_platform || Platform.OS,
-      };
-      console.log("🔑 [useSignup] Executing signup mutation with payload:", {
-        email: payload.email,
-        device_token: payload.device_token || "Not Provided",
-        device_platform: payload.device_platform,
+      console.log("🔑 [useSignup] Executing signup mutation for:", data.email);
+      return AUTH_SERVICE.signup({
+        email: data.email,
+        password: data.password,
+        device_platform: Platform.OS,
       });
-      return AUTH_SERVICE.signup(payload);
     },
 
     onSuccess: (response) => {

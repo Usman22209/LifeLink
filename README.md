@@ -1,5 +1,5 @@
-This is the **LifeLink** project — an AI-powered cross-platform blood donation app built with [**React Native**](https://reactnative.dev), using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-It connects **donors**, **patients**, and **blood banks** through real-time updates and AI-based donor recommendations.
+This is the **LifeLink** project — a modern cross-platform blood donation mobile app built with [**React Native**](https://reactnative.dev), powered by a [**NestJS**](https://nestjs.com) & [**Supabase**](https://supabase.com) backend.
+It connects **donors** and **patients** through location-based matching, real-time tracking, push notifications, and 1-on-1 chat.
 
 # Getting Started
 
@@ -58,44 +58,29 @@ yarn ios
 
 If everything is set up correctly, you should see the **LifeLink** app running in the Android Emulator, iOS Simulator, or your connected device.
 
-You can also open and run the project directly from **Android Studio** or **Xcode**.
-
 ---
 
 ## Step 3: Configure Environment Variables
 
-Create a `.env` file in your project root and add your **Supabase credentials**:
+Create a `.env` file in your project root and configure your **API Base URL** and **Supabase credentials**:
 
-```
+```env
+API_BASE_URL=http://localhost:3001
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-public-anon-key
 ```
-
-These credentials allow secure access to Supabase authentication, database, and real-time APIs.
-
----
-
-## Step 4: Modify your app
-
-Now that you have successfully run LifeLink, open `App.tsx` and start customizing it.
-When you save, your app will automatically reload — powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-To reload manually:
-
-* **Android:** Press <kbd>R</kbd> twice or open **Dev Menu** using <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-* **iOS:** Press <kbd>R</kbd> in the iOS Simulator.
 
 ---
 
 # 💡 Features
 
-* 🤝 Connects **donors, patients, and blood banks** in one platform.
-* 🧠 **AI-based donor matching** using TensorFlow Lite.
-* 🔔 **Real-time notifications** for urgent requests.
-* 🗺 **Location-based donor search**.
-* 🌐 **Bilingual interface** (Urdu + English).
-* 🩸 **Blood bank management** through a dedicated mobile app.
-* 🖥 **Admin dashboard** (Next.js) for monitoring and control.
+* 🤝 **Donor & Patient Connection**: Direct connection between blood requesters and potential donors.
+* 🩸 **Blood Request Management**: Create, filter, search, track, and fulfill blood requests.
+* 🗺 **Location-Based Matching**: Distance calculation and proximity filtering for nearby donors.
+* 💬 **1-on-1 In-App Chat**: Direct communication between donors and requesters.
+* 🔔 **Instant Push Alerts**: Urgent request notifications via OneSignal.
+* 🌐 **Bilingual Interface**: Full Urdu + English support with active RTL dynamic layout.
+* 📊 **Donation History & Stats**: Personal donation log, eligibility tracker, and lives saved counter.
 
 ---
 
@@ -103,34 +88,16 @@ To reload manually:
 
 | Layer                 | Technology                        |
 | --------------------- | --------------------------------- |
-| **Frontend (Mobile)** | React Native (0.81+)              |
-| **Backend**           | Node.js (22+) + Supabase (2.57.4) |
-| **State Management**  | TanStack Query (v5.56)            |
-| **AI/ML**             | TensorFlow Lite (2.17)            |
-| **Dashboard**         | Next.js (14.2)                    |
-| **Language**          | TypeScript / JavaScript           |
+| **Frontend (Mobile)** | React Native (0.82)               |
+| **Backend**           | NestJS + Supabase (PostgreSQL)    |
+| **State Management**  | Redux Toolkit + TanStack Query    |
+| **Push Notifications**| OneSignal                         |
+| **Maps & Location**   | react-native-maps & Geolocation   |
+| **Language**          | TypeScript                        |
 
 ---
 
-# Troubleshooting
-
-If you encounter issues running the app, check the [Troubleshooting Guide](https://reactnative.dev/docs/troubleshooting) or ensure your environment is correctly configured.
-
----
-
-# Learn More
-
-To learn more about the technologies used in LifeLink:
-
-* [React Native Docs](https://reactnative.dev/docs/getting-started)
-* [Supabase Documentation](https://supabase.com/docs)
-* [TensorFlow Lite Overview](https://www.tensorflow.org/lite)
-* [TanStack Query Docs](https://tanstack.com/query/latest)
-* [Next.js Documentation](https://nextjs.org/docs)
-
----
-
-# 👨‍💻 Contributors
+## 👨‍💻 Contributors
 
 | Name                | Role                                   |
 | ------------------- | -------------------------------------- |
@@ -145,6 +112,3 @@ To learn more about the technologies used in LifeLink:
 This project is developed as part of the **Final Year Design Project (FYDP)** at
 **FCIT, University of the Punjab, Lahore — 2025**.
 
----
-
-Would you like me to make a **version for GitHub (with emoji badges, sections collapsed, and project image placeholders)** next? It gives a more professional look if you plan to upload it.

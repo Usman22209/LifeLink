@@ -11,6 +11,8 @@ export interface BloodRequest {
   units: number;
   urgency: "critical" | "urgent" | "normal";
   time: string;
+  time_left?: string;
+  is_expired?: boolean;
   distance: string;
   latitude?: number;
   longitude?: number;

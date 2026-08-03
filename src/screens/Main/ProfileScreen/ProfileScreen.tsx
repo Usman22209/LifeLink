@@ -20,6 +20,7 @@ import ProfileHeaderCard from "./components/ProfileHeaderCard";
 import StatsSection from "./components/StatsSection";
 import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
+import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
 
 const ProfileScreen = () => {
   const reduxUser = useSelector(selectUser);
@@ -34,6 +35,7 @@ const ProfileScreen = () => {
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
@@ -45,18 +47,7 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      t("profile.logout") || "Logout",
-      t("logoutConfirm") || "Are you sure you want to sign out?",
-      [
-        { text: t("common.cancel") || "Cancel", style: "cancel" },
-        {
-          text: t("profile.logout") || "Logout",
-          style: "destructive",
-          onPress: () => logoutMutate(),
-        },
-      ],
-    );
+    setLogoutModalVisible(true);
   };
 
   const handleDeleteAccount = () => {
@@ -131,6 +122,14 @@ const ProfileScreen = () => {
               onPress={() => {
                 navigation.navigate(ROUTES.MY_DONATIONS as any);
               }}
+            />
+            <SettingItem
+              iconName="file-text"
+              label="My Blood Requests"
+              onPress={() => {
+                navigation.navigate(ROUTES.MY_REQUESTS as any);
+              }}
+              iconColor={colors.warning}
             />
             <SettingItem
               iconName="bell"
@@ -216,6 +215,15 @@ const ProfileScreen = () => {
         setTempLanguage={setTempLanguage}
         onConfirm={confirmLanguageSelection}
         t={t}
+      />
+
+      <LogoutConfirmationModal
+        visible={logoutModalVisible}
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirm={() => {
+          logoutMutate();
+        }}
+        isLoading={logoutPending}
       />
     </ScreenWrapper>
   );

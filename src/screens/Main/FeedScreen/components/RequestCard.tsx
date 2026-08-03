@@ -28,6 +28,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   units,
   urgency,
   time,
+  time_left,
   distance,
   latitude,
   longitude,
@@ -146,6 +147,27 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 />
                 <Text regular FONT_10 style={{ color: colors.textSecondary }}>
                   {validDistance}
+                </Text>
+              </View>
+            ) : null}
+            {time_left ? (
+              <View
+                style={[
+                  styles.metaChip,
+                  {
+                    flexDirection: isRtl ? "row-reverse" : "row",
+                    backgroundColor: withOpacity(colors.primary, 0.08),
+                  },
+                ]}
+              >
+                <AnyIcon
+                  type={Icons.Feather}
+                  name="clock"
+                  size={moderateScale(10)}
+                  color={colors.primary}
+                />
+                <Text semiBold FONT_10 style={{ color: colors.primary }}>
+                  {time_left}
                 </Text>
               </View>
             ) : null}

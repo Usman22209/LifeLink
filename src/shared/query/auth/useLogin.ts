@@ -10,8 +10,6 @@ import { Platform } from "react-native";
 interface LoginPayload {
   email: string;
   password: string;
-  device_token?: string;
-  device_platform?: string;
 }
 
 interface LoginResponse {
@@ -37,16 +35,12 @@ export const useLogin = () => {
   return useMutation({
     mutationKey: ["login"],
     mutationFn: (data: LoginPayload) => {
-      const payload = {
-        ...data,
-        device_platform: data.device_platform || Platform.OS,
-      };
-      console.log("🔑 [useLogin] Executing login mutation with payload:", {
-        email: payload.email,
-        device_token: payload.device_token || "Not Provided",
-        device_platform: payload.device_platform,
+      console.log("🔑 [useLogin] Executing login mutation for:", data.email);
+      return AUTH_SERVICE.login({
+        email: data.email,
+        password: data.password,
+        device_platform: Platform.OS,
       });
-      return AUTH_SERVICE.login(payload);
     },
 
     onSuccess: async (response) => {
