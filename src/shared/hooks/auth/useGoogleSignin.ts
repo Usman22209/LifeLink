@@ -26,9 +26,18 @@ const useGoogleSignIn = () => {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
-      const user: any = await GoogleSignin.signIn();
+
+      const rawNonce =
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+
+      const user: any = await GoogleSignin.signIn({ nonce: rawNonce } as any);
       setUserInfo(user);
-      return user;
+
+      return {
+        ...user,
+        rawNonce,
+      };
     } catch (error) {
       console.error("Google Sign-In Error:", error);
       throw error;

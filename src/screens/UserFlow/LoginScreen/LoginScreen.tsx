@@ -64,7 +64,7 @@ const LoginScreen = () => {
     try {
       const result = await signIn();
       const idToken = result.data?.idToken || (result as any)?.idToken;
-      const nonce = result.data?.nonce || (result as any)?.nonce;
+      const nonce = (result as any)?.rawNonce || result.data?.nonce || (result as any)?.nonce;
       if (idToken) {
         googleLoginMutate({ idToken, nonce });
       }
