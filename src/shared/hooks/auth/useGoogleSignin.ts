@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import ENV from "@config/env";
+import { sha256 } from "@shared/utils/sha256";
 
 export interface GoogleUser {
   user: {
@@ -30,10 +31,14 @@ const useGoogleSignIn = () => {
       const rawNonce =
         Math.random().toString(36).substring(2, 15) +
         Math.random().toString(36).substring(2, 15);
+      const hashedNonce = sha256(rawNonce);
 
-      console.log("🔍 [GoogleSignin Debug] Generated rawNonce:", rawNonce);
+      console.log("🔍 [GoogleSignin Debug] Nonce generated:", {
+        rawNonce,
+        hashedNonceHex: hashedNonce,
+      });
 
-      const user: any = await GoogleSignin.signIn({ nonce: rawNonce } as any);
+      const user: any = await GoogleSignin.signIn({ nonce: hashedNonce } as any);
       setUserInfo(user);
 
       const idToken = user?.data?.idToken || user?.idToken;
@@ -45,11 +50,13 @@ const useGoogleSignIn = () => {
         idTokenPreview: idToken ? `${idToken.substring(0, 30)}...` : "NONE",
         returnedNonce: returnedNonce || "NONE",
         rawNonce,
+        hashedNonce,
       });
 
       return {
         ...user,
         rawNonce,
+        hashedNonce,
       };
     } catch (error: any) {
       console.error("❌ [GoogleSignin Error]:", error?.message || error);
