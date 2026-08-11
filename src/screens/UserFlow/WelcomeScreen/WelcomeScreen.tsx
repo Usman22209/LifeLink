@@ -6,7 +6,9 @@ import {
   Modal,
   I18nManager,
   Alert,
+  Platform,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -33,6 +35,7 @@ const WelcomeScreen = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
+  const insets = useSafeAreaInsets();
 
   // Local state for modal selection before confirming
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
@@ -53,25 +56,27 @@ const WelcomeScreen = () => {
       scrollable={false}
       safeArea
       backgroundColor={colors.background}
-      style={styles.wrapper}
+      style={[styles.wrapper, Platform.OS === "ios" && { paddingTop: insets.top }]}
     >
       <View style={styles.container}>
         <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.languageButton}
-            onPress={openLanguageModal}
-            activeOpacity={0.7}
-          >
-            <AnyIcon
-              type={Icons.Ionicons}
-              name="globe-outline"
-              size={moderateScale(16)}
-              color={colors.primary}
-            />
-            <Text bold FONT_12 style={styles.languageButtonText}>
-              {language === "en" ? "EN" : "UR"}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.languageButtonShadow}>
+            <TouchableOpacity
+              style={styles.languageButton}
+              onPress={openLanguageModal}
+              activeOpacity={0.7}
+            >
+              <AnyIcon
+                type={Icons.Ionicons}
+                name="globe-outline"
+                size={moderateScale(16)}
+                color={colors.primary}
+              />
+              <Text bold FONT_12 style={styles.languageButtonText}>
+                {language === "en" ? "EN" : "UR"}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.content}>
@@ -202,6 +207,20 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: verticalScale(30),
   },
+  languageButtonShadow: {
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+    borderRadius: moderateScale(16),
+  },
   languageButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -212,11 +231,6 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(16),
     borderWidth: 1,
     borderColor: colors.primary,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   languageButtonText: {
     color: colors.primary,
