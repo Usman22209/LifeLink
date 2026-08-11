@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import ENV from "@config/env";
-import { sha256 } from "@shared/utils/sha256";
 
 export interface GoogleUser {
   user: {
@@ -28,43 +27,18 @@ const useGoogleSignIn = () => {
         showPlayServicesUpdateDialog: true,
       });
 
-      const rawNonce =
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
-      const hashedNonce = sha256(rawNonce);
-
-      console.log("🔍 [GoogleSignin Debug] Nonce generated:", {
-        rawNonce,
-        hashedNonceHex: hashedNonce,
-      });
-
-      // Re-configure GoogleSignin with hashedNonce so Google iOS SDK embeds it into idToken
-      GoogleSignin.configure({
-        webClientId: WEB_CLIENT_ID,
-        offlineAccess: true,
-        nonce: hashedNonce,
-      });
-
       const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
 
       const idToken = user?.data?.idToken || user?.idToken;
-      const returnedNonce = user?.data?.nonce || user?.nonce;
 
       console.log("🔍 [GoogleSignin Debug] Native response received:", {
         hasData: !!user?.data,
         hasIdToken: !!idToken,
         idTokenPreview: idToken ? `${idToken.substring(0, 30)}...` : "NONE",
-        returnedNonce: returnedNonce || "NONE",
-        rawNonce,
-        hashedNonce,
       });
 
-      return {
-        ...user,
-        rawNonce,
-        hashedNonce,
-      };
+      return user;
     } catch (error: any) {
       console.error("❌ [GoogleSignin Error]:", error?.message || error);
       throw error;
