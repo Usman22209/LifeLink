@@ -38,8 +38,14 @@ const useGoogleSignIn = () => {
         hashedNonceHex: hashedNonce,
       });
 
-      // Pass rawNonce to GoogleSignin.signIn (Google iOS SDK hashes rawNonce internally with SHA-256)
-      const user: any = await GoogleSignin.signIn({ nonce: rawNonce } as any);
+      // Re-configure GoogleSignin with hashedNonce so Google iOS SDK embeds it into idToken
+      GoogleSignin.configure({
+        webClientId: WEB_CLIENT_ID,
+        offlineAccess: true,
+        nonce: hashedNonce,
+      });
+
+      const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
 
       const idToken = user?.data?.idToken || user?.idToken;
