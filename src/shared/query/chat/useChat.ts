@@ -15,6 +15,7 @@ export const useChatThreads = (enabled = true) => {
       return response.data?.data || response.data;
     },
     enabled,
+    refetchInterval: 8000, // Background polling for unread messages and new threads
   });
 };
 

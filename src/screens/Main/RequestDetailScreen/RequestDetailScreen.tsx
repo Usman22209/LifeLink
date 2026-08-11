@@ -430,8 +430,8 @@ const RequestDetailScreen = () => {
                 <MapView
                   provider={PROVIDER_DEFAULT}
                   style={{ width: "100%", height: "100%" }}
-                  key={`${request.latitude || 31.5723}-${request.longitude || 74.3213}`}
-                  region={{
+                  key={`map-${request.latitude || 31.5723}-${request.longitude || 74.3213}`}
+                  initialRegion={{
                     latitude: request.latitude || 31.5723,
                     longitude: request.longitude || 74.3213,
                     latitudeDelta: 0.015,
@@ -447,10 +447,37 @@ const RequestDetailScreen = () => {
                       latitude: request.latitude || 31.5723,
                       longitude: request.longitude || 74.3213,
                     }}
-                    pinColor={colors.primary}
                     title={request.hospital}
                     description={`Emergency Blood Request: ${request.bloodType}`}
-                  />
+                  >
+                    <View
+                      style={{
+                        backgroundColor: colors.primary,
+                        padding: moderateScale(6),
+                        borderRadius: moderateScale(16),
+                        borderWidth: 2,
+                        borderColor: colors.white,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        ...Platform.select({
+                          ios: {
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3,
+                          },
+                          android: { elevation: 4 },
+                        }),
+                      }}
+                    >
+                      <AnyIcon
+                        type={Icons.Feather}
+                        name="droplet"
+                        size={moderateScale(14)}
+                        color={colors.white}
+                      />
+                    </View>
+                  </Marker>
                 </MapView>
               )}
 
