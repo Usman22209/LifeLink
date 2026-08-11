@@ -69,13 +69,6 @@ const RequestDetailScreen = () => {
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
 
-  React.useEffect(() => {
-    // Delay mounting map until after transition to avoid screen entry animation lag
-    const timer = setTimeout(() => {
-      setMapReady(true);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
@@ -392,12 +385,47 @@ const RequestDetailScreen = () => {
                 </View>
               </View>
             </View>
-            {/* Interactive Maps View */}
             <View style={styles.mapCanvas}>
               {!mapReady ? (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.gray100 }}>
-                  <ActivityIndicator color={colors.primary} size="small" />
-                </View>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.gray100,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderWidth: 1,
+                    borderColor: colors.gray300,
+                    borderRadius: moderateScale(10),
+                    borderStyle: "dashed",
+                    padding: moderateScale(16),
+                    margin: moderateScale(8),
+                  }}
+                  activeOpacity={0.85}
+                  onPress={() => setMapReady(true)}
+                >
+                  <View style={{
+                    width: moderateScale(38),
+                    height: moderateScale(38),
+                    borderRadius: moderateScale(19),
+                    backgroundColor: withOpacity(colors.primary, 0.08),
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: verticalScale(6)
+                  }}>
+                    <AnyIcon
+                      type={Icons.Feather}
+                      name="map-pin"
+                      size={moderateScale(18)}
+                      color={colors.primary}
+                    />
+                  </View>
+                  <AppText bold FONT_11 style={{ color: colors.text }}>
+                    Load Interactive Map
+                  </AppText>
+                  <AppText regular FONT_9 style={{ color: colors.textSecondary, marginTop: verticalScale(2), textAlign: "center" }}>
+                    Tap to render exact hospital route on map
+                  </AppText>
+                </TouchableOpacity>
               ) : (
                 <MapView
                   provider={PROVIDER_DEFAULT}
