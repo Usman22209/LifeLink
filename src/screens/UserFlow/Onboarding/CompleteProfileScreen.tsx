@@ -6,6 +6,7 @@ import {
   Image,
   I18nManager,
   PermissionsAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -26,7 +27,7 @@ import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import { BLOOD_GROUPS } from "@shared/constants/blood";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
-import { useUpdateProfile } from "@shared/query/profile/useProfile";
+import { useUpdateProfile, useGetProfile } from "@shared/query/profile/useProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
@@ -60,13 +61,14 @@ const CompleteProfileScreen = () => {
   const isEditing = (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(!!user);
   const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t, i18n } = useTranslation();
 
-  // Build initial values from user data when editing
+  // Build initial values from user data when editing or when restoring session
   const editDefaults = useMemo(() => {
-    if (!isEditing || !user) return undefined;
+    if (!user) return undefined;
     return {
       full_name: user.full_name || "",
       email: user.email || "",
@@ -80,7 +82,7 @@ const CompleteProfileScreen = () => {
       profile_image: user.profile_image || "",
       confirmed_data: true,
     };
-  }, [isEditing, user]);
+  }, [user]);
 
   const {
     control,
@@ -88,6 +90,7 @@ const CompleteProfileScreen = () => {
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useOnboardingForm(editDefaults);
 
   const [loading, setLoading] = useState(false);
@@ -243,10 +246,31 @@ const CompleteProfileScreen = () => {
   }, [media, setValue, uploadImage]);
 
   useEffect(() => {
-    if (user?.email) {
+    if (serverProfile) {
+      // 1. Sync onboarding status to Redux if it's already onboarded on server
+      if (serverProfile.is_onboarded && !isEditing) {
+        dispatch(updateUser(serverProfile));
+        return;
+      }
+
+      // 2. Pre-populate form fields using reset
+      reset({
+        full_name: serverProfile.full_name || "",
+        email: serverProfile.email || user?.email || "",
+        phone: serverProfile.phone || "",
+        gender: (serverProfile.gender || "male") as OnboardingFormValues["gender"],
+        dob: serverProfile.dob || "",
+        city: serverProfile.city_id || "",
+        state: serverProfile.state || "",
+        country: serverProfile.country || "Pakistan",
+        blood_group: serverProfile.blood_group || "",
+        profile_image: serverProfile.profile_image || "",
+        confirmed_data: true,
+      });
+    } else if (user?.email) {
       setValue("email", user.email);
     }
-  }, [user?.email, setValue]);
+  }, [serverProfile, user?.email, isEditing, dispatch, reset, setValue]);
 
   useEffect(() => {
     // Skip location fetch in edit mode — user already has location data
@@ -305,6 +329,16 @@ const CompleteProfileScreen = () => {
       await pickFromGallery({ ...options, multiple: false });
     }
   };
+
+  if (isProfileLoading && !isEditing) {
+    return (
+      <ScreenWrapper backgroundColor={colors.background} safeArea>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </ScreenWrapper>
+    );
+  }
 
   return (
     <ScreenWrapper

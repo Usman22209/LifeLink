@@ -9,6 +9,7 @@ import {
   Modal,
   Pressable,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
@@ -63,9 +64,18 @@ const RequestDetailScreen = () => {
 
   const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
 
+  const [mapReady, setMapReady] = useState(false);
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
+
+  React.useEffect(() => {
+    // Delay mounting map until after transition to avoid screen entry animation lag
+    const timer = setTimeout(() => {
+      setMapReady(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
@@ -73,12 +83,12 @@ const RequestDetailScreen = () => {
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
-        message: `🚨 URGENT BLOOD REQUEST 🚨\n\nPatient Name: ${request.patientName}\nBlood Type Required: ${request.bloodType}\nRequired Units: ${request.units}\nHospital: ${request.hospital}, ${cityName}\nUrgency: ${cfg.label}\n\nPlease share this message or contact the hospital immediately!`,
+        message: `🚨 ${t("feed.title")}: ${request.bloodType} required for ${request.patientName} at ${request.hospital}, ${cityName}. Please help save a life!`,
       });
     } catch (error: any) {
       console.log("Error sharing request:", error.message);
     }
-  }, [request, cfg, cityName]);
+  }, [request, cityName, t]);
 
   const handleContact = useCallback(() => {
     (navigation as any).navigate(ROUTES.CHAT, { request });
@@ -384,31 +394,37 @@ const RequestDetailScreen = () => {
             </View>
             {/* Interactive Maps View */}
             <View style={styles.mapCanvas}>
-              <MapView
-                provider={PROVIDER_DEFAULT}
-                style={{ width: "100%", height: "100%" }}
-                key={`${request.latitude || 31.5723}-${request.longitude || 74.3213}`}
-                region={{
-                  latitude: request.latitude || 31.5723,
-                  longitude: request.longitude || 74.3213,
-                  latitudeDelta: 0.015,
-                  longitudeDelta: 0.0121,
-                }}
-                scrollEnabled={true}
-                zoomEnabled={true}
-                pitchEnabled={false}
-                rotateEnabled={false}
-              >
-                <Marker
-                  coordinate={{
+              {!mapReady ? (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.gray100 }}>
+                  <ActivityIndicator color={colors.primary} size="small" />
+                </View>
+              ) : (
+                <MapView
+                  provider={PROVIDER_DEFAULT}
+                  style={{ width: "100%", height: "100%" }}
+                  key={`${request.latitude || 31.5723}-${request.longitude || 74.3213}`}
+                  region={{
                     latitude: request.latitude || 31.5723,
                     longitude: request.longitude || 74.3213,
+                    latitudeDelta: 0.015,
+                    longitudeDelta: 0.0121,
                   }}
-                  pinColor={colors.primary}
-                  title={request.hospital}
-                  description={`Emergency Blood Request: ${request.bloodType}`}
-                />
-              </MapView>
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  pitchEnabled={false}
+                  rotateEnabled={false}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: request.latitude || 31.5723,
+                      longitude: request.longitude || 74.3213,
+                    }}
+                    pinColor={colors.primary}
+                    title={request.hospital}
+                    description={`Emergency Blood Request: ${request.bloodType}`}
+                  />
+                </MapView>
+              )}
 
               {/* Floating Action Overlay on Map Canvas */}
               <View style={styles.mapOverlay}>
