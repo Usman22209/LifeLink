@@ -76,3 +76,17 @@ export const useUpdateDonationStatus = () => {
     },
   });
 };
+
+/**
+ * Get logged-in donor's historical donations and stats
+ */
+export const useMyDonations = (enabled = true) => {
+  return useQuery({
+    queryKey: ["donations", "my"],
+    queryFn: async () => {
+      const response = await DONATION_SERVICE.getMyDonations();
+      return response.data?.data || response.data;
+    },
+    enabled,
+  });
+};

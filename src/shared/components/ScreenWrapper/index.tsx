@@ -25,6 +25,7 @@ interface ScreenWrapperProps {
   safeArea?: boolean;
   scrollable?: boolean;
   backgroundColor?: string;
+  disableBottomSafeArea?: boolean;
 }
 
 const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
@@ -39,6 +40,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   safeArea = true,
   scrollable = false,
   backgroundColor,
+  disableBottomSafeArea = false,
 }) => {
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
@@ -58,7 +60,8 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           styles.wrapper,
           {
             backgroundColor: bgColor,
-            paddingBottom: safeArea ? insets.bottom : 0,
+            paddingBottom:
+              safeArea && !disableBottomSafeArea ? insets.bottom : 0,
             paddingLeft: safeArea ? insets.left : 0,
             paddingRight: safeArea ? insets.right : 0,
           },

@@ -4,9 +4,11 @@ import { useDispatch } from "react-redux";
 import { AUTH_SERVICE } from "../../api/service/auth.service";
 import { setAuth } from "../../../store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
+import { Platform } from "react-native";
 
 interface GoogleLoginPayload {
   idToken: string;
+  nonce?: string;
 }
 
 interface GoogleLoginResponse {
@@ -31,7 +33,12 @@ export const useGoogleLogin = () => {
 
   return useMutation({
     mutationKey: ["googleLogin"],
-    mutationFn: (data: GoogleLoginPayload) => AUTH_SERVICE.googleLogin(data),
+    mutationFn: (data: GoogleLoginPayload) => {
+      return AUTH_SERVICE.googleLogin({
+        idToken: data.idToken,
+        device_platform: Platform.OS,
+      });
+    },
 
     onSuccess: async (response) => {
       const { session, user } = response.data as GoogleLoginResponse;

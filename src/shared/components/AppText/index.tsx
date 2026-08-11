@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Text as RNText, TextProps } from "react-native";
+import { Text as RNText, TextProps, Platform } from "react-native";
 import { fontFamily as fm, fontSize as fs } from "@theme/fonts";
 import { colors } from "@theme/colors";
 import { useSelector } from "react-redux";
@@ -89,7 +89,8 @@ const Text = (props: Props) => {
   let fontFamily = fm.REGULAR;
 
   if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
-  else if (extraLight) fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
+  else if (extraLight)
+    fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
   else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
   else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
   else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;
@@ -97,6 +98,11 @@ const Text = (props: Props) => {
   else if (bold) fontFamily = italic ? fm.BOLD_ITALIC : fm.BOLD;
   else if (extraBold) fontFamily = italic ? fm.EXTRABOLD_ITALIC : fm.EXTRABOLD;
   else if (black) fontFamily = italic ? fm.BLACK_ITALIC : fm.BLACK;
+
+  if (Platform.OS === "ios" && isRtl) {
+    const isBold = semiBold || bold || extraBold || black;
+    fontFamily = isBold ? "Arial-BoldMT" : "Arial";
+  }
 
   let fontSize = fs.FONT_14;
   if (FONT_48) fontSize = fs.FONT_48;

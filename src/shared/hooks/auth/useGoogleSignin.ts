@@ -26,11 +26,13 @@ const useGoogleSignIn = () => {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
+
       const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
+
       return user;
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
+    } catch (error: any) {
+      console.error("❌ [GoogleSignin Error]:", error?.message || error);
       throw error;
     }
   };

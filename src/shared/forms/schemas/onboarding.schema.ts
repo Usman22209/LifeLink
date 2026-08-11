@@ -11,6 +11,7 @@ export const getOnboardingSchema = (t: any) =>
     state: z.string().min(2, t("errors.stateRequired")),
     country: z.string().min(2, t("errors.countryRequired")),
     blood_group: z.string().min(1, t("errors.bloodGroupRequired")),
+    last_donated_at: z.string().optional(),
     profile_image: z.string().optional(),
     confirmed_data: z.boolean().refine((val) => val === true, {
       message: t("errors.confirmRequired"),

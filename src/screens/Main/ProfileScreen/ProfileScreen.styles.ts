@@ -21,10 +21,15 @@ export const styles = StyleSheet.create({
     borderRadius: scale(16),
     borderWidth: 1,
     borderColor: colors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   avatarContainer: {
     position: "relative",
-    marginRight: scale(16),
+    marginEnd: scale(16),
   },
   avatar: {
     width: scale(64),
@@ -35,8 +40,8 @@ export const styles = StyleSheet.create({
   },
   badge: {
     position: "absolute",
-    bottom: -scale(4),
-    right: -scale(4),
+    bottom: -scale(2),
+    end: -scale(2),
     backgroundColor: colors.primary,
     paddingHorizontal: scale(6),
     paddingVertical: verticalScale(1),
@@ -66,10 +71,15 @@ export const styles = StyleSheet.create({
     marginHorizontal: scale(16),
     marginTop: verticalScale(16),
     backgroundColor: colors.white,
-    borderRadius: scale(12),
-    paddingVertical: verticalScale(10),
+    borderRadius: scale(14),
+    paddingVertical: verticalScale(12),
     borderWidth: 1,
     borderColor: colors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   statItem: {
     flex: 1,
@@ -95,7 +105,7 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     color: colors.textSecondary,
     marginBottom: verticalScale(6),
-    paddingLeft: scale(4),
+    paddingHorizontal: scale(6),
     letterSpacing: 0.5,
   },
   card: {
@@ -104,6 +114,11 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   // Setting Item Row
   itemRow: {
@@ -150,76 +165,62 @@ export const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: verticalScale(24),
   },
-  // Modal Styles for Language Selector Picker
+  // Modal Styles for Language Selector Picker (Minimalist & Clean)
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(15, 15, 15, 0.4)",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
     borderTopLeftRadius: scale(20),
     borderTopRightRadius: scale(20),
-    paddingTop: verticalScale(8),
-    paddingHorizontal: scale(24),
+    paddingTop: verticalScale(10),
+    paddingHorizontal: scale(20),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   modalHandle: {
-    width: scale(40),
+    width: scale(36),
     height: verticalScale(4),
     backgroundColor: colors.border,
     borderRadius: scale(2),
     alignSelf: "center",
-    marginBottom: verticalScale(16),
+    marginBottom: verticalScale(14),
+  },
+  modalHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingBottom: verticalScale(10),
   },
   modalTitle: {
     color: colors.text,
-    textAlign: "center",
-    marginBottom: verticalScale(20),
   },
-  languageOptions: {
-    marginBottom: verticalScale(20),
+  modalCloseBtn: {
+    padding: scale(4),
   },
-  languageOption: {
+  cleanOptionRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: verticalScale(14),
-    paddingHorizontal: scale(16),
+    paddingHorizontal: scale(12),
     borderRadius: scale(12),
-    backgroundColor: colors.card,
-    marginBottom: verticalScale(10),
   },
-  languageOptionSelected: {
-    backgroundColor: withOpacity(colors.primary, 0.08),
-    borderWidth: 1,
-    borderColor: withOpacity(colors.primary, 0.2),
+  cleanOptionRowSelected: {
+    backgroundColor: withOpacity(colors.primary, 0.06),
   },
-  languageOptionText: {
-    color: colors.text,
-  },
-  radioCircle: {
-    width: scale(18),
-    height: scale(18),
-    borderRadius: scale(9),
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioCircleSelected: {
-    borderColor: colors.primary,
-  },
-  radioDot: {
-    width: scale(10),
-    height: scale(10),
-    borderRadius: scale(5),
-    backgroundColor: colors.primary,
+  optionDivider: {
+    height: 1,
+    backgroundColor: colors.gray300,
+    marginHorizontal: scale(6),
   },
   modalButtons: {
     flexDirection: "row",
-    gap: scale(12),
-  },
-  modalButton: {
-    flex: 1,
+    marginTop: verticalScale(12),
   },
 });

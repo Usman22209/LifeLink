@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, View } from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -8,6 +8,10 @@ import { UserStackParamList } from "@shared/interfaces/navigation/navigation-par
 import { ROUTES } from "@utils/Routes";
 import { styles } from "./ChatScreen.styles";
 
+import { useSelector } from "react-redux";
+import { selectUser } from "@store/slices/authSlice";
+import useTranslation from "@shared/hooks/useTranslation";
+import { useChatMessages, useSendMessage } from "@shared/query/chat/useChat";
 import ChatHeader from "./components/ChatHeader";
 import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
@@ -19,82 +23,68 @@ type ChatScreenRouteProp = RouteProp<UserStackParamList, typeof ROUTES.CHAT>;
 const ChatScreen = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation();
+  const user = useSelector(selectUser);
   const { request } = route.params;
+  const threadId = (route.params as any)?.threadId || request?.id || "";
 
   const flatListRef = useRef<FlatList>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => {
-    const initialMessages: Message[] = [
-      {
-        id: "1",
-        text: `Hi, thank you for reaching out regarding the ${request.bloodType} blood request for ${request.patientName}.`,
-        createdAt: new Date(Date.now() - 3600000),
-        senderId: "them",
-      },
-      {
-        id: "2",
-        text: `We urgently need ${request.units} units at ${request.hospital}. Are you eligible and available to donate?`,
-        createdAt: new Date(Date.now() - 3500000),
-        senderId: "them",
-      },
-    ];
-    setMessages(initialMessages);
-  }, [request]);
+  const { data: remoteMessagesData, isLoading } = useChatMessages(threadId);
+  const { mutate: sendMessageMutate } = useSendMessage();
+
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
+
+  const messages: Message[] = useMemo(() => {
+    const rawMsgs =
+      remoteMessagesData?.messages ||
+      (Array.isArray(remoteMessagesData) ? remoteMessagesData : []);
+
+    const serverFormatted: Message[] = rawMsgs.map((m: any) => ({
+      id: String(m.id),
+      text: m.text,
+      createdAt: new Date(m.sent_at || m.created_at || Date.now()),
+      senderId: m.sender_id === user?.id ? "me" : "them",
+    }));
+
+    // Merge server messages with unsynced local optimistic messages for instant 0ms UI feedback
+    const serverTexts = new Set(serverFormatted.map((m) => m.text));
+    const pendingLocal = localMessages.filter((m) => !serverTexts.has(m.text));
+
+    return [...serverFormatted, ...pendingLocal];
+  }, [remoteMessagesData, localMessages, user]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated });
-    }, 150);
+    }, 100);
   }, []);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
 
-    const newMessage: Message = {
-      id: Math.random().toString(),
-      text: inputText.trim(),
+    const textToSend = inputText.trim();
+    setInputText("");
+
+    // 1. Optimistic Message (0ms latency UI update)
+    const optimisticMessage: Message = {
+      id: `temp_${Date.now()}`,
+      text: textToSend,
       createdAt: new Date(),
       senderId: "me",
     };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setInputText("");
-    scrollToBottom();
+    setLocalMessages((prev) => [...prev, optimisticMessage]);
 
-    simulateReply();
-  };
+    // 2. Background API Call
+    const payload = {
+      ...(threadId ? { thread_id: threadId } : {}),
+      ...(request?.id ? { request_id: request.id } : {}),
+      text: textToSend,
+    };
 
-  const simulateReply = () => {
-    setTimeout(() => {
-      setIsTyping(true);
-      scrollToBottom();
-
-      setTimeout(() => {
-        setIsTyping(false);
-
-        const replies = [
-          `Thank you so much! The patient's family is at ${request.hospital} right now. Please coordinate with the receptionist or call us when you are nearby.`,
-          `That is wonderful news! Let me know if you need any directions to ${request.hospital}. They are expecting donors at the Emergency Ward.`,
-          `Bless you! Your compatibility match looks perfect. Please let me know what time you can visit so we can notify the duty coordinator.`,
-          `Thank you for saving a life. When you reach ${request.hospital}, please mention the request ID #${request.id} at the blood bank reception.`,
-        ];
-
-        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-
-        const responseMessage: Message = {
-          id: Math.random().toString(),
-          text: randomReply,
-          createdAt: new Date(),
-          senderId: "them",
-        };
-
-        setMessages((prev) => [...prev, responseMessage]);
-        scrollToBottom();
-      }, 2000);
-    }, 1000);
+    sendMessageMutate(payload);
+    scrollToBottom(true);
   };
 
   return (
@@ -121,24 +111,30 @@ const ChatScreen = () => {
           hospital={request.hospital}
         />
 
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <MessageItem item={item} patientImage={request.patientImage} />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() => scrollToBottom(true)}
-          onLayout={() => scrollToBottom(false)}
-          ListFooterComponent={
-            <TypingBubble
-              patientImage={request.patientImage}
-              isTyping={isTyping}
-            />
-          }
-        />
+        {isLoading && messages.length === 0 ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={({ item }) => (
+              <MessageItem item={item} patientImage={request.patientImage} />
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => scrollToBottom(true)}
+            onLayout={() => scrollToBottom(false)}
+          />
+        )}
 
         <MessageInput
           inputText={inputText}

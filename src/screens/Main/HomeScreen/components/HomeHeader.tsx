@@ -1,12 +1,14 @@
 import React from "react";
-import { View, TouchableOpacity, I18nManager } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import AppImage from "@components/AppImage";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { headerStyles as styles } from "../HomeScreen.styles";
 
 interface HomeHeaderProps {
@@ -33,8 +35,8 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const isRtl = I18nManager.isRTL;
-  const firstName = userName.split(" ")[0];
+  const isRtl = useSelector(selectIsRtl);
+  const firstName = userName ? userName.split(" ")[0] : "User";
 
   return (
     <View
@@ -82,10 +84,25 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
             { alignItems: isRtl ? "flex-end" : "flex-start" },
           ]}
         >
-          <Text medium FONT_12 style={{ color: colors.textSecondary }}>
+          <Text
+            medium
+            FONT_12
+            style={{
+              color: colors.textSecondary,
+              textAlign: isRtl ? "right" : "left",
+            }}
+          >
             {t(`home.${getGreetingKey()}`)} 👋
           </Text>
-          <Text bold FONT_16 style={{ color: colors.text }} numberOfLines={1}>
+          <Text
+            bold
+            FONT_16
+            style={{
+              color: colors.text,
+              textAlign: isRtl ? "right" : "left",
+            }}
+            numberOfLines={1}
+          >
             {firstName}
           </Text>
         </View>

@@ -1,8 +1,13 @@
 import React from "react";
-import { View, Modal, TouchableOpacity, Pressable } from "react-native";
-import { verticalScale } from "react-native-size-matters";
+import { View, Modal, TouchableOpacity, StyleSheet } from "react-native";
+import { moderateScale, verticalScale } from "react-native-size-matters";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AppButton from "@components/AppButton";
+import AnyIcon, { Icons } from "@components/AnyIcon";
+import { colors } from "@theme/colors";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { styles } from "../ProfileScreen.styles";
 
 interface LanguageSelectorModalProps {
@@ -22,68 +27,130 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
   onConfirm,
   t,
 }) => {
-  return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
-        <Pressable style={styles.modalContent} onPress={() => {}}>
-          <View style={styles.modalHandle} />
-          <Text bold FONT_16 style={styles.modalTitle}>
-            {t("selectLanguage") || "Select Language"}
-          </Text>
+  const insets = useSafeAreaInsets();
+  const isRtl = useSelector(selectIsRtl);
 
-          <View style={styles.languageOptions}>
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      statusBarTranslucent
+    >
+      <View style={styles.modalOverlay}>
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+        <View
+          style={[
+            styles.modalContent,
+            { paddingBottom: Math.max(insets.bottom + verticalScale(14), verticalScale(20)) },
+          ]}
+        >
+          <View style={styles.modalHandle} />
+
+          {/* Minimal Clean Header */}
+          <View
+            style={[
+              styles.modalHeaderRow,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <Text
+              bold
+              FONT_16
+              style={[styles.modalTitle, { textAlign: isRtl ? "right" : "left" }]}
+            >
+              {t("profile.languageModalTitle")}
+            </Text>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <AnyIcon
+                type={Icons.Ionicons}
+                name="close"
+                size={moderateScale(20)}
+                color={colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Clean Flat Options */}
+          <View style={{ marginVertical: verticalScale(10) }}>
+            {/* English Option */}
             <TouchableOpacity
               style={[
-                styles.languageOption,
-                tempLanguage === "en" && styles.languageOptionSelected,
+                styles.cleanOptionRow,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+                tempLanguage === "en" && styles.cleanOptionRowSelected,
               ]}
               onPress={() => setTempLanguage("en")}
               activeOpacity={0.7}
             >
-              <Text semiBold FONT_13 style={styles.languageOptionText}>
+              <Text
+                semiBold={tempLanguage === "en"}
+                medium={tempLanguage !== "en"}
+                FONT_14
+                style={{ color: tempLanguage === "en" ? colors.primary : colors.text }}
+              >
                 English
               </Text>
-              <View
-                style={[styles.radioCircle, tempLanguage === "en" && styles.radioCircleSelected]}
-              >
-                {tempLanguage === "en" && <View style={styles.radioDot} />}
-              </View>
+              {tempLanguage === "en" && (
+                <AnyIcon
+                  type={Icons.Ionicons}
+                  name="checkmark"
+                  size={moderateScale(18)}
+                  color={colors.primary}
+                />
+              )}
             </TouchableOpacity>
 
+            <View style={styles.optionDivider} />
+
+            {/* Urdu Option */}
             <TouchableOpacity
               style={[
-                styles.languageOption,
-                tempLanguage === "ur" && styles.languageOptionSelected,
+                styles.cleanOptionRow,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+                tempLanguage === "ur" && styles.cleanOptionRowSelected,
               ]}
               onPress={() => setTempLanguage("ur")}
               activeOpacity={0.7}
             >
-              <Text semiBold FONT_13 style={styles.languageOptionText}>
+              <Text
+                semiBold={tempLanguage === "ur"}
+                medium={tempLanguage !== "ur"}
+                FONT_14
+                style={{ color: tempLanguage === "ur" ? colors.primary : colors.text }}
+              >
                 اردو (Urdu)
               </Text>
-              <View
-                style={[styles.radioCircle, tempLanguage === "ur" && styles.radioCircleSelected]}
-              >
-                {tempLanguage === "ur" && <View style={styles.radioDot} />}
-              </View>
+              {tempLanguage === "ur" && (
+                <AnyIcon
+                  type={Icons.Ionicons}
+                  name="checkmark"
+                  size={moderateScale(18)}
+                  color={colors.primary}
+                />
+              )}
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.modalButtons, { paddingBottom: verticalScale(20) }]}>
+          {/* Clean Primary Button */}
+          <View style={{ marginTop: verticalScale(10) }}>
             <AppButton
-              title={t("common.cancel") || "Cancel"}
-              onPress={onClose}
-              variant="outline"
-              style={styles.modalButton}
-            />
-            <AppButton
-              title={t("confirmSelection") || "Confirm"}
+              title={t("profile.confirmSelection")}
               onPress={onConfirm}
-              style={styles.modalButton}
+              style={{ width: "100%" }}
             />
           </View>
-        </Pressable>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   );
 };

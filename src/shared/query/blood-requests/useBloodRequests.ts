@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { BLOOD_REQUEST_SERVICE } from "@shared/api/service/blood-request.service";
 import {
   CreateBloodRequestDto,
@@ -15,6 +15,8 @@ export const bloodRequestKeys = {
   all: ["blood-requests"] as const,
   feed: (params?: PaginationParams) =>
     [...bloodRequestKeys.all, "feed", params] as const,
+  urgent: (params?: { limit?: number; lat?: number; lng?: number }) =>
+    [...bloodRequestKeys.all, "urgent", params] as const,
   myRequests: (params?: PaginationParams) =>
     [...bloodRequestKeys.all, "my", params] as const,
   detail: (id: string) => [...bloodRequestKeys.all, "detail", id] as const,
@@ -30,6 +32,41 @@ export const useBloodRequestFeed = (params?: PaginationParams) => {
     queryFn: async () => {
       const response = await BLOOD_REQUEST_SERVICE.getFeed(params);
       return response.data;
+    },
+  });
+};
+
+/**
+ * Get public blood request feed with infinite scroll pagination
+ */
+export const useInfiniteBloodRequestFeed = (
+  params?: Omit<PaginationParams, "page"> & {
+    blood_group?: string;
+    urgency?: string;
+    city_id?: string;
+    search?: string;
+    sort_by?: string;
+    lat?: number;
+    lng?: number;
+  },
+) => {
+  return useInfiniteQuery({
+    queryKey: bloodRequestKeys.feed(params),
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await BLOOD_REQUEST_SERVICE.getFeed({
+        ...params,
+        page: pageParam as number,
+        limit: params?.limit || 10,
+      });
+      return response.data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) => {
+      const pagination = lastPage?.pagination || lastPage?.data?.pagination;
+      if (pagination && pagination.hasNext) {
+        return pagination.page + 1;
+      }
+      return undefined;
     },
   });
 };
@@ -110,6 +147,28 @@ export const useUpdateBloodRequest = () => {
         queryKey: bloodRequestKeys.myRequests(),
       });
       queryClient.invalidateQueries({ queryKey: bloodRequestKeys.feed() });
+    },
+  });
+};
+
+/**
+  * Get urgent blood requests for HomeScreen
+  */
+export const useUrgentBloodRequests = (params?: {
+  limit?: number;
+  lat?: number;
+  lng?: number;
+}) => {
+  return useQuery({
+    queryKey: bloodRequestKeys.urgent(params),
+    queryFn: async () => {
+      try {
+        const response = await BLOOD_REQUEST_SERVICE.getUrgentRequests(params);
+        return response.data?.data || response.data;
+      } catch (error) {
+        console.warn("[useUrgentBloodRequests] Backend returned error, falling back:", error);
+        return [];
+      }
     },
   });
 };

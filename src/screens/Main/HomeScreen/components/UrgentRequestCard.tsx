@@ -2,15 +2,18 @@ import React from "react";
 import {
   View,
   TouchableOpacity,
-  I18nManager,
   useWindowDimensions,
 } from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl, selectLanguage } from "@store/slices/appSlice";
+import { getCityNameById } from "@shared/utils/cityUtils";
+import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { UrgentRequest } from "../types";
 import { cardStyles as styles } from "../HomeScreen.styles";
 
@@ -21,6 +24,7 @@ interface UrgentRequestCardProps extends UrgentRequest {
 const URGENCY_CONFIG = {
   critical: { color: colors.danger, icon: "alert-circle" },
   urgent: { color: colors.warning, icon: "alert-triangle" },
+  high: { color: colors.warning, icon: "alert-triangle" },
   normal: { color: colors.success, icon: "clock" },
 };
 
@@ -32,15 +36,38 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   urgency,
   time,
   distance,
+  latitude,
+  longitude,
   onPress,
 }) => {
-  const config = URGENCY_CONFIG[urgency];
-  const isRtl = I18nManager.isRTL;
+  const urgencyKey = (urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const config = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+  const isRtl = useSelector(selectIsRtl);
+  const selectedLang = useSelector(selectLanguage);
   const { t } = useTranslation();
+  const userLocation = useUserLocation();
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const usableWidth = windowWidth - insets.left - insets.right;
   const cardWidth = (usableWidth - moderateScale(20) - scale(12)) / 2;
+
+  const cityName = getCityNameById(city, selectedLang);
+  const computedDistance = formatDistance(userLocation, { latitude, longitude });
+  const validDistance = computedDistance || (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
+  const locationText = [cityName, validDistance].filter(Boolean).join(" · ");
+
+  const getUrgencyText = (val?: string) => {
+    switch (val?.toLowerCase()) {
+      case "critical":
+        return t("home.critical") || "Critical";
+      case "urgent":
+      case "high":
+        return t("home.urgent") || "Urgent";
+      case "normal":
+      default:
+        return t("home.normal") || "Normal";
+    }
+  };
 
   return (
     <TouchableOpacity
@@ -85,19 +112,21 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
               FONT_9
               style={{ color: config.color, marginLeft: scale(3) }}
             >
-              {t(`home.${urgency}`)}
+              {getUrgencyText(urgency)}
             </Text>
           </View>
         </View>
 
-        <Text
-          semiBold
-          FONT_12
-          numberOfLines={2}
-          style={[styles.hospital, { textAlign: isRtl ? "right" : "left" }]}
-        >
-          {hospital}
-        </Text>
+        <View style={[styles.hospitalContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
+          <Text
+            semiBold
+            FONT_12
+            numberOfLines={2}
+            style={[styles.hospital, { textAlign: isRtl ? "right" : "left" }]}
+          >
+            {hospital}
+          </Text>
+        </View>
 
         <View
           style={[
@@ -121,8 +150,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
               flex: 1,
             }}
           >
-            {city}
-            {distance ? ` · ${distance}` : ""}
+            {locationText}
           </Text>
         </View>
 

@@ -198,8 +198,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: scale(16),
     paddingBottom: verticalScale(12),
-    paddingTop:verticalScale(8)
-
+    paddingTop: verticalScale(8),
   },
   inputRow: {
     flexDirection: "row",
@@ -211,7 +210,8 @@ export const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     maxHeight: verticalScale(80),
     paddingHorizontal: 0,
-    paddingVertical: Platform.OS === "ios" ? verticalScale(8) : verticalScale(6),
+    paddingVertical:
+      Platform.OS === "ios" ? verticalScale(8) : verticalScale(6),
   },
   sendButton: {
     padding: scale(6),

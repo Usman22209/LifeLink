@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, I18nManager } from "react-native";
+import { View, TouchableOpacity, StyleSheet, I18nManager, Platform } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -21,6 +21,7 @@ import type { AuthStackParamList } from "@shared/interfaces/navigation/navigatio
 import { useLogin } from "@shared/query/auth/useLogin";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
+import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -62,9 +63,10 @@ const LoginScreen = () => {
   const handleGoogleLogin = async () => {
     try {
       const result = await signIn();
-      const idToken = result.data?.idToken;
-      console.log("Google ID Token:", idToken);
-      googleLoginMutate({ idToken });
+      const idToken = result.data?.idToken || (result as any)?.idToken;
+      if (idToken) {
+        googleLoginMutate({ idToken });
+      }
     } catch (error) {
       console.error("Google sign-in failed:", error);
     }
@@ -214,19 +216,19 @@ const styles = StyleSheet.create({
   logo: { width: scale(250), height: verticalScale(180) },
   formContainer: { width: "100%", paddingHorizontal: 0 },
   forgotContainer: {
-    alignSelf: "flex-end",
+    alignSelf: I18nManager.isRTL ? "flex-start" : "flex-end",
     marginTop: verticalScale(-6),
     marginBottom: verticalScale(8),
   },
   dividerContainer: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     marginVertical: verticalScale(20),
   },
   divider: { flex: 1, height: 1 },
   dividerText: { marginHorizontal: scale(16) },
   googleButton: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: moderateScale(12),
@@ -239,11 +241,11 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(8),
     alignItems: "center",
     justifyContent: "center",
-    [I18nManager.isRTL ? "marginLeft" : "marginRight"]: scale(12),
+    marginRight: scale(12),
   },
   googleText: {},
   footer: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     justifyContent: "center",
     marginTop: verticalScale(20),
   },

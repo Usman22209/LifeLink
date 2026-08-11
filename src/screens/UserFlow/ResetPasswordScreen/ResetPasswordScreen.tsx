@@ -14,6 +14,7 @@ import AppButton from "@components/AppButton";
 import { useSelector } from "react-redux";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useResetPasswordForm } from "@shared/forms/hooks/useResetPasswordForm";
 import type { ResetPasswordFormValues } from "@shared/forms/schemas/resetPassword.schema";
@@ -32,6 +33,7 @@ type ResetPasswordScreenProps = StackScreenProps<
 
 const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
+  const { t } = useTranslation();
 
   const {
     control,
@@ -50,7 +52,7 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
     if (!accessToken) {
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: t("common.error"),
         text2: "Invalid or missing recovery token.",
       });
       return;
@@ -69,7 +71,7 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
       if (response.data.success) {
         Toast.show({
           type: "success",
-          text1: "Success",
+          text1: t("common.success"),
           text2:
             response.data.message || "Password has been reset successfully.",
         });
@@ -77,7 +79,7 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
       } else {
         Toast.show({
           type: "error",
-          text1: "Error",
+          text1: t("common.error"),
           text2: response.data.message || "Failed to reset password.",
         });
       }
@@ -85,7 +87,7 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
       console.error("Reset Password Error:", error);
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: t("common.error"),
         text2:
           error?.response?.data?.message ||
           "Failed to reset password. Please try again.",
@@ -111,22 +113,22 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
 
         <View style={styles.formContainer}>
           <Text bold FONT_18 style={[styles.title, { color: colors.text }]}>
-            Reset Password
+            {t("resetPassword.title")}
           </Text>
           <Text
             FONT_14
             style={[styles.subtitle, { color: colors.textSecondary }]}
           >
-            Enter your new password below.
+            {t("resetPassword.subtitle")}
           </Text>
 
           <AppInput
             name="newPassword"
             control={control}
-            label="New Password"
+            label={t("resetPassword.newPassword")}
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
-            placeholder="Enter your new password"
+            placeholder={t("resetPassword.newPasswordPlaceholder")}
             secureText={true}
             error={errors.newPassword?.message}
           />
@@ -134,16 +136,16 @@ const ResetPasswordScreen = ({ route }: ResetPasswordScreenProps) => {
           <AppInput
             name="confirmPassword"
             control={control}
-            label="Confirm Password"
+            label={t("resetPassword.confirmPassword")}
             iconType={Icons.MaterialCommunityIcons}
             iconName="lock-outline"
-            placeholder="Confirm your new password"
+            placeholder={t("resetPassword.confirmPasswordPlaceholder")}
             secureText={true}
             error={errors.confirmPassword?.message}
           />
 
           <AppButton
-            title="Reset Password"
+            title={t("resetPassword.resetButton")}
             onPress={handleSubmit(handleResetPassword)}
             loading={isSubmitting}
             style={{ marginTop: verticalScale(12) }}

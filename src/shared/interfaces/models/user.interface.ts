@@ -14,6 +14,14 @@ export interface User {
   longitude?: number;
   profile_image?: string;
   language_preference?: string;
+  notifications_enabled?: boolean;
+  stats?: {
+    donations_count?: number;
+    lives_saved?: number;
+    last_donated_at?: string;
+    is_eligible?: boolean;
+    next_eligible_date?: string;
+  };
 }
 
 export interface Profile {
@@ -30,6 +38,14 @@ export interface Profile {
   profile_image?: string;
   is_onboarded: boolean;
   language_preference?: string;
+  notifications_enabled?: boolean;
+  stats?: {
+    donations_count?: number;
+    lives_saved?: number;
+    last_donated_at?: string;
+    is_eligible?: boolean;
+    next_eligible_date?: string;
+  };
 }
 
 export interface AuthResponse {

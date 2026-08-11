@@ -9,9 +9,12 @@ import {
 } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { SORT_OPTIONS } from "../types";
 import { sheetStyles as s } from "../FeedScreen.styles";
 
@@ -35,6 +38,8 @@ const SortSheet: React.FC<SortSheetProps> = ({
   onSelectSort,
 }) => {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -45,6 +50,19 @@ const SortSheet: React.FC<SortSheetProps> = ({
       },
     }),
   ).current;
+
+  const translateSortOption = (opt: string) => {
+    switch (opt) {
+      case "Newest First":
+        return t("feed.newestFirst");
+      case "Nearest First":
+        return t("feed.nearestFirst");
+      case "Most Units":
+        return t("feed.mostUnits");
+      default:
+        return opt;
+    }
+  };
 
   return (
     <Modal
@@ -68,10 +86,19 @@ const SortSheet: React.FC<SortSheetProps> = ({
           </View>
 
           {/* Header */}
-          <View style={s.header}>
-            <View style={{ flex: 1 }}>
-              <Text bold FONT_16 style={{ color: colors.text }}>
-                Sort By
+          <View
+            style={[
+              s.header,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <View style={{ flex: 1, alignItems: isRtl ? "flex-end" : "flex-start" }}>
+              <Text
+                bold
+                FONT_16
+                style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
+              >
+                {t("feed.sortModalTitle")}
               </Text>
               <Text
                 regular
@@ -79,9 +106,10 @@ const SortSheet: React.FC<SortSheetProps> = ({
                 style={{
                   color: colors.textSecondary,
                   marginTop: verticalScale(2),
+                  textAlign: isRtl ? "right" : "left",
                 }}
               >
-                Select order for requests feed
+                {t("feed.sortModalSubtitle")}
               </Text>
             </View>
             <TouchableOpacity
@@ -104,20 +132,29 @@ const SortSheet: React.FC<SortSheetProps> = ({
           <View style={styles.listContainer}>
             {SORT_OPTIONS.map((opt, index) => {
               const active = selectedSort === opt;
-              const iconCfg = SORT_ICONS[opt];
+              const iconCfg = SORT_ICONS[opt] || { lib: Icons.Feather, name: "clock" };
               const isLast = index === SORT_OPTIONS.length - 1;
 
               return (
                 <TouchableOpacity
                   key={opt}
-                  style={[styles.optionRow, isLast && { borderBottomWidth: 0 }]}
+                  style={[
+                    styles.optionRow,
+                    { flexDirection: isRtl ? "row-reverse" : "row" },
+                    isLast && { borderBottomWidth: 0 },
+                  ]}
                   onPress={() => {
                     onSelectSort(opt);
                     onClose();
                   }}
                   activeOpacity={0.6}
                 >
-                  <View style={styles.optionRowLeft}>
+                  <View
+                    style={[
+                      styles.optionRowLeft,
+                      { flexDirection: isRtl ? "row-reverse" : "row" },
+                    ]}
+                  >
                     <View
                       style={[
                         styles.iconContainer,
@@ -137,7 +174,7 @@ const SortSheet: React.FC<SortSheetProps> = ({
                       FONT_13
                       style={{ color: active ? colors.primary : colors.text }}
                     >
-                      {opt}
+                      {translateSortOption(opt)}
                     </Text>
                   </View>
 

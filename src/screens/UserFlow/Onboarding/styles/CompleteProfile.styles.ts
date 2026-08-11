@@ -17,13 +17,13 @@ export const styles = StyleSheet.create({
     marginBottom: verticalScale(25),
   },
   imageContainer: {
-    width: moderateScale(110),
-    height: moderateScale(110),
-    borderRadius: moderateScale(55),
+    width: moderateScale(90),
+    height: moderateScale(90),
+    borderRadius: moderateScale(45),
     backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: verticalScale(12),
+    marginBottom: verticalScale(10),
     borderWidth: 1,
     borderColor: colors.border,
     elevation: 2,
@@ -35,12 +35,12 @@ export const styles = StyleSheet.create({
   profileImage: {
     width: "100%",
     height: "100%",
-    borderRadius: moderateScale(55),
+    borderRadius: moderateScale(45),
   },
   imagePlaceholder: {
     width: "100%",
     height: "100%",
-    borderRadius: moderateScale(55),
+    borderRadius: moderateScale(45),
     backgroundColor: colors.card,
     justifyContent: "center",
     alignItems: "center",
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
   },
   uploadText: {
     color: colors.primary,
-    fontSize: moderateScale(14),
+    fontSize: moderateScale(13),
   },
   recognizeText: {
     color: colors.textSecondary,
@@ -96,9 +96,9 @@ export const styles = StyleSheet.create({
   },
   genderCard: {
     flex: 1,
-    height: verticalScale(48),
+    height: verticalScale(42),
     flexDirection: "row",
-    borderRadius: moderateScale(12),
+    borderRadius: moderateScale(10),
     borderColor: colors.border,
     justifyContent: "center",
     alignItems: "center",
@@ -113,8 +113,8 @@ export const styles = StyleSheet.create({
     marginLeft: scale(8),
   },
   pickerButton: {
-    height: verticalScale(48),
-    borderRadius: moderateScale(12),
+    height: verticalScale(42),
+    borderRadius: moderateScale(10),
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: scale(12),
@@ -141,8 +141,8 @@ export const styles = StyleSheet.create({
   },
   bloodGroupButton: {
     width: "23%",
-    height: verticalScale(42),
-    borderRadius: moderateScale(10),
+    height: verticalScale(36),
+    borderRadius: moderateScale(8),
     borderWidth: 1,
     borderColor: colors.primary + "10",
     justifyContent: "center",
@@ -155,7 +155,7 @@ export const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: verticalScale(12),
-    height: verticalScale(48),
-    borderRadius: moderateScale(12),
+    height: verticalScale(44),
+    borderRadius: moderateScale(10),
   },
 });

@@ -23,8 +23,10 @@ import { ROUTES } from "@utils/Routes";
 import { useOnboardingForm } from "@shared/forms/hooks/useOnboardingForm";
 import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
+import { BLOOD_GROUPS } from "@shared/constants/blood";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
+import { useUpdateProfile } from "@shared/query/profile/useProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
@@ -43,7 +45,10 @@ type CompleteProfileNavigationProp = StackNavigationProp<
   typeof ROUTES.ONBOARDING
 >;
 
-type CompleteProfileRouteProp = RouteProp<UserStackParamList, typeof ROUTES.EDIT_PROFILE> & {
+type CompleteProfileRouteProp = RouteProp<
+  UserStackParamList,
+  typeof ROUTES.EDIT_PROFILE
+> & {
   params?: { isEditing?: boolean };
 };
 
@@ -55,6 +60,7 @@ const CompleteProfileScreen = () => {
   const isEditing = (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t, i18n } = useTranslation();
 
@@ -161,46 +167,38 @@ const CompleteProfileScreen = () => {
   const onSubmit = async (data: OnboardingFormValues) => {
     setLoading(true);
     try {
+      let finalLocation = location;
+      if (!finalLocation) {
+        try {
+          finalLocation = await getCurrentLocation(true);
+        } catch {
+          finalLocation = null;
+        }
+      }
+
       // Remove fields that are not in the profiles table schema
       // We only store city_id now, and derive state/city name on frontend
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, confirmed_data, city, ...sanitizedData } = data;
 
-      const response = await PROFILE_SERVICE.updateProfile({
+      await updateProfileMutate({
         ...sanitizedData,
         city_id: data.city, // 'city' in form holds the ID
         state: data.state, // Send state/province to match DB schema
         language_preference: selectedLang,
         is_onboarded: true,
-        latitude: location?.latitude,
-        longitude: location?.longitude,
+        latitude: finalLocation?.latitude,
+        longitude: finalLocation?.longitude,
       } as any);
 
-      if (response.data.success) {
-        if (isEditing) {
-          // Update Redux with the edited profile fields and navigate back
-          dispatch(
-            updateUser({
-              full_name: data.full_name,
-              phone: data.phone,
-              gender: data.gender as "male" | "female",
-              dob: data.dob,
-              blood_group: data.blood_group,
-              country: data.country,
-              state: data.state,
-              city_id: data.city,
-              profile_image: data.profile_image,
-            }),
-          );
-          navigation.goBack();
-        } else {
-          dispatch(
-            updateUser({
-              is_onboarded: true,
-            }),
-          );
-          // Navigation handles itself via UserNavigation
-        }
+      if (isEditing) {
+        navigation.goBack();
+      } else {
+        dispatch(
+          updateUser({
+            is_onboarded: true,
+          }),
+        );
       }
     } catch (error) {
       console.error("[CompleteProfile] Update error:", error);
@@ -260,7 +258,8 @@ const CompleteProfileScreen = () => {
     }
     const fetchLocation = async () => {
       try {
-        const coords = await getCurrentLocation();
+        // Only fetch if permission is ALREADY granted — never open permission dialogs during screen mount
+        const coords = await getCurrentLocation(false);
         if (coords) {
           setLocation(coords);
           console.log("[CompleteProfile] Location captured:", coords);
@@ -307,15 +306,17 @@ const CompleteProfileScreen = () => {
     }
   };
 
-  const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-
   return (
     <ScreenWrapper
       backgroundColor={colors.background}
       safeArea
       header={
         <AppHeader
-          title={isEditing ? (t("profile.editProfile") || "Edit Profile") : t("onboarding.title")}
+          title={
+            isEditing
+              ? t("profile.editProfile") || "Edit Profile"
+              : t("onboarding.title")
+          }
           hasBorder
           showBackButton={isEditing}
         />
@@ -368,7 +369,7 @@ const CompleteProfileScreen = () => {
                 <AnyIcon
                   type={Icons.MaterialIcons}
                   name="person"
-                  size={moderateScale(55)}
+                  size={moderateScale(45)}
                   color={colors.placeholder}
                 />
               </View>
@@ -395,7 +396,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -440,7 +441,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.gender")}
@@ -469,7 +470,7 @@ const CompleteProfileScreen = () => {
                 />
                 <Text
                   semiBold
-                  FONT_14
+                  FONT_13
                   style={[
                     styles.genderText,
                     watch("gender") === g
@@ -501,7 +502,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.dob")}
@@ -522,7 +523,7 @@ const CompleteProfileScreen = () => {
             >
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   watch("dob")
                     ? { color: colors.text }
@@ -558,7 +559,11 @@ const CompleteProfileScreen = () => {
             mode="date"
             onConfirm={handleConfirmDate}
             onCancel={() => setDatePickerVisibility(false)}
-            date={watch("dob") ? new Date(watch("dob")) : maxDate}
+            date={
+              watch("dob") && !isNaN(Date.parse(watch("dob")))
+                ? new Date(watch("dob"))
+                : maxDate
+            }
             maximumDate={maxDate}
             accentColor={colors.primary}
             buttonTextColorIOS={colors.primary}
@@ -568,7 +573,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -579,7 +584,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.country")}
@@ -618,7 +623,7 @@ const CompleteProfileScreen = () => {
                   />
                 )}
               </View>
-              <Text regular FONT_14 style={{ color: colors.text }}>
+              <Text regular FONT_13 style={{ color: colors.text }}>
                 {selectedCountry
                   ? t(`onboarding.${selectedCountry.toLowerCase()}`)
                   : t("onboarding.pakistan")}
@@ -628,7 +633,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.state")} {t("onboarding.provinceLabel")}
@@ -659,7 +664,7 @@ const CompleteProfileScreen = () => {
               />
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   selectedProvince
                     ? { color: colors.text }
@@ -694,7 +699,7 @@ const CompleteProfileScreen = () => {
 
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.city")}
@@ -732,7 +737,7 @@ const CompleteProfileScreen = () => {
               />
               <Text
                 regular
-                FONT_14
+                FONT_13
                 style={
                   selectedCity
                     ? { color: colors.text }
@@ -768,7 +773,7 @@ const CompleteProfileScreen = () => {
         <View style={styles.section}>
           <Text
             bold
-            FONT_16
+            FONT_14
             style={[
               styles.sectionTitle,
               { textAlign: isRtl ? "right" : "left" },
@@ -778,7 +783,7 @@ const CompleteProfileScreen = () => {
           </Text>
           <Text
             semiBold
-            FONT_14
+            FONT_12
             style={[styles.inputLabel, { textAlign: isRtl ? "right" : "left" }]}
           >
             {t("onboarding.selectBloodGroup")}
@@ -789,7 +794,7 @@ const CompleteProfileScreen = () => {
               { flexDirection: isRtl ? "row-reverse" : "row" },
             ]}
           >
-            {bloodGroups.map((group) => (
+            {BLOOD_GROUPS.map((group) => (
               <TouchableOpacity
                 key={group}
                 onPress={() =>
@@ -803,7 +808,7 @@ const CompleteProfileScreen = () => {
               >
                 <Text
                   bold
-                  FONT_14
+                  FONT_13
                   style={[
                     watch("blood_group") === group
                       ? { color: colors.white }
@@ -832,7 +837,11 @@ const CompleteProfileScreen = () => {
         </View>
 
         <AppButton
-          title={isEditing ? (t("profile.saveChanges") || "Save Changes") : t("onboarding.completeButton")}
+          title={
+            isEditing
+              ? t("profile.saveChanges") || "Save Changes"
+              : t("onboarding.completeButton")
+          }
           onPress={handleSubmit(onSubmit)}
           loading={loading}
           style={styles.submitButton}

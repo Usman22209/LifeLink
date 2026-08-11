@@ -36,9 +36,9 @@ const languageDetector = {
       })
       .catch(() => callback("en"));
   },
-  init: () => {},
+  init: () => { },
   cacheUserLanguage: (lng: string) => {
-    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng).catch(() => {});
+    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng).catch(() => { });
   },
 };
 

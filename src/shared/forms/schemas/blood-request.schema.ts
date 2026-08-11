@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { UrgencyLevel } from "@shared/interfaces/models/blood-request.interface";
-
-const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+import { BLOOD_GROUPS } from "@shared/constants/blood";
 
 export const getBloodRequestSchema = (t: any) =>
   z.object({

@@ -47,4 +47,33 @@ export const tokenStorage = {
       console.error("Error clearing refresh token from Keychain:", error);
     }
   },
+
+  /**
+   * Stores the push notification device token in Keychain.
+   */
+  setDeviceToken: async (token: string) => {
+    try {
+      await Keychain.setGenericPassword("device_push_token", token, {
+        service: "device_push_token",
+        accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      });
+      console.log("📱 [tokenStorage] Saved device_token:", token);
+    } catch (error) {
+      console.error("Error storing device token:", error);
+    }
+  },
+
+  /**
+   * Retrieves stored push notification device token.
+   */
+  getDeviceToken: async (): Promise<string | null> => {
+    try {
+      const credentials = await Keychain.getGenericPassword({
+        service: "device_push_token",
+      });
+      return credentials ? credentials.password : null;
+    } catch (error) {
+      return null;
+    }
+  },
 };

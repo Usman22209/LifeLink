@@ -27,7 +27,7 @@ const useLanguage = () => {
       // Restart app to apply RTL changes
       setTimeout(() => {
         RNRestart.restart();
-      }, 100);
+      }, 1000);
     }
   };
 
@@ -35,3 +35,5 @@ const useLanguage = () => {
 };
 
 export default useLanguage;
+
+

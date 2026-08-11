@@ -20,9 +20,16 @@ import AppHeader from "@components/AppHeader";
 import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
+import { useSelector } from "react-redux";
+import { selectLanguage } from "@store/slices/appSlice";
+import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
+import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { ROUTES } from "@utils/Routes";
+import { useAcceptBloodRequest } from "@shared/query/donations/useDonations";
+import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
 import { URGENCY_CONFIG } from "../FeedScreen/types";
 import { styles } from "./RequestDetailScreen.styles";
 
@@ -35,44 +42,69 @@ const RequestDetailScreen = () => {
   const route = useRoute<RequestDetailScreenRouteProp>();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+  const selectedLang = useSelector(selectLanguage);
+  const userLocation = useUserLocation();
   const { request } = route.params;
 
-  const [matchSheetVisible, setMatchSheetVisible] = useState(false);
-  const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(false);
-  const [checked3, setChecked3] = useState(false);
+  const cityName = getCityNameById(request.city, selectedLang);
+  const provinceName = request.state || getProvinceByCityId(request.city) || "Punjab";
 
-  const isFormValid = checked1 && checked2 && checked3;
-  const cfg = URGENCY_CONFIG[request.urgency];
+  const computedDist = formatDistance(userLocation, {
+    latitude: request.latitude,
+    longitude: request.longitude,
+  });
+
+  const displayDistance = computedDist
+    ? `${computedDist} away`
+    : request.distance && request.distance !== "N/A" && request.distance !== "0 km"
+    ? `${request.distance} away`
+    : "";
+
+  const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
+
+  const [matchSheetVisible, setMatchSheetVisible] = useState(false);
+  const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
+    useAcceptBloodRequest();
+
+  const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
-        message: `🚨 URGENT BLOOD REQUEST 🚨\n\nPatient Name: ${request.patientName}\nBlood Type Required: ${request.bloodType}\nRequired Units: ${request.units}\nHospital: ${request.hospital}, ${request.city}\nUrgency: ${cfg.label}\n\nPlease share this message or contact the hospital immediately!`,
+        message: `🚨 URGENT BLOOD REQUEST 🚨\n\nPatient Name: ${request.patientName}\nBlood Type Required: ${request.bloodType}\nRequired Units: ${request.units}\nHospital: ${request.hospital}, ${cityName}\nUrgency: ${cfg.label}\n\nPlease share this message or contact the hospital immediately!`,
       });
     } catch (error: any) {
       console.log("Error sharing request:", error.message);
     }
-  }, [request, cfg]);
+  }, [request, cfg, cityName]);
 
   const handleContact = useCallback(() => {
     (navigation as any).navigate(ROUTES.CHAT, { request });
   }, [navigation, request]);
 
-  const handleConfirmMatch = useCallback(() => {
-    setMatchSheetVisible(false);
-    setChecked1(false);
-    setChecked2(false);
-    setChecked3(false);
+  const handleConfirmMatch = useCallback(async () => {
+    try {
+      await acceptBloodRequestMutate(request.id);
+      setMatchSheetVisible(false);
 
-    setTimeout(() => {
       Alert.alert(
-        "Match Confirmed! 🎉",
-        `Thank you for saving a life!\n\nYour profile info was shared with ${request.hospital}. Please coordinates with hospital reception or wait for contact request.`,
-        [{ text: "Okay" }],
+        "Donation Pledged! 🎉",
+        `Thank you for offering to save a life!\n\nWe have initiated a chat thread with the requester for ${request.hospital}.`,
+        [
+          {
+            text: "Open Chat",
+            onPress: () =>
+              (navigation as any).navigate(ROUTES.CHAT, { request }),
+          },
+        ],
       );
-    }, 400);
-  }, [request]);
+    } catch (err: any) {
+      setMatchSheetVisible(false);
+      Alert.alert("Error", err?.message || "Could not respond to request.");
+    }
+  }, [acceptBloodRequestMutate, request, navigation]);
 
   const handleNavigate = useCallback(() => {
     const query = encodeURIComponent(`${request.hospital}, ${request.city}`);
@@ -157,7 +189,7 @@ const RequestDetailScreen = () => {
         scrollable={false}
         header={
           <AppHeader
-            title="Request Details"
+            title={t("requestDetail.title")}
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={
@@ -242,7 +274,7 @@ const RequestDetailScreen = () => {
                   color={colors.textSecondary}
                 />
                 <AppText semiBold FONT_10 style={styles.distanceText}>
-                  {request.distance} away
+                  {displayDistance || "Nearby"}
                 </AppText>
               </View>
             </View>
@@ -274,30 +306,36 @@ const RequestDetailScreen = () => {
             <View style={styles.timelineHeader}>
               <AnyIcon
                 type={Icons.Feather}
-                name="activity"
+                name="clock"
                 size={moderateScale(14)}
                 color={colors.primary}
               />
               <AppText bold FONT_13 style={styles.timelineTitle}>
-                Request Timeline
+                Request Schedule & Timeline
               </AppText>
             </View>
             {renderTimelineStep(
-              "clock",
+              "calendar",
               "Request Broadcasted",
-              `Posted in Lahore feed (${request.time})`,
+              `Created & broadcasted to ${cityName} donors (${request.time || "Recently"})`,
               true,
             )}
             {renderTimelineStep(
-              "users",
-              "Compatible Matchmaking",
-              "Checking active donors matching blood profile",
+              "clock",
+              "Urgency & Expiry Window",
+              request.time_left
+                ? `Active countdown: ${request.time_left}`
+                : request.urgency === "critical"
+                ? "Emergency Request — Expires in 48 hours"
+                : "Standard Emergency — Active for 7 days",
               true,
             )}
             {renderTimelineStep(
               "heart",
-              "Donor Commitment",
-              "Awaiting blood matching coordinates",
+              "Donation Match Progress",
+              (request as any).fulfilled_units
+                ? `${(request as any).fulfilled_units} of ${request.units} Units Received`
+                : "Live Matchmaking Active — Donors being notified",
               false,
               true,
             )}
@@ -309,16 +347,17 @@ const RequestDetailScreen = () => {
             {renderInfoRow("droplet", "Blood Group", request.bloodType)}
             {renderInfoRow(
               "database",
-              "Units Needed",
+              "Units Required",
               `${request.units} ${request.units === 1 ? "Unit" : "Units"}`,
             )}
-            {renderInfoRow("clock", "Time Requested", request.time)}
+            {renderInfoRow("clock", "Time Posted", request.time || "Just now")}
+            {renderInfoRow("alert-circle", "Required Deadline", request.time_left ? `${request.time_left} remaining` : "Immediate")}
             {renderInfoRow("home", "Hospital", request.hospital)}
-            {renderInfoRow("navigation", "City", request.city)}
+            {renderInfoRow("navigation", "City", cityName)}
             {renderInfoRow(
               "map",
               "State / Province",
-              request.state || "Punjab",
+              provinceName,
               true,
             )}
           </View>
@@ -383,7 +422,7 @@ const RequestDetailScreen = () => {
                     {request.hospital}
                   </AppText>
                   <AppText regular style={styles.mapOverlayDistance}>
-                    {request.city} · {request.distance} away
+                    {mapOverlayText}
                   </AppText>
                 </View>
                 <TouchableOpacity
@@ -446,151 +485,12 @@ const RequestDetailScreen = () => {
         </View>
       </ScreenWrapper>
 
-      {/* Premium Match Screening Sheet Modal */}
-      <Modal
-        visible={matchSheetVisible}
-        transparent
-        animationType="slide"
-        statusBarTranslucent
-        onRequestClose={() => setMatchSheetVisible(false)}
-      >
-        <Pressable
-          style={styles.modalBackdrop}
-          onPress={() => setMatchSheetVisible(false)}
-        >
-          <Pressable
-            style={[
-              styles.sheetContainer,
-              { paddingBottom: Math.max(moderateScale(20), insets.bottom) },
-            ]}
-            onPress={() => {}}
-          >
-            {/* Modal Header */}
-            <View style={styles.sheetHeader}>
-              <View style={styles.sheetTitleRow}>
-                <AnyIcon
-                  type={Icons.Feather}
-                  name="shield"
-                  size={moderateScale(16)}
-                  color={colors.primary}
-                />
-                <AppText bold FONT_16 style={styles.sheetTitle}>
-                  Donor Screening
-                </AppText>
-              </View>
-              <TouchableOpacity
-                onPress={() => setMatchSheetVisible(false)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <AnyIcon
-                  type={Icons.Ionicons}
-                  name="close"
-                  size={moderateScale(18)}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <AppText regular FONT_12 style={styles.sheetSubText}>
-              Please verify your eligibility before committing to this match
-              coordinates for Mayo Emergency.
-            </AppText>
-
-            {/* Checklist */}
-            <View style={styles.checklist}>
-              {/* Check 1 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked1 && styles.checkRowChecked]}
-                onPress={() => setChecked1(!checked1)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked1 && styles.checkBoxChecked]}
-                >
-                  {checked1 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  My blood group is matching {request.bloodType}
-                </AppText>
-              </TouchableOpacity>
-
-              {/* Check 2 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked2 && styles.checkRowChecked]}
-                onPress={() => setChecked2(!checked2)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked2 && styles.checkBoxChecked]}
-                >
-                  {checked2 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  I feel fit and healthy today (no fever or cold)
-                </AppText>
-              </TouchableOpacity>
-
-              {/* Check 3 */}
-              <TouchableOpacity
-                style={[styles.checkRow, checked3 && styles.checkRowChecked]}
-                onPress={() => setChecked3(!checked3)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[styles.checkBox, checked3 && styles.checkBoxChecked]}
-                >
-                  {checked3 && (
-                    <AnyIcon
-                      type={Icons.Ionicons}
-                      name="checkmark"
-                      size={moderateScale(12)}
-                      color={colors.white}
-                    />
-                  )}
-                </View>
-                <AppText medium FONT_11 style={styles.checkText}>
-                  I haven't donated blood or gotten tattoos in last 3 months
-                </AppText>
-              </TouchableOpacity>
-            </View>
-
-            {/* CTA Confirm Button */}
-            <TouchableOpacity
-              style={[
-                styles.confirmBtn,
-                !isFormValid && styles.confirmBtnDisabled,
-              ]}
-              disabled={!isFormValid}
-              onPress={handleConfirmMatch}
-              activeOpacity={0.8}
-            >
-              <AnyIcon
-                type={Icons.Feather}
-                name="heart"
-                size={moderateScale(14)}
-                color={colors.white}
-              />
-              <AppText bold FONT_13 style={styles.confirmBtnText}>
-                Confirm Donation Match
-              </AppText>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <EligibilityChecklistModal
+        isVisible={matchSheetVisible}
+        onClose={() => setMatchSheetVisible(false)}
+        onConfirm={handleConfirmMatch}
+        isLoading={isAccepting}
+      />
     </View>
   );
 };

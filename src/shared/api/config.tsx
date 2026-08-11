@@ -1,4 +1,4 @@
-const API_URL = "http://192.168.0.102:3001/";
+const API_URL = "http://192.168.18.123:3001/";
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
@@ -12,6 +12,8 @@ const API_CONFIG = {
   },
   PROFILE: {
     me: "profile/me",
+    delete: "profile/me",
+    settings: "profile/settings",
   },
   FILE: {
     upload: "file/upload",
@@ -21,11 +23,28 @@ const API_CONFIG = {
     base: "blood-requests",
     create: "blood-requests",
     feed: "blood-requests/feed",
+    urgent: "blood-requests/urgent",
     myRequests: "blood-requests/my",
   },
   DONATIONS: {
     base: "donations",
     accept: "donations/accept",
+    my: "donations/my",
+  },
+  CHAT: {
+    base: "chat",
+    threads: "chat/threads",
+    messages: "chat/messages",
+  },
+  NOTIFICATIONS: {
+    base: "notifications",
+    unreadCount: "notifications/unread-count",
+    readAll: "notifications/read-all",
+    deviceToken: "notifications/device-token",
+  },
+  SUPPORT: {
+    faqs: "support/faqs",
+    contact: "support/contact",
   },
 };
 export { API_CONFIG };

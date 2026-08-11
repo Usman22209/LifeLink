@@ -13,7 +13,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useTranslation as useI18NextTranslation } from "react-i18next"; // Temporarily kept if needed by other parts, but better to remove if unused
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
-import RNRestart from "react-native-restart";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppImage from "@components/AppImage";
@@ -199,12 +198,12 @@ const styles = StyleSheet.create({
     paddingBottom: verticalScale(40),
   },
   topBar: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    justifyContent: I18nManager.isRTL ? "flex-start" : "flex-end",
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginBottom: verticalScale(30),
   },
   languageButton: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     gap: scale(5),
     paddingHorizontal: scale(12),
@@ -274,13 +273,12 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: colors.text,
-    textAlign: "left",
   },
   languageOptions: {
     gap: verticalScale(12),
   },
   languageOption: {
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: scale(18),

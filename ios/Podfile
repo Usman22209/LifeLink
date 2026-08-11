@@ -6,6 +6,7 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 platform :ios, min_ios_version_supported
+use_modular_headers!
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -30,5 +31,76 @@ target 'LifeLink' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # 1. Resolve React-jsitooling modulemap conflict
+    react_jsitooling_public_modulemap = "#{installer.sandbox.root}/Headers/Public/react_runtime/React-jsitooling.modulemap"
+    if File.exist?(react_jsitooling_public_modulemap)
+      File.delete(react_jsitooling_public_modulemap)
+    end
+
+    # Remove -Xcc and -fmodule-map-file reference for React-jsitooling.modulemap in xcconfigs
+    Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig").each do |xcconfig_path|
+      if File.exist?(xcconfig_path)
+        xcconfig_content = File.read(xcconfig_path)
+        modified_content = xcconfig_content.gsub(/\s*(?:-Xcc\s+)?-fmodule-map-file="\$\{PODS_ROOT\}\/Headers\/Public\/react_runtime\/React-jsitooling\.modulemap"/, '')
+        if modified_content != xcconfig_content
+          File.write(xcconfig_path, modified_content)
+        end
+      end
+    end
+
+    # 2. Rename react_runtime to React_RuntimeCore to prevent collisions
+    react_runtime_core_modulemap = "#{installer.sandbox.root}/Target Support Files/React-RuntimeCore/React-RuntimeCore.modulemap"
+    if File.exist?(react_runtime_core_modulemap)
+      content = File.read(react_runtime_core_modulemap)
+      content = content.sub('module react_runtime', 'module React_RuntimeCore')
+      content = content.gsub('module * { export * }', '')
+      File.write(react_runtime_core_modulemap, content)
+    end
+
+    # 3. Clean wildcards in React-RuntimeHermes modulemap
+    react_runtime_hermes_modulemap = "#{installer.sandbox.root}/Target Support Files/React-RuntimeHermes/React-RuntimeHermes.modulemap"
+    if File.exist?(react_runtime_hermes_modulemap)
+      content = File.read(react_runtime_hermes_modulemap)
+      content = content.gsub('module * { export * }', '')
+      File.write(react_runtime_hermes_modulemap, content)
+    end
+
+    # 4. Fix React-jsitooling target support modulemap
+    react_jsitooling_modulemap = "#{installer.sandbox.root}/Target Support Files/React-jsitooling/React-jsitooling.modulemap"
+    if File.exist?(react_jsitooling_modulemap)
+      content = File.read(react_jsitooling_modulemap)
+      content = content.sub('module react_runtime', 'module React_jsitooling')
+      content = content.gsub('module * { export * }', '')
+      File.write(react_jsitooling_modulemap, content)
+    end
+
+    # 5. Fix React-RuntimeApple modulemap conflict
+    react_runtime_apple_public_modulemap = "#{installer.sandbox.root}/Headers/Public/ReactCommon/React-RuntimeApple.modulemap"
+    if File.exist?(react_runtime_apple_public_modulemap)
+      File.delete(react_runtime_apple_public_modulemap)
+    end
+
+    # Remove -Xcc and -fmodule-map-file reference for React-RuntimeApple.modulemap in xcconfigs
+    Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig").each do |xcconfig_path|
+      if File.exist?(xcconfig_path)
+        xcconfig_content = File.read(xcconfig_path)
+        modified_content = xcconfig_content.gsub(/\s*(?:-Xcc\s+)?-fmodule-map-file="\$\{PODS_ROOT\}\/Headers\/Public\/ReactCommon\/React-RuntimeApple\.modulemap"/, '')
+        if modified_content != xcconfig_content
+          File.write(xcconfig_path, modified_content)
+        end
+      end
+    end
+
+    # 6. Normalize duplicated -Xcc flags
+    Dir.glob("#{installer.sandbox.root}/Target Support Files/**/*.xcconfig").each do |xcconfig_path|
+      if File.exist?(xcconfig_path)
+        xcconfig_content = File.read(xcconfig_path)
+        modified_content = xcconfig_content.gsub('-Xcc -Xcc ', '-Xcc ')
+        if modified_content != xcconfig_content
+          File.write(xcconfig_path, modified_content)
+        end
+      end
+    end
   end
 end

@@ -43,4 +43,11 @@ export const DONATION_SERVICE = {
       data,
     );
   },
+
+  /**
+   * Get logged-in donor's historical donations and stats
+   */
+  getMyDonations: () => {
+    return HTTP_CLIENT.get(API_CONFIG.DONATIONS.my);
+  },
 };

@@ -42,10 +42,10 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user?.id) {
       OneSignal.login(user.id);
-      console.log("OneSignal login for user:", user.id);
+      console.log("🔔 [OneSignal] Logged in user:", user.id);
     } else {
       OneSignal.logout();
-      console.log("OneSignal logout");
+      console.log("🔔 [OneSignal] Logged out user");
     }
   }, [user?.id]);
 

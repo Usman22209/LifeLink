@@ -2,11 +2,11 @@ import HTTP_CLIENT from "../controller/HTTP_CLIENT";
 import { API_CONFIG } from "../config";
 import axios from "axios";
 export const AUTH_SERVICE = {
-  login: (data: { email: string; password: string }) => {
+  login: (data: { email: string; password: string; device_platform?: string }) => {
     const url = API_CONFIG.AUTH.login;
     return HTTP_CLIENT.post(url, data);
   },
-  signup: (data: { password: string; email: string }) => {
+  signup: (data: { password: string; email: string; device_platform?: string }) => {
     const url = API_CONFIG.AUTH.signup;
     return HTTP_CLIENT.post(url, data);
   },
@@ -14,7 +14,7 @@ export const AUTH_SERVICE = {
     const url = API_CONFIG.AUTH.forgotPassword;
     return HTTP_CLIENT.post(url, data);
   },
-  googleLogin: (data: { idToken: string }) => {
+  googleLogin: (data: { idToken: string; nonce?: string; device_platform?: string }) => {
     const url = API_CONFIG.AUTH.googleLogin;
     return HTTP_CLIENT.post(url, data);
   },

@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
 import { moderateScale } from "react-native-size-matters";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../ChatScreen.styles";
 
 interface MessageInputProps {
@@ -16,6 +17,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onChangeText,
   onSend,
 }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.inputWrapper}>
       <View style={styles.inputRow}>
@@ -23,7 +25,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           style={styles.textInput}
           value={inputText}
           onChangeText={onChangeText}
-          placeholder="Type a message..."
+          placeholder={t("chats.typeMessage")}
           placeholderTextColor={colors.placeholder}
           multiline
           maxLength={500}

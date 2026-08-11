@@ -28,4 +28,9 @@ export const ROUTES = {
   // Chat
   CHAT: "Chat",
   CHATS_LIST: "ChatsList",
+  MY_DONATIONS: "MyDonations",
+  MY_REQUESTS: "MyRequests",
+  TRACK_REQUEST: "TrackRequest",
+  HELP_SUPPORT: "HelpSupport",
+  PRIVACY_POLICY: "PrivacyPolicy",
 } as const;
