@@ -34,10 +34,8 @@ export const useGoogleLogin = () => {
   return useMutation({
     mutationKey: ["googleLogin"],
     mutationFn: (data: GoogleLoginPayload) => {
-      console.log("🔑 [useGoogleLogin] Executing Google Login mutation");
       return AUTH_SERVICE.googleLogin({
         idToken: data.idToken,
-        nonce: data.nonce,
         device_platform: Platform.OS,
       });
     },

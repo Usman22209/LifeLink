@@ -64,9 +64,6 @@ const LoginScreen = () => {
     try {
       const result = await signIn();
       const idToken = result.data?.idToken || (result as any)?.idToken;
-      console.log("🔑 [LoginScreen Debug] Sending payload to backend:", {
-        idTokenPreview: idToken ? `${idToken.substring(0, 25)}...` : "NONE",
-      });
       if (idToken) {
         googleLoginMutate({ idToken });
       }

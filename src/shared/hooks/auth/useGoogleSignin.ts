@@ -30,14 +30,6 @@ const useGoogleSignIn = () => {
       const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
 
-      const idToken = user?.data?.idToken || user?.idToken;
-
-      console.log("🔍 [GoogleSignin Debug] Native response received:", {
-        hasData: !!user?.data,
-        hasIdToken: !!idToken,
-        idTokenPreview: idToken ? `${idToken.substring(0, 30)}...` : "NONE",
-      });
-
       return user;
     } catch (error: any) {
       console.error("❌ [GoogleSignin Error]:", error?.message || error);
