@@ -1,4 +1,4 @@
-const API_URL = "https://life-link-backend-production-7226.up.railway.app/";
+const API_URL = "http://192.168.18.123:3001/"";
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
