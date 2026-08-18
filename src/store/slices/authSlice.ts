@@ -22,11 +22,37 @@ const authSlice = createSlice({
     ) => {
       state.accessToken = action.payload.accessToken;
       state.expiresAt = action.payload.expiresAt || null;
-      state.user = action.payload.user;
+      const incomingUser = action.payload.user;
+      const isOnboarded =
+        incomingUser.is_onboarded ||
+        Boolean(incomingUser.phone && incomingUser.blood_group);
+
+      state.user = {
+        ...incomingUser,
+        is_onboarded: isOnboarded,
+      };
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+        const wasOnboarded =
+          Boolean(state.user.is_onboarded) ||
+          Boolean(state.user.phone && state.user.blood_group);
+
+        const incomingOnboarded = action.payload.is_onboarded;
+
+        const finalIsOnboarded =
+          wasOnboarded ||
+          Boolean(incomingOnboarded) ||
+          Boolean(
+            (action.payload.phone || state.user.phone) &&
+              (action.payload.blood_group || state.user.blood_group),
+          );
+
+        state.user = {
+          ...state.user,
+          ...action.payload,
+          is_onboarded: finalIsOnboarded,
+        };
       }
     },
     logout: (state) => {

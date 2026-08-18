@@ -21,26 +21,45 @@ interface Country {
 }
 
 interface CountryPickerModalProps {
-  isVisible: boolean;
+  isVisible?: boolean;
+  visible?: boolean;
   onClose: () => void;
   countries: Country[];
-  selectedCountry: string;
-  onSelect: (country: string) => void;
-  onSearch: (text: string) => void;
+  selectedCountry?: string;
+  onSelect?: (country: string) => void;
+  onSelectCountry?: (country: string) => void;
+  onSearch?: (text: string) => void;
+  onSearchChange?: (text: string) => void;
+  searchValue?: string;
 }
 
 const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
   isVisible,
+  visible,
   onClose,
   countries,
   selectedCountry,
   onSelect,
+  onSelectCountry,
   onSearch,
+  onSearchChange,
+  searchValue = "",
 }) => {
   const isRtl = I18nManager.isRTL;
+  const showModal = isVisible ?? visible ?? false;
+
+  const handleSearchChange = (text: string) => {
+    if (onSearchChange) onSearchChange(text);
+    if (onSearch) onSearch(text);
+  };
+
+  const handleSelect = (countryName: string) => {
+    if (onSelectCountry) onSelectCountry(countryName);
+    if (onSelect) onSelect(countryName);
+  };
 
   return (
-    <Modal visible={isVisible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={showModal} animationType="slide" onRequestClose={onClose}>
       <ScreenWrapper safeArea backgroundColor={colors.white}>
         <View style={styles.handleIndicator} />
         <View
@@ -67,9 +86,10 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
           <AppInput
             name="search_country"
             placeholder="Search..."
+            value={searchValue}
             iconType={Icons.Ionicons}
             iconName="search-outline"
-            onChangeText={onSearch}
+            onChangeText={handleSearchChange}
             marginBottom={0}
           />
         </View>
@@ -88,7 +108,7 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
                 { flexDirection: isRtl ? "row-reverse" : "row" },
                 selectedCountry === item.name && styles.selectedItem,
               ]}
-              onPress={() => onSelect(item.name)}
+              onPress={() => handleSelect(item.name)}
             >
               <View
                 style={[

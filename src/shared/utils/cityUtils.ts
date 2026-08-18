@@ -68,3 +68,5 @@ export const getProvinceByCityId = (cityIdOrName?: string): string => {
 
   return city?.province || "";
 };
+
+export const getProvinceNameByCityId = getProvinceByCityId;

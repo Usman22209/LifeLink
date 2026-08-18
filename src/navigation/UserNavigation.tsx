@@ -22,7 +22,9 @@ export default function UserNavigation() {
   const token = useSelector(selectToken);
   const user = useSelector(selectUser);
 
-  const isOnboarded = user?.is_onboarded || false;
+  const isOnboarded =
+    Boolean(user?.is_onboarded) ||
+    Boolean(user?.phone && user?.blood_group);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

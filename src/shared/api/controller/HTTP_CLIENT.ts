@@ -75,15 +75,6 @@ HTTP_CLIENT.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Handle 404 on profile/me - implies user needs onboarding
-    if (
-      error?.response?.status === 404 &&
-      originalRequest.url?.includes(API_CONFIG.PROFILE.me)
-    ) {
-      console.warn("⚠️ [HTTP_CLIENT] Profile not found, user needs onboarding.");
-      store.dispatch(updateUser({ is_onboarded: false }));
-      return Promise.reject(error);
-    }
 
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
