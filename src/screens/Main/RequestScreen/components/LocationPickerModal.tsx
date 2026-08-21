@@ -18,12 +18,16 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import { getCurrentLocation, Coords } from "@shared/utils/locationService";
 import useTranslation from "@shared/hooks/useTranslation";
+import { findCityRecord } from "@shared/utils/cityUtils";
 import ENV from "@config/env";
 import { styles } from "../RequestScreen.styles";
 
 export interface PlaceInfo {
   name?: string;
   address?: string;
+  cityName?: string;
+  provinceName?: string;
+  cityId?: string;
 }
 
 interface LocationPickerModalProps {
@@ -121,7 +125,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       if (!ENV.MAP_API_KEY) return;
 
       try {
-        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,name,formatted_address&key=${ENV.MAP_API_KEY}`;
+        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,name,formatted_address,address_components&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data.status === "OK" && data.result?.geometry?.location) {
@@ -135,10 +139,52 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           setRegion(newRegion);
           mapRef.current?.animateToRegion(newRegion, 600);
 
-          // Store place name & address for auto-fill
+          let extractedCity = "";
+          let extractedProvince = "";
+
+          if (data.result.address_components) {
+            for (const comp of data.result.address_components) {
+              if (
+                comp.types.includes("locality") ||
+                comp.types.includes("postal_town")
+              ) {
+                extractedCity = comp.long_name;
+              } else if (
+                !extractedCity &&
+                comp.types.includes("administrative_area_level_2")
+              ) {
+                extractedCity = comp.long_name;
+              }
+              if (comp.types.includes("administrative_area_level_1")) {
+                extractedProvince = comp.long_name;
+              }
+            }
+          }
+
+          // Fallback: parse formatted_address if components didn't yield a matched city
+          if (!extractedCity && data.result.formatted_address) {
+            const parts = data.result.formatted_address
+              .split(",")
+              .map((p: string) => p.trim());
+            for (const part of parts) {
+              const matched = findCityRecord(part);
+              if (matched) {
+                extractedCity = matched.name.en;
+                extractedProvince = matched.province;
+                break;
+              }
+            }
+          }
+
+          const matchedRecord = findCityRecord(extractedCity, extractedProvince);
+
+          // Store place name, address, city, province & cityId for auto-fill
           setSelectedPlaceInfo({
             name: data.result.name || undefined,
             address: data.result.formatted_address || undefined,
+            cityName: matchedRecord?.name.en || extractedCity || undefined,
+            provinceName: matchedRecord?.province || extractedProvince || undefined,
+            cityId: matchedRecord?.id || undefined,
           });
         }
       } catch {
@@ -170,13 +216,51 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     }
   }, []);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    let info = selectedPlaceInfo;
+
+    // If cityId was not resolved from search, reverse geocode the pinned coordinates
+    if (!info?.cityId && ENV.MAP_API_KEY) {
+      try {
+        const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${region.latitude},${region.longitude}&key=${ENV.MAP_API_KEY}`;
+        const res = await fetch(geoUrl);
+        const geoData = await res.json();
+        if (geoData.status === "OK" && geoData.results?.[0]) {
+          const topResult = geoData.results[0];
+          let city = "";
+          let prov = "";
+          for (const comp of topResult.address_components) {
+            if (
+              comp.types.includes("locality") ||
+              comp.types.includes("postal_town") ||
+              comp.types.includes("administrative_area_level_2")
+            ) {
+              if (!city) city = comp.long_name;
+            }
+            if (comp.types.includes("administrative_area_level_1")) {
+              prov = comp.long_name;
+            }
+          }
+          const matchedRecord = findCityRecord(city, prov);
+          info = {
+            name: info?.name || topResult.formatted_address?.split(",")?.[0],
+            address: info?.address || topResult.formatted_address,
+            cityName: matchedRecord?.name.en || city || undefined,
+            provinceName: matchedRecord?.province || prov || undefined,
+            cityId: matchedRecord?.id || undefined,
+          };
+        }
+      } catch {
+        // Silently continue
+      }
+    }
+
     onConfirm(
       {
         latitude: region.latitude,
         longitude: region.longitude,
       },
-      selectedPlaceInfo,
+      info,
     );
   };
 

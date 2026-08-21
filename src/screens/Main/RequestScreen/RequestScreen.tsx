@@ -103,6 +103,12 @@ const RequestScreen = () => {
             shouldValidate: true,
           });
         }
+        if (placeInfo.provinceName) {
+          setValue("state", placeInfo.provinceName, { shouldValidate: true });
+        }
+        if (placeInfo.cityId) {
+          setValue("city_id", placeInfo.cityId, { shouldValidate: true });
+        }
       }
 
       setMapVisible(false);

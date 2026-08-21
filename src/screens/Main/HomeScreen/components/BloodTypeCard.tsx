@@ -44,7 +44,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   subtitle,
   donations = 0,
   livesSaved = 0,
-  lastDonated = "N/A",
+  lastDonated = "—",
 }) => {
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();

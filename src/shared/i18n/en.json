@@ -262,9 +262,15 @@
   },
   "notifications": {
     "title": "Notifications",
-    "clearAll": "Clear all",
+    "clearAll": "Mark all read",
     "noNotifications": "No Notifications Yet",
-    "noNotificationsSub": "We'll notify you when urgent blood requests match your blood type"
+    "noNotificationsSub": "We'll notify you when urgent blood requests match your blood type",
+    "all": "All",
+    "requests": "Requests",
+    "matches": "Matches",
+    "system": "Updates",
+    "viewDetails": "View Details",
+    "unread": "unread"
   },
   "myDonations": {
     "title": "My Donations",

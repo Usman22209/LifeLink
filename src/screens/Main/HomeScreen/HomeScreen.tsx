@@ -57,7 +57,22 @@ const HomeScreen = () => {
   const bloodType = user?.blood_group || "O+";
   const donationsCount = stats.donations_count ?? 0;
   const livesSaved = stats.lives_saved ?? (donationsCount * 3);
-  const lastDonated = stats.last_donated_at || "N/A";
+  
+  const formatLastDonated = (dateStr?: string) => {
+    if (!dateStr || dateStr === "N/A" || dateStr === "null" || dateStr === "undefined") {
+      return "—";
+    }
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) {
+      return dateStr;
+    }
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const lastDonated = formatLastDonated(stats.last_donated_at);
 
   return (
     <ScreenWrapper
