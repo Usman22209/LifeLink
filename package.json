@@ -14,6 +14,8 @@
     "build": "cd android && ./gradlew build && cd ..",
     "debug": "cd android && ./gradlew assembleDebug && cd ..",
     "release": "cd android && ./gradlew assembleRelease && cd ..",
+    "release:fast": "cd android && ./gradlew assembleRelease -x lint -x lintVitalRelease -x test && cd ..",
+    "bundle:release": "cd android && ./gradlew bundleRelease -x lint -x lintVitalRelease && cd ..",
     "android:fast": "npx react-native run-android --active-arch-only",
     "android:install": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
     "sentry:remove": "powershell -Command \"Remove-Item Env:SENTRY_AUTH_TOKEN -ErrorAction SilentlyContinue\"",
