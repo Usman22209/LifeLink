@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Modal,
@@ -9,7 +9,8 @@ import {
   Keyboard,
   Platform,
 } from "react-native";
-import MapView, { PROVIDER_DEFAULT, Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import { WebView } from "react-native-webview";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
@@ -47,12 +48,61 @@ interface PlacePrediction {
   };
 }
 
-const DEFAULT_REGION: Region = {
+const DEFAULT_COORDS = {
   latitude: 31.5204,
   longitude: 74.3587,
-  latitudeDelta: 0.03,
-  longitudeDelta: 0.03,
 };
+
+const getLeafletHtml = (lat: number, lng: number) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f7;
+    }
+    .leaflet-control-container .leaflet-routing-container-hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView([${lat}, ${lng}], 15);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      subdomains: ['a','b','c']
+    }).addTo(map);
+
+    map.on('moveend', function() {
+      var center = map.getCenter();
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'REGION_CHANGE',
+        latitude: center.lat,
+        longitude: center.lng
+      }));
+    });
+
+    window.setMapCenter = function(lat, lng) {
+      map.setView([lat, lng], 16, { animate: true });
+    };
+  </script>
+</body>
+</html>
+`;
 
 const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   visible,
@@ -61,6 +111,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   initialCoords,
 }) => {
   const { t } = useTranslation();
+  const webViewRef = useRef<WebView>(null);
   const mapRef = useRef<MapView>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -72,13 +123,39 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const [selectedPlaceInfo, setSelectedPlaceInfo] = useState<
     PlaceInfo | undefined
   >(undefined);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-  const [region, setRegion] = useState<Region>(() => ({
-    latitude: initialCoords?.latitude ?? DEFAULT_REGION.latitude,
-    longitude: initialCoords?.longitude ?? DEFAULT_REGION.longitude,
-    latitudeDelta: DEFAULT_REGION.latitudeDelta,
-    longitudeDelta: DEFAULT_REGION.longitudeDelta,
-  }));
+  const regionRef = useRef<{ latitude: number; longitude: number }>({
+    latitude: initialCoords?.latitude ?? DEFAULT_COORDS.latitude,
+    longitude: initialCoords?.longitude ?? DEFAULT_COORDS.longitude,
+  });
+
+  useEffect(() => {
+    if (visible) {
+      console.log("[LocationPickerModal] Modal opened | initialCoords:", initialCoords);
+      const coords = {
+        latitude: initialCoords?.latitude ?? DEFAULT_COORDS.latitude,
+        longitude: initialCoords?.longitude ?? DEFAULT_COORDS.longitude,
+      };
+      regionRef.current = coords;
+      setSelectedPlaceInfo(undefined);
+      setSearchQuery("");
+      setPredictions([]);
+      setShowResults(false);
+
+      const timer = setTimeout(() => {
+        console.log("[LocationPickerModal] Mounting MapView...");
+        setMapLoaded(true);
+      }, 250);
+
+      return () => clearTimeout(timer);
+    } else {
+      console.log("[LocationPickerModal] Modal closing.");
+      setMapLoaded(false);
+    }
+  }, [visible, initialCoords]);
+
+  const isProgrammaticChangeRef = useRef(false);
 
   // ── Google Places Autocomplete ──
   const fetchPredictions = useCallback(async (text: string) => {
@@ -87,6 +164,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       setShowResults(false);
       return;
     }
+    console.log("[LocationPickerModal] Searching predictions for query:", text);
     setSearching(true);
     try {
       const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
@@ -94,13 +172,15 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       )}&components=country:pk&key=${ENV.MAP_API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
+      console.log("[LocationPickerModal] Predictions response status:", data.status, "Count:", data.predictions?.length || 0);
       if (data.status === "OK" && data.predictions) {
         setPredictions(data.predictions);
         setShowResults(true);
       } else {
         setPredictions([]);
       }
-    } catch {
+    } catch (error) {
+      console.log("[LocationPickerModal] Predictions fetch error:", error);
       setPredictions([]);
     } finally {
       setSearching(false);
@@ -110,6 +190,10 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const handleSearchChange = useCallback(
     (text: string) => {
       setSearchQuery(text);
+      if (isProgrammaticChangeRef.current) {
+        isProgrammaticChangeRef.current = false;
+        return;
+      }
       if (searchTimer.current) clearTimeout(searchTimer.current);
       searchTimer.current = setTimeout(() => fetchPredictions(text), 400);
     },
@@ -118,27 +202,44 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   const handleSelectPlace = useCallback(
     async (placeId: string, description: string) => {
+      console.log("[LocationPickerModal] Selecting place:", placeId, description);
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      isProgrammaticChangeRef.current = true;
       Keyboard.dismiss();
       setSearchQuery(description);
       setShowResults(false);
       setPredictions([]);
 
-      if (!ENV.MAP_API_KEY) return;
+      if (!ENV.MAP_API_KEY) {
+        console.log("[LocationPickerModal] MAP_API_KEY missing");
+        return;
+      }
 
       try {
         const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,name,formatted_address,address_components&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(url);
         const data = await res.json();
+        console.log("[LocationPickerModal] Place details status:", data.status);
         if (data.status === "OK" && data.result?.geometry?.location) {
           const { lat, lng } = data.result.geometry.location;
-          const newRegion: Region = {
-            latitude: lat,
-            longitude: lng,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          };
-          setRegion(newRegion);
-          mapRef.current?.animateToRegion(newRegion, 600);
+          console.log("[LocationPickerModal] Navigating map to coords:", lat, lng);
+          regionRef.current = { latitude: lat, longitude: lng };
+          
+          if (Platform.OS === "ios") {
+            webViewRef.current?.injectJavaScript(
+              `if(window.setMapCenter) window.setMapCenter(${lat}, ${lng}); true;`
+            );
+          } else {
+            mapRef.current?.animateToRegion(
+              {
+                latitude: lat,
+                longitude: lng,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              },
+              600
+            );
+          }
 
           let extractedCity = "";
           let extractedProvince = "";
@@ -178,8 +279,8 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           }
 
           const matchedRecord = findCityRecord(extractedCity, extractedProvince);
+          console.log("[LocationPickerModal] Place matched city record:", matchedRecord?.name?.en, matchedRecord?.id);
 
-          // Store place name, address, city, province & cityId for auto-fill
           setSelectedPlaceInfo({
             name: data.result.name || undefined,
             address: data.result.formatted_address || undefined,
@@ -188,8 +289,8 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             cityId: matchedRecord?.id || undefined,
           });
         }
-      } catch {
-        // Silently fail
+      } catch (error) {
+        console.log("[LocationPickerModal] Select place error:", error);
       }
     },
     [],
@@ -197,21 +298,31 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   // ── Locate Me ──
   const handleLocateMe = useCallback(async () => {
+    console.log("[LocationPickerModal] Requesting user location...");
     setLocating(true);
     try {
       const coords = await getCurrentLocation();
-      if (coords && mapRef.current) {
-        const newRegion: Region = {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        };
-        mapRef.current.animateToRegion(newRegion, 600);
-        setRegion(newRegion);
+      console.log("[LocationPickerModal] User location result:", coords);
+      if (coords) {
+        regionRef.current = { latitude: coords.latitude, longitude: coords.longitude };
+        if (Platform.OS === "ios") {
+          webViewRef.current?.injectJavaScript(
+            `if(window.setMapCenter) window.setMapCenter(${coords.latitude}, ${coords.longitude}); true;`
+          );
+        } else {
+          mapRef.current?.animateToRegion(
+            {
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            },
+            600
+          );
+        }
       }
-    } catch {
-      // Silently fail
+    } catch (error) {
+      console.log("[LocationPickerModal] Locate me error:", error);
     } finally {
       setLocating(false);
     }
@@ -219,13 +330,17 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   const handleConfirm = async () => {
     let info = selectedPlaceInfo;
+    const currentRegion = regionRef.current;
+    console.log("[LocationPickerModal] Confirm pressed | region:", currentRegion, "info:", info);
 
     // If cityId was not resolved from search, reverse geocode the pinned coordinates
     if (!info?.cityId && ENV.MAP_API_KEY) {
       try {
-        const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${region.latitude},${region.longitude}&key=${ENV.MAP_API_KEY}`;
+        console.log("[LocationPickerModal] Reverse geocoding pinned coords...");
+        const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentRegion.latitude},${currentRegion.longitude}&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(geoUrl);
         const geoData = await res.json();
+        console.log("[LocationPickerModal] Reverse geocode status:", geoData.status);
         if (geoData.status === "OK" && geoData.results?.[0]) {
           const topResult = geoData.results[0];
           let city = "";
@@ -250,26 +365,40 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             provinceName: matchedRecord?.province || prov || undefined,
             cityId: matchedRecord?.id || undefined,
           };
+          console.log("[LocationPickerModal] Resolved place info:", info);
         }
-      } catch {
-        // Silently continue
+      } catch (error) {
+        console.log("[LocationPickerModal] Reverse geocode error:", error);
       }
     }
 
     onConfirm(
       {
-        latitude: region.latitude,
-        longitude: region.longitude,
+        latitude: currentRegion.latitude,
+        longitude: currentRegion.longitude,
       },
       info,
     );
   };
 
   const handleClose = () => {
+    console.log("[LocationPickerModal] Closing modal");
     setSearchQuery("");
     setPredictions([]);
     setShowResults(false);
     onClose();
+  };
+
+  const handleWebViewMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === "REGION_CHANGE") {
+        console.log("[LocationPickerModal] Region change complete:", data.latitude, data.longitude);
+        regionRef.current = { latitude: data.latitude, longitude: data.longitude };
+      }
+    } catch {
+      // Silently ignore
+    }
   };
 
   // ── Render autocomplete suggestion row ──
@@ -374,27 +503,58 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           </View>
 
           {/* Map */}
-          <MapView
-            ref={mapRef}
-            provider={PROVIDER_DEFAULT}
-            mapType="standard"
-            userInterfaceStyle="light"
-            tintColor="transparent"
-            style={styles.map}
-            initialRegion={{
-              latitude: initialCoords?.latitude ?? DEFAULT_REGION.latitude,
-              longitude: initialCoords?.longitude ?? DEFAULT_REGION.longitude,
-              latitudeDelta: DEFAULT_REGION.latitudeDelta,
-              longitudeDelta: DEFAULT_REGION.longitudeDelta,
-            }}
-            onRegionChangeComplete={(r) => setRegion(r)}
-            showsUserLocation={Platform.OS === "android"}
-            showsMyLocationButton={false}
-            onPress={() => {
-              setShowResults(false);
-              Keyboard.dismiss();
-            }}
-          />
+          {mapLoaded ? (
+            Platform.OS === "ios" ? (
+              <WebView
+                ref={webViewRef}
+                style={styles.map}
+                originWhitelist={["*"]}
+                source={{
+                  html: getLeafletHtml(
+                    regionRef.current.latitude,
+                    regionRef.current.longitude
+                  ),
+                }}
+                onMessage={handleWebViewMessage}
+                javaScriptEnabled
+                domStorageEnabled
+                scrollEnabled={false}
+                bounces={false}
+                onPress={() => {
+                  setShowResults(false);
+                  Keyboard.dismiss();
+                }}
+              />
+            ) : (
+              <MapView
+                ref={mapRef}
+                provider={PROVIDER_GOOGLE}
+                style={styles.map}
+                initialRegion={{
+                  latitude: regionRef.current.latitude,
+                  longitude: regionRef.current.longitude,
+                  latitudeDelta: 0.03,
+                  longitudeDelta: 0.03,
+                }}
+                onRegionChangeComplete={(r) => {
+                  regionRef.current = { latitude: r.latitude, longitude: r.longitude };
+                }}
+                showsUserLocation
+                showsMyLocationButton={false}
+                onPress={() => {
+                  setShowResults(false);
+                  Keyboard.dismiss();
+                }}
+              />
+            )
+          ) : (
+            <View style={[styles.map, { justifyContent: "center", alignItems: "center", backgroundColor: colors.gray100 }]}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <AppText regular FONT_12 style={{ marginTop: verticalScale(8), color: colors.textSecondary }}>
+                Loading map...
+              </AppText>
+            </View>
+          )}
 
           {/* Center Pin */}
           <View style={styles.centerMarkerContainer}>
