@@ -44,7 +44,10 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
       <View style={styles.mapCanvas}>
         <MapView
           provider={PROVIDER_DEFAULT}
+          mapType="standard"
           userInterfaceStyle="light"
+          tintColor="transparent"
+          showsUserLocation={false}
           style={{ width: "100%", height: "100%" }}
           key={`map-${lat}-${lng}`}
           initialRegion={{

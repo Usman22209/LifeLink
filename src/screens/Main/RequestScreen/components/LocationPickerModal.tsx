@@ -7,6 +7,7 @@ import {
   TextInput,
   FlatList,
   Keyboard,
+  Platform,
 } from "react-native";
 import MapView, { PROVIDER_DEFAULT, Region } from "react-native-maps";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
@@ -376,7 +377,9 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           <MapView
             ref={mapRef}
             provider={PROVIDER_DEFAULT}
+            mapType="standard"
             userInterfaceStyle="light"
+            tintColor="transparent"
             style={styles.map}
             initialRegion={{
               latitude: initialCoords?.latitude ?? DEFAULT_REGION.latitude,
@@ -385,7 +388,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
               longitudeDelta: DEFAULT_REGION.longitudeDelta,
             }}
             onRegionChangeComplete={(r) => setRegion(r)}
-            showsUserLocation
+            showsUserLocation={Platform.OS === "android"}
             showsMyLocationButton={false}
             onPress={() => {
               setShowResults(false);
