@@ -60,6 +60,12 @@ const ChatScreen = () => {
     }, 100);
   }, []);
 
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom(true);
+    }
+  }, [messages.length, scrollToBottom]);
+
   const handleSend = () => {
     if (!inputText.trim()) return;
 
