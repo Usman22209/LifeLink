@@ -376,6 +376,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           <MapView
             ref={mapRef}
             provider={PROVIDER_DEFAULT}
+            userInterfaceStyle="light"
             style={styles.map}
             initialRegion={{
               latitude: initialCoords?.latitude ?? DEFAULT_REGION.latitude,

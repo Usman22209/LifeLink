@@ -18,10 +18,6 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
   mapOverlayText,
   onNavigate,
 }) => {
-  if (Platform.OS === "ios") {
-    return null;
-  }
-
   const lat = Number(request?.latitude) || 31.5723;
   const lng = Number(request?.longitude) || 74.3213;
 
@@ -48,6 +44,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
       <View style={styles.mapCanvas}>
         <MapView
           provider={PROVIDER_DEFAULT}
+          userInterfaceStyle="light"
           style={{ width: "100%", height: "100%" }}
           key={`map-${lat}-${lng}`}
           initialRegion={{
