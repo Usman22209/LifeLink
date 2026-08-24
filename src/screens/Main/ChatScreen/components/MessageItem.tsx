@@ -1,7 +1,10 @@
 import React from "react";
 import { View } from "react-native";
+import { moderateScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
+import AnyIcon, { Icons } from "@components/AnyIcon";
+import { colors } from "@theme/colors";
 import { styles } from "../ChatScreen.styles";
 
 export interface Message {
@@ -30,16 +33,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ item, patientImage }) => {
         isMe ? styles.myMessageRow : styles.otherMessageRow,
       ]}
     >
-      {!isMe && (
-        <AppImage
-          source={{
-            uri:
-              patientImage ||
-              "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
-          }}
-          style={styles.avatar}
-        />
-      )}
+      {!isMe &&
+        (patientImage ? (
+          <AppImage source={{ uri: patientImage }} style={styles.avatar} />
+        ) : (
+          <View style={[styles.avatar, styles.defaultMessageAvatar]}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="user"
+              size={moderateScale(14)}
+              color={colors.textSecondary}
+            />
+          </View>
+        ))}
       <View
         style={[
           styles.messageBubble,

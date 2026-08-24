@@ -61,6 +61,11 @@ export const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: colors.white,
   },
+  defaultHeroAvatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E2E8F0",
+  },
   gradientBadge: {
     width: moderateScale(90),
     height: moderateScale(90),

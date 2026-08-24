@@ -24,7 +24,11 @@ const ChatScreen = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation();
   const user = useSelector(selectUser);
-  const { request } = route.params;
+  const request = route.params?.request;
+  const patientName = request?.patientName || "User";
+  const patientImage = request?.patientImage;
+  const bloodType = request?.bloodType || "";
+  const hospital = request?.hospital || "";
   const threadId = (route.params as any)?.threadId || request?.id || "";
 
   const flatListRef = useRef<FlatList>(null);
@@ -101,8 +105,8 @@ const ChatScreen = () => {
       style={styles.wrapper}
       header={
         <ChatHeader
-          patientName={request.patientName}
-          patientImage={request.patientImage}
+          patientName={patientName}
+          patientImage={patientImage}
           onBackPress={() => navigation.goBack()}
         />
       }
@@ -113,8 +117,8 @@ const ChatScreen = () => {
         keyboardVerticalOffset={Platform.OS === "ios" ? verticalScale(40) : 0}
       >
         <ChatContextBanner
-          bloodType={request.bloodType}
-          hospital={request.hospital}
+          bloodType={bloodType}
+          hospital={hospital}
         />
 
         {isLoading && messages.length === 0 ? (
@@ -132,7 +136,7 @@ const ChatScreen = () => {
             ref={flatListRef}
             data={messages}
             renderItem={({ item }) => (
-              <MessageItem item={item} patientImage={request.patientImage} />
+              <MessageItem item={item} patientImage={patientImage} />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}

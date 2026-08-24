@@ -28,6 +28,11 @@ export const styles = StyleSheet.create({
     borderRadius: moderateScale(24),
     backgroundColor: colors.gray300,
   },
+  defaultAvatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E2E8F0",
+  },
   onlineIndicator: {
     width: moderateScale(12),
     height: moderateScale(12),

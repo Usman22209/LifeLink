@@ -4,6 +4,8 @@ import { scale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
 import Text from "@components/AppText";
 import AppImage from "@components/AppImage";
+import AnyIcon, { Icons } from "@components/AnyIcon";
+import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectIsRtl } from "@store/slices/appSlice";
 import { styles } from "../ProfileScreen.styles";
@@ -15,10 +17,7 @@ interface ProfileHeaderCardProps {
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
-  const avatarUri =
-    user?.avatar_url ||
-    user?.profile_image ||
-    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop";
+  const avatarUri = user?.avatar_url || user?.profile_image;
   const userBloodType = user?.blood_type || user?.blood_group || "O+";
 
   return (
@@ -37,7 +36,18 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
           },
         ]}
       >
-        <AppImage source={{ uri: avatarUri }} style={styles.avatar} />
+        {avatarUri ? (
+          <AppImage source={{ uri: avatarUri }} style={styles.avatar} />
+        ) : (
+          <View style={[styles.avatar, styles.defaultAvatar]}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="user"
+              size={scale(24)}
+              color={colors.textSecondary}
+            />
+          </View>
+        )}
         <View style={styles.badge}>
           <Text bold FONT_9 style={styles.badgeText}>
             {userBloodType}

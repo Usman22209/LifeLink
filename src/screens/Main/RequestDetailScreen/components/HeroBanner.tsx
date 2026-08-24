@@ -27,14 +27,21 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   return (
     <View style={styles.heroSection}>
       <View style={styles.avatarContainer}>
-        <AppImage
-          source={{
-            uri:
-              request?.patientImage ||
-              "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
-          }}
-          style={styles.patientAvatar}
-        />
+        {request?.patientImage ? (
+          <AppImage
+            source={{ uri: request.patientImage }}
+            style={styles.patientAvatar}
+          />
+        ) : (
+          <View style={[styles.patientAvatar, styles.defaultHeroAvatar]}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="user"
+              size={moderateScale(36)}
+              color={colors.textSecondary}
+            />
+          </View>
+        )}
         <LinearGradient
           colors={
             isCritical

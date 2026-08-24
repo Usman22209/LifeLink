@@ -38,6 +38,11 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  defaultAvatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E2E8F0",
+  },
   badge: {
     position: "absolute",
     bottom: -scale(2),
