@@ -75,15 +75,38 @@ export const useSendMessage = () => {
       return response.data?.data || response.data;
     },
     onSuccess: (resData, variables) => {
-      const activeThreadId =
-        variables.thread_id ||
-        (resData as any)?.thread_id ||
-        (resData as any)?.thread?.id;
-      if (activeThreadId) {
+      const targetIds = [
+        variables.thread_id,
+        variables.request_id,
+        (resData as any)?.thread_id,
+        (resData as any)?.thread?.id,
+      ].filter(Boolean) as string[];
+
+      const createdMsg =
+        (resData as any)?.message || (resData as any)?.data || resData;
+
+      targetIds.forEach((id) => {
+        if (createdMsg && createdMsg.text) {
+          queryClient.setQueryData(chatKeys.messages(id), (oldData: any) => {
+            if (!oldData) return oldData;
+            const rawList =
+              oldData.messages || (Array.isArray(oldData) ? oldData : []);
+            if (
+              rawList.some((m: any) => String(m.id) === String(createdMsg.id))
+            ) {
+              return oldData;
+            }
+            const updatedList = [...rawList, createdMsg];
+            return oldData.messages
+              ? { ...oldData, messages: updatedList }
+              : updatedList;
+          });
+        }
         queryClient.invalidateQueries({
-          queryKey: chatKeys.messages(activeThreadId),
+          queryKey: chatKeys.messages(id),
         });
-      }
+      });
+
       queryClient.invalidateQueries({
         queryKey: chatKeys.threads(),
       });

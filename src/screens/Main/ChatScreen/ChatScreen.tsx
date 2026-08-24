@@ -61,89 +61,109 @@ const ChatScreen = () => {
     }
   }, [threadId, markReadMutate]);
 
+  const channelIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (threadId) ids.add(threadId);
+    if (request?.id) ids.add(request.id);
+    const remoteThreadId =
+      (remoteMessagesData as any)?.thread_id ||
+      (remoteMessagesData as any)?.thread?.id;
+    if (remoteThreadId) ids.add(remoteThreadId);
+    return Array.from(ids);
+  }, [threadId, request?.id, remoteMessagesData]);
+
   // Realtime Broadcast Channel for 0ms typing indicators and instant message delivery
   useEffect(() => {
-    if (!threadId) return;
+    if (channelIds.length === 0) return;
 
-    const channelName = `chat_room_${threadId}`;
-    const channel = supabase.channel(channelName, {
-      config: {
-        broadcast: { self: false },
-      },
-    });
-
-    channel
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
+    const channels = channelIds.map((id) => {
+      const channel = supabase.channel(`chat_room_${id}`, {
+        config: {
+          broadcast: { self: false },
         },
-        (payload) => {
-          const newMsg = payload.new;
-          if (
-            newMsg &&
-            (newMsg.thread_id === threadId ||
-              String(newMsg.request_id) === String(threadId))
-          ) {
-            queryClient.setQueryData(
-              chatKeys.messages(threadId),
-              (oldData: any) => {
-                const rawList =
-                  oldData?.messages || (Array.isArray(oldData) ? oldData : []);
-                if (rawList.some((m: any) => String(m.id) === String(newMsg.id))) {
-                  return oldData;
+      });
+
+      channel
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "chat_messages",
+          },
+          (payload) => {
+            const newMsg = payload.new;
+            if (newMsg) {
+              channelIds.forEach((targetId) => {
+                queryClient.setQueryData(
+                  chatKeys.messages(targetId),
+                  (oldData: any) => {
+                    const rawList =
+                      oldData?.messages ||
+                      (Array.isArray(oldData) ? oldData : []);
+                    if (
+                      rawList.some((m: any) => String(m.id) === String(newMsg.id))
+                    ) {
+                      return oldData;
+                    }
+                    const updatedList = [...rawList, newMsg];
+                    return oldData?.messages
+                      ? { ...oldData, messages: updatedList }
+                      : updatedList;
+                  }
+                );
+              });
+              queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+            }
+          }
+        )
+        .on("broadcast", { event: "message" }, ({ payload: newMsg }) => {
+          if (newMsg) {
+            channelIds.forEach((targetId) => {
+              queryClient.setQueryData(
+                chatKeys.messages(targetId),
+                (oldData: any) => {
+                  const rawList =
+                    oldData?.messages ||
+                    (Array.isArray(oldData) ? oldData : []);
+                  if (
+                    rawList.some((m: any) => String(m.id) === String(newMsg.id))
+                  ) {
+                    return oldData;
+                  }
+                  const updatedList = [...rawList, newMsg];
+                  return oldData?.messages
+                    ? { ...oldData, messages: updatedList }
+                    : updatedList;
                 }
-                const updatedList = [...rawList, newMsg];
-                return oldData?.messages
-                  ? { ...oldData, messages: updatedList }
-                  : updatedList;
-              }
-            );
+              );
+            });
             queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
           }
-        }
-      )
-      .on("broadcast", { event: "message" }, ({ payload: newMsg }) => {
-        if (newMsg) {
-          queryClient.setQueryData(
-            chatKeys.messages(threadId),
-            (oldData: any) => {
-              const rawList =
-                oldData?.messages || (Array.isArray(oldData) ? oldData : []);
-              if (rawList.some((m: any) => String(m.id) === String(newMsg.id))) {
-                return oldData;
-              }
-              const updatedList = [...rawList, newMsg];
-              return oldData?.messages
-                ? { ...oldData, messages: updatedList }
-                : updatedList;
+        })
+        .on("broadcast", { event: "typing" }, ({ payload }) => {
+          if (payload?.senderId && String(payload.senderId) !== String(user?.id)) {
+            setIsOtherUserTyping(Boolean(payload.isTyping));
+            if (payload.isTyping) {
+              if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              typingTimeoutRef.current = setTimeout(() => {
+                setIsOtherUserTyping(false);
+              }, 3500);
             }
-          );
-          queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
-        }
-      })
-      .on("broadcast", { event: "typing" }, ({ payload }) => {
-        if (payload?.senderId && String(payload.senderId) !== String(user?.id)) {
-          setIsOtherUserTyping(Boolean(payload.isTyping));
-          if (payload.isTyping) {
-            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-            typingTimeoutRef.current = setTimeout(() => {
-              setIsOtherUserTyping(false);
-            }, 3500);
           }
-        }
-      })
-      .subscribe();
+        })
+        .subscribe();
 
-    realtimeChannelRef.current = channel;
+      return channel;
+    });
+
+    realtimeChannelRef.current = channels;
 
     return () => {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-      supabase.removeChannel(channel);
+      channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [threadId, user?.id, queryClient]);
+  }, [channelIds, user?.id, queryClient]);
 
   const messages: Message[] = useMemo(() => {
     const rawMsgs =
@@ -176,31 +196,27 @@ const ChatScreen = () => {
     }
   }, [messages.length, scrollToBottom]);
 
+  const broadcastToChannels = (event: string, payload: any) => {
+    if (Array.isArray(realtimeChannelRef.current)) {
+      realtimeChannelRef.current.forEach((ch) => {
+        ch.send({ type: "broadcast", event, payload });
+      });
+    }
+  };
+
   const handleInputChange = (text: string) => {
     setInputText(text);
 
-    if (realtimeChannelRef.current && user?.id) {
+    if (user?.id) {
       if (text.trim().length > 0) {
-        realtimeChannelRef.current.send({
-          type: "broadcast",
-          event: "typing",
-          payload: { senderId: user.id, isTyping: true },
-        });
+        broadcastToChannels("typing", { senderId: user.id, isTyping: true });
 
         if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
         userTypingDebounceRef.current = setTimeout(() => {
-          realtimeChannelRef.current?.send({
-            type: "broadcast",
-            event: "typing",
-            payload: { senderId: user.id, isTyping: false },
-          });
+          broadcastToChannels("typing", { senderId: user.id, isTyping: false });
         }, 2000);
       } else {
-        realtimeChannelRef.current.send({
-          type: "broadcast",
-          event: "typing",
-          payload: { senderId: user.id, isTyping: false },
-        });
+        broadcastToChannels("typing", { senderId: user.id, isTyping: false });
       }
     }
   };
@@ -213,11 +229,7 @@ const ChatScreen = () => {
 
     // Cancel typing broadcast immediately
     if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
-    realtimeChannelRef.current?.send({
-      type: "broadcast",
-      event: "typing",
-      payload: { senderId: user?.id, isTyping: false },
-    });
+    broadcastToChannels("typing", { senderId: user?.id, isTyping: false });
 
     // 1. Optimistic Message (0ms latency UI update)
     const optimisticMessage: Message = {
@@ -230,17 +242,13 @@ const ChatScreen = () => {
     setLocalMessages((prev) => [...prev, optimisticMessage]);
 
     // 2. Broadcast for 0ms delivery to recipient
-    realtimeChannelRef.current?.send({
-      type: "broadcast",
-      event: "message",
-      payload: {
-        id: `bc_${Date.now()}`,
-        text: textToSend,
-        sender_id: user?.id,
-        created_at: new Date().toISOString(),
-        thread_id: threadId,
-        request_id: request?.id,
-      },
+    broadcastToChannels("message", {
+      id: `bc_${Date.now()}`,
+      text: textToSend,
+      sender_id: user?.id,
+      created_at: new Date().toISOString(),
+      thread_id: threadId,
+      request_id: request?.id,
     });
 
     // 3. Background API Call
