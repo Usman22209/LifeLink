@@ -53,6 +53,11 @@ export const styles = StyleSheet.create({
     marginRight: scale(10),
     backgroundColor: colors.gray300,
   },
+  defaultHeaderAvatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E2E8F0",
+  },
   headerTextContainer: {
     justifyContent: "center",
   },
@@ -110,6 +115,11 @@ export const styles = StyleSheet.create({
     borderRadius: moderateScale(14),
     marginRight: scale(8),
     backgroundColor: colors.gray300,
+  },
+  defaultMessageAvatar: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#E2E8F0",
   },
   messageBubble: {
     paddingHorizontal: scale(12),

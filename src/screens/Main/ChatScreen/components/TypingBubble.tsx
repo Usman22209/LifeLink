@@ -1,6 +1,9 @@
 import React from "react";
 import { View } from "react-native";
+import { moderateScale } from "react-native-size-matters";
 import AppImage from "@components/AppImage";
+import AnyIcon, { Icons } from "@components/AnyIcon";
+import { colors } from "@theme/colors";
 import { styles } from "../ChatScreen.styles";
 
 interface TypingBubbleProps {
@@ -15,14 +18,18 @@ const TypingBubble: React.FC<TypingBubbleProps> = ({
   if (!isTyping) return null;
   return (
     <View style={[styles.messageRow, styles.otherMessageRow]}>
-      <AppImage
-        source={{
-          uri:
-            patientImage ||
-            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
-        }}
-        style={styles.avatar}
-      />
+      {patientImage ? (
+        <AppImage source={{ uri: patientImage }} style={styles.avatar} />
+      ) : (
+        <View style={[styles.avatar, styles.defaultMessageAvatar]}>
+          <AnyIcon
+            type={Icons.Feather}
+            name="user"
+            size={moderateScale(14)}
+            color={colors.textSecondary}
+          />
+        </View>
+      )}
       <View
         style={[
           styles.messageBubble,

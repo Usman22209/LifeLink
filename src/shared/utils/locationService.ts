@@ -43,14 +43,14 @@ export const getCurrentLocation = async (
             },
             {
               enableHighAccuracy: false,
-              timeout: 15000,
+              timeout: 3000, // 3 second fallback timeout
               maximumAge: 300000, // 5 minute cached location fallback
             },
           );
         },
         {
           enableHighAccuracy: false,
-          timeout: 10000,
+          timeout: 3000, // 3 second primary timeout
           maximumAge: 60000,
         },
       );

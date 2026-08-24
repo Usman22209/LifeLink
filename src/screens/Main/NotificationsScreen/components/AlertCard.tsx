@@ -9,93 +9,86 @@ import { styles } from "../NotificationsScreen.styles";
 
 interface AlertCardProps extends Alert {
   onPress: (item: Alert) => void;
+  isRtl?: boolean;
 }
 
-const AlertCard: React.FC<AlertCardProps> = ({
-  id,
-  type,
-  title,
-  body,
-  time,
-  read,
-  urgency,
-  bloodType,
-  hospital,
-  onPress,
-}) => {
-  const config = ALERT_TYPE_CONFIG[type];
-  const accent = config.accent;
+const AlertCard: React.FC<AlertCardProps> = (props) => {
+  const { title, body, time, read, type, onPress, isRtl = false } = props;
 
-  const isNavigatable = type === "blood_request" || type === "donation_match";
+  const config = ALERT_TYPE_CONFIG[type] || ALERT_TYPE_CONFIG.system;
 
   return (
     <View style={[styles.card, !read && styles.cardUnread]}>
       <TouchableOpacity
-        onPress={() =>
-          onPress({
-            id,
-            type,
-            title,
-            body,
-            time,
-            read,
-            urgency,
-            bloodType,
-            hospital,
-          })
-        }
+        onPress={() => onPress(props)}
         activeOpacity={0.75}
-        style={styles.cardContent}
+        style={[
+          styles.cardContent,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
       >
-        <View style={styles.iconWrap}>
+        {/* Category Icon */}
+        <View style={[styles.iconWrap, { backgroundColor: config.bg }]}>
           <AnyIcon
             type={Icons.Feather}
             name={config.icon}
-            size={moderateScale(18)}
-            color={accent}
+            size={moderateScale(17)}
+            color={config.accent}
           />
         </View>
 
+        {/* Text Content */}
         <View style={styles.cardBody}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardTitleContainer}>
-              {!read && <View style={styles.unreadInlineDot} />}
+          <View
+            style={[
+              styles.cardHeader,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <View
+              style={[
+                styles.titleRow,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
+            >
+              {!read && <View style={styles.unreadDot} />}
               <AppText
-                semiBold={!read}
-                medium={read}
+                bold={!read}
+                semiBold={read}
                 FONT_13
                 style={[
                   styles.cardTitle,
-                  { color: read ? colors.gray600 : colors.text },
+                  { color: read ? colors.gray700 : colors.text },
                 ]}
                 numberOfLines={1}
               >
                 {title}
               </AppText>
             </View>
+
+            <AppText regular FONT_11 style={styles.timeText}>
+              {time}
+            </AppText>
           </View>
 
-          <AppText regular FONT_12 style={styles.cardMessage} numberOfLines={2}>
+          <AppText
+            regular
+            FONT_12
+            style={styles.cardMessage}
+            numberOfLines={2}
+          >
             {body}
           </AppText>
         </View>
 
-        <View style={styles.cardRight}>
-          <AppText regular FONT_10 style={styles.timeText}>
-            {time}
-          </AppText>
-          {isNavigatable ? (
-            <View style={styles.chevronWrap}>
-              <AnyIcon
-                type={Icons.Feather}
-                name="chevron-right"
-                size={moderateScale(20)}
-                color={colors.gray600}
-              />
-            </View>
-          ) : (
-            <View style={{ height: moderateScale(20) }} />
-          )}
+        {/* Subtle Chevron Indicator */}
+        <View style={styles.chevronWrap}>
+          <AnyIcon
+            type={Icons.Feather}
+            name={isRtl ? "chevron-left" : "chevron-right"}
+            size={moderateScale(16)}
+            color={colors.gray400}
+          />
         </View>
       </TouchableOpacity>
     </View>
@@ -103,3 +96,4 @@ const AlertCard: React.FC<AlertCardProps> = ({
 };
 
 export default AlertCard;
+

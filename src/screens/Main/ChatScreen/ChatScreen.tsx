@@ -11,7 +11,9 @@ import { styles } from "./ChatScreen.styles";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useChatMessages, useSendMessage } from "@shared/query/chat/useChat";
+import { useChatMessages, useSendMessage, useMarkThreadAsRead, chatKeys } from "@shared/query/chat/useChat";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@shared/config/supabase";
 import ChatHeader from "./components/ChatHeader";
 import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
@@ -23,17 +25,145 @@ type ChatScreenRouteProp = RouteProp<UserStackParamList, typeof ROUTES.CHAT>;
 const ChatScreen = () => {
   const route = useRoute<ChatScreenRouteProp>();
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const user = useSelector(selectUser);
-  const { request } = route.params;
+  const request = route.params?.request;
+  const patientName =
+    request?.patientName ||
+    (request as any)?.patient_name ||
+    (request as any)?.user?.full_name ||
+    "User";
+  const patientImage =
+    request?.patientImage ||
+    (request as any)?.patient_image ||
+    (request as any)?.user?.profile_image;
+  const bloodType = request?.bloodType || (request as any)?.blood_group || "";
+  const hospital = request?.hospital || (request as any)?.hospital_name || "";
   const threadId = (route.params as any)?.threadId || request?.id || "";
 
   const flatListRef = useRef<FlatList>(null);
   const [inputText, setInputText] = useState("");
+  const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const realtimeChannelRef = useRef<any>(null);
 
   const { data: remoteMessagesData, isLoading } = useChatMessages(threadId);
   const { mutate: sendMessageMutate } = useSendMessage();
+  const { mutate: markReadMutate } = useMarkThreadAsRead();
 
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
+
+  // Mark thread as read on mount / when threadId is available
+  useEffect(() => {
+    if (threadId) {
+      markReadMutate(threadId);
+    }
+  }, [threadId, markReadMutate]);
+
+  const channelIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (threadId) ids.add(threadId);
+    if (request?.id) ids.add(request.id);
+    const remoteThreadId =
+      (remoteMessagesData as any)?.thread_id ||
+      (remoteMessagesData as any)?.thread?.id;
+    if (remoteThreadId) ids.add(remoteThreadId);
+    return Array.from(ids);
+  }, [threadId, request?.id, remoteMessagesData]);
+
+  // Realtime Broadcast Channel for 0ms typing indicators and instant message delivery
+  useEffect(() => {
+    if (channelIds.length === 0) return;
+
+    const channels = channelIds.map((id) => {
+      const channel = supabase.channel(`chat_room_${id}`, {
+        config: {
+          broadcast: { self: false },
+        },
+      });
+
+      channel
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "chat_messages",
+          },
+          (payload) => {
+            const newMsg = payload.new;
+            if (newMsg) {
+              channelIds.forEach((targetId) => {
+                queryClient.setQueryData(
+                  chatKeys.messages(targetId),
+                  (oldData: any) => {
+                    const rawList =
+                      oldData?.messages ||
+                      (Array.isArray(oldData) ? oldData : []);
+                    if (
+                      rawList.some((m: any) => String(m.id) === String(newMsg.id))
+                    ) {
+                      return oldData;
+                    }
+                    const updatedList = [...rawList, newMsg];
+                    return oldData?.messages
+                      ? { ...oldData, messages: updatedList }
+                      : updatedList;
+                  }
+                );
+              });
+              queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+            }
+          }
+        )
+        .on("broadcast", { event: "message" }, ({ payload: newMsg }) => {
+          if (newMsg) {
+            channelIds.forEach((targetId) => {
+              queryClient.setQueryData(
+                chatKeys.messages(targetId),
+                (oldData: any) => {
+                  const rawList =
+                    oldData?.messages ||
+                    (Array.isArray(oldData) ? oldData : []);
+                  if (
+                    rawList.some((m: any) => String(m.id) === String(newMsg.id))
+                  ) {
+                    return oldData;
+                  }
+                  const updatedList = [...rawList, newMsg];
+                  return oldData?.messages
+                    ? { ...oldData, messages: updatedList }
+                    : updatedList;
+                }
+              );
+            });
+            queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+          }
+        })
+        .on("broadcast", { event: "typing" }, ({ payload }) => {
+          if (payload?.senderId && String(payload.senderId) !== String(user?.id)) {
+            setIsOtherUserTyping(Boolean(payload.isTyping));
+            if (payload.isTyping) {
+              if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              typingTimeoutRef.current = setTimeout(() => {
+                setIsOtherUserTyping(false);
+              }, 3500);
+            }
+          }
+        })
+        .subscribe();
+
+      return channel;
+    });
+
+    realtimeChannelRef.current = channels;
+
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      channels.forEach((ch) => supabase.removeChannel(ch));
+    };
+  }, [channelIds, user?.id, queryClient]);
 
   const messages: Message[] = useMemo(() => {
     const rawMsgs =
@@ -60,11 +190,46 @@ const ChatScreen = () => {
     }, 100);
   }, []);
 
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom(true);
+    }
+  }, [messages.length, scrollToBottom]);
+
+  const broadcastToChannels = (event: string, payload: any) => {
+    if (Array.isArray(realtimeChannelRef.current)) {
+      realtimeChannelRef.current.forEach((ch) => {
+        ch.send({ type: "broadcast", event, payload });
+      });
+    }
+  };
+
+  const handleInputChange = (text: string) => {
+    setInputText(text);
+
+    if (user?.id) {
+      if (text.trim().length > 0) {
+        broadcastToChannels("typing", { senderId: user.id, isTyping: true });
+
+        if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
+        userTypingDebounceRef.current = setTimeout(() => {
+          broadcastToChannels("typing", { senderId: user.id, isTyping: false });
+        }, 2000);
+      } else {
+        broadcastToChannels("typing", { senderId: user.id, isTyping: false });
+      }
+    }
+  };
+
   const handleSend = () => {
     if (!inputText.trim()) return;
 
     const textToSend = inputText.trim();
     setInputText("");
+
+    // Cancel typing broadcast immediately
+    if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
+    broadcastToChannels("typing", { senderId: user?.id, isTyping: false });
 
     // 1. Optimistic Message (0ms latency UI update)
     const optimisticMessage: Message = {
@@ -76,7 +241,17 @@ const ChatScreen = () => {
 
     setLocalMessages((prev) => [...prev, optimisticMessage]);
 
-    // 2. Background API Call
+    // 2. Broadcast for 0ms delivery to recipient
+    broadcastToChannels("message", {
+      id: `bc_${Date.now()}`,
+      text: textToSend,
+      sender_id: user?.id,
+      created_at: new Date().toISOString(),
+      thread_id: threadId,
+      request_id: request?.id,
+    });
+
+    // 3. Background API Call
     const payload = {
       ...(threadId ? { thread_id: threadId } : {}),
       ...(request?.id ? { request_id: request.id } : {}),
@@ -95,8 +270,8 @@ const ChatScreen = () => {
       style={styles.wrapper}
       header={
         <ChatHeader
-          patientName={request.patientName}
-          patientImage={request.patientImage}
+          patientName={patientName}
+          patientImage={patientImage}
           onBackPress={() => navigation.goBack()}
         />
       }
@@ -107,8 +282,8 @@ const ChatScreen = () => {
         keyboardVerticalOffset={Platform.OS === "ios" ? verticalScale(40) : 0}
       >
         <ChatContextBanner
-          bloodType={request.bloodType}
-          hospital={request.hospital}
+          bloodType={bloodType}
+          hospital={hospital}
         />
 
         {isLoading && messages.length === 0 ? (
@@ -126,19 +301,25 @@ const ChatScreen = () => {
             ref={flatListRef}
             data={messages}
             renderItem={({ item }) => (
-              <MessageItem item={item} patientImage={request.patientImage} />
+              <MessageItem item={item} patientImage={patientImage} />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
             onContentSizeChange={() => scrollToBottom(true)}
             onLayout={() => scrollToBottom(false)}
+            ListFooterComponent={
+              <TypingBubble
+                isTyping={isOtherUserTyping}
+                patientImage={patientImage}
+              />
+            }
           />
         )}
 
         <MessageInput
           inputText={inputText}
-          onChangeText={setInputText}
+          onChangeText={handleInputChange}
           onSend={handleSend}
         />
       </KeyboardAvoidingView>

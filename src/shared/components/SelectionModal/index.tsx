@@ -20,7 +20,8 @@ interface SelectionOption {
 }
 
 interface SelectionModalProps {
-  isVisible: boolean;
+  isVisible?: boolean;
+  visible?: boolean;
   onClose: () => void;
   title: string;
   options: string[] | SelectionOption[];
@@ -31,6 +32,7 @@ interface SelectionModalProps {
 
 const SelectionModal: React.FC<SelectionModalProps> = ({
   isVisible,
+  visible,
   onClose,
   title,
   options,
@@ -40,8 +42,10 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
 }) => {
   const isRtl = I18nManager.isRTL;
   const [search, setSearch] = useState("");
+  const showModal = isVisible ?? visible ?? false;
 
   const normalizedOptions = useMemo((): SelectionOption[] => {
+    if (!Array.isArray(options)) return [];
     return options.map((opt) =>
       typeof opt === "string" ? { label: opt, value: opt } : opt,
     );
@@ -54,7 +58,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
   }, [normalizedOptions, search]);
 
   return (
-    <Modal visible={isVisible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={showModal} animationType="slide" onRequestClose={onClose}>
       <ScreenWrapper safeArea backgroundColor={colors.white}>
         <View style={styles.handleIndicator} />
         <View

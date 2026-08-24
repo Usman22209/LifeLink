@@ -34,14 +34,17 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (profile) {
-      dispatch(updateUser(profile));
+      const profileData = profile?.user || profile?.profile || profile;
+      dispatch(updateUser(profileData));
     }
   }, [profile, dispatch]);
 
-  const user = profile || reduxUser;
+  const rawUser = profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
   const displayName =
     user?.full_name ||
     user?.name ||
+    user?.fullName ||
     (user?.email ? user.email.split("@")[0] : "User");
 
   const rawUrgent = Array.isArray(urgentRequestsData?.data)
@@ -57,7 +60,22 @@ const HomeScreen = () => {
   const bloodType = user?.blood_group || "O+";
   const donationsCount = stats.donations_count ?? 0;
   const livesSaved = stats.lives_saved ?? (donationsCount * 3);
-  const lastDonated = stats.last_donated_at || "N/A";
+  
+  const formatLastDonated = (dateStr?: string) => {
+    if (!dateStr || dateStr === "N/A" || dateStr === "null" || dateStr === "undefined") {
+      return "—";
+    }
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) {
+      return dateStr;
+    }
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const lastDonated = formatLastDonated(stats.last_donated_at);
 
   return (
     <ScreenWrapper

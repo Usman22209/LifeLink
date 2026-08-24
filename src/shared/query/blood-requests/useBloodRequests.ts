@@ -172,3 +172,5 @@ export const useUrgentBloodRequests = (params?: {
     },
   });
 };
+
+export { useAcceptBloodRequest } from "../donations/useDonations";

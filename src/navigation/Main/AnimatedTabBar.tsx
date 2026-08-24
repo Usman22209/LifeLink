@@ -12,8 +12,12 @@ import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { selectIsRtl } from "@store/slices/appSlice";
+import { selectToken } from "@store/slices/authSlice";
 import { colors } from "@theme/colors";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useChatThreads } from "@shared/query/chat/useChat";
+import { ROUTES } from "@utils/Routes";
+import Text from "@components/AppText";
 
 const TAB_COUNT = 5;
 const CENTER_INDEX = 2;
@@ -31,6 +35,17 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const isRtl = useSelector(selectIsRtl);
+  const token = useSelector(selectToken);
+  const { data: chatThreads } = useChatThreads(!!token);
+
+  const totalUnreadChats = React.useMemo(() => {
+    if (!Array.isArray(chatThreads)) return 0;
+    return chatThreads.reduce(
+      (acc: number, thread: any) => acc + (thread.unreadCount || 0),
+      0,
+    );
+  }, [chatThreads]);
+
   const previousIndex = useRef(0);
 
   const indicatorX = useRef(new Animated.Value(0)).current;
@@ -231,14 +246,23 @@ const AnimatedTabBar: React.FC<BottomTabBarProps> = ({
             activeOpacity={0.7}
             style={styles.tab}
           >
-            <Animated.View style={{ transform: [{ scale: iconScale }] }}>
-              {options.tabBarIcon &&
-                options.tabBarIcon({
-                  focused: isFocused,
-                  color: iconColor,
-                  size: moderateScale(21),
-                })}
-            </Animated.View>
+            <View style={{ position: "relative" }}>
+              <Animated.View style={{ transform: [{ scale: iconScale }] }}>
+                {options.tabBarIcon &&
+                  options.tabBarIcon({
+                    focused: isFocused,
+                    color: iconColor,
+                    size: moderateScale(21),
+                  })}
+              </Animated.View>
+              {route.name === ROUTES.CHATS_LIST && totalUnreadChats > 0 ? (
+                <View style={styles.chatBadge}>
+                  <Text bold style={styles.chatBadgeText}>
+                    {totalUnreadChats > 99 ? "99+" : totalUnreadChats}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
 
             <Animated.Text
               style={[
@@ -324,5 +348,23 @@ const styles = StyleSheet.create({
   },
   fabSpacer: {
     height: verticalScale(20),
+  },
+  chatBadge: {
+    position: "absolute",
+    top: -verticalScale(4),
+    right: -scale(8),
+    minWidth: moderateScale(16),
+    height: moderateScale(16),
+    borderRadius: moderateScale(8),
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: scale(3),
+    borderWidth: 1.5,
+    borderColor: colors.white,
+  },
+  chatBadgeText: {
+    fontSize: moderateScale(8.5),
+    color: colors.white,
   },
 });

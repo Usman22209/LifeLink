@@ -68,3 +68,52 @@ export const getProvinceByCityId = (cityIdOrName?: string): string => {
 
   return city?.province || "";
 };
+
+/**
+ * Matches a city and/or province from raw string (e.g. from Google Place address components)
+ * to a corresponding record in cities.json.
+ */
+export const findCityRecord = (
+  cityName?: string,
+  provinceName?: string,
+): { id: string; name: { en: string; ur: string }; province: string } | null => {
+  if (!cityName && !provinceName) return null;
+
+  const normCity = cityName ? normalizeCityStr(cityName).toLowerCase() : "";
+  const normProvince = provinceName ? normalizeCityStr(provinceName).toLowerCase() : "";
+
+  // 1. Try exact match on city name and province
+  if (normCity) {
+    const directMatch = CitiesData.cities.find((c) => {
+      const matchCity =
+        c.name.en.toLowerCase() === normCity ||
+        c.name.ur === normCity ||
+        c.id === normCity;
+      if (!matchCity) return false;
+      if (normProvince) {
+        return (
+          c.province.toLowerCase() === normProvince ||
+          c.province.toLowerCase().includes(normProvince) ||
+          normProvince.includes(c.province.toLowerCase())
+        );
+      }
+      return true;
+    });
+    if (directMatch) return directMatch;
+
+    // 2. Try substring / word match (e.g. "Lahore District" -> "Lahore", "Rawalpindi Cantt" -> "Rawalpindi")
+    const subMatch = CitiesData.cities.find((c) => {
+      const cityEn = c.name.en.toLowerCase();
+      return (
+        normCity.includes(cityEn) ||
+        cityEn.includes(normCity) ||
+        (normCity.length > 3 && normCity.startsWith(cityEn))
+      );
+    });
+    if (subMatch) return subMatch;
+  }
+
+  return null;
+};
+
+export const getProvinceNameByCityId = getProvinceByCityId;

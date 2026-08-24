@@ -6,7 +6,7 @@ import AppNavigation from "@navigation/index";
 import "@shared/i18n";
 import OneSignalProvider from "@providers/OneSignalProvider";
 import Toast from "react-native-toast-message";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
 import * as Sentry from "@sentry/react-native";
 import {
@@ -14,7 +14,7 @@ import {
   LinkingOptions,
   getStateFromPath,
 } from "@react-navigation/native";
-import { Linking } from "react-native";
+import { Linking, Platform } from "react-native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ROUTES } from "@utils/Routes";
 import ENV from "@config/env";
@@ -66,6 +66,17 @@ Sentry.init({
   integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
 });
 
+const AppToast = () => {
+  const insets = useSafeAreaInsets();
+  return (
+    <Toast
+      config={toastConfig}
+      position="top"
+      topOffset={Platform.OS === "ios" ? insets.top + 10 : 10}
+    />
+  );
+};
+
 const App = (): React.JSX.Element => {
   return (
     <SafeAreaProvider>
@@ -75,7 +86,7 @@ const App = (): React.JSX.Element => {
             <OneSignalProvider>
               <NavigationContainer linking={linking}>
                 <AppNavigation />
-                <Toast config={toastConfig} position="top" topOffset={10} />
+                <AppToast />
               </NavigationContainer>
             </OneSignalProvider>
           </QueryClientProvider>

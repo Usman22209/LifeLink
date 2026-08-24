@@ -16,8 +16,13 @@ export const useGetProfile = (enabled = true) => {
   return useQuery({
     queryKey: profileKeys.me(),
     queryFn: async () => {
+      console.log("🔍 [useGetProfile] Fetching profile from API...");
       const response = await PROFILE_SERVICE.getProfile();
-      return response.data?.data || response.data;
+      console.log("🔍 [useGetProfile] Raw API Response:", JSON.stringify(response.data));
+      const rawData = response.data?.data || response.data;
+      const profileData = rawData?.user || rawData?.profile || rawData;
+      console.log("🔍 [useGetProfile] Resolved profileData:", JSON.stringify(profileData));
+      return profileData;
     },
     enabled,
   });

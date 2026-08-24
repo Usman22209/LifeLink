@@ -47,17 +47,24 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <AppImage
-            source={{
-              uri:
-                patientImage ||
-                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop",
-            }}
-            style={styles.headerAvatar}
-          />
+          {patientImage ? (
+            <AppImage
+              source={{ uri: patientImage }}
+              style={styles.headerAvatar}
+            />
+          ) : (
+            <View style={[styles.headerAvatar, styles.defaultHeaderAvatar]}>
+              <AnyIcon
+                type={Icons.Feather}
+                name="user"
+                size={moderateScale(18)}
+                color={colors.textSecondary}
+              />
+            </View>
+          )}
           <View style={styles.headerTextContainer}>
             <AppText bold style={styles.headerName}>
-              {patientName}
+              {patientName || "User"}
             </AppText>
             <View style={styles.headerStatus}>
               <View style={styles.headerStatusDot} />

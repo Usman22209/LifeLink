@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, Alert, View } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Text from "@components/AppText";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppButton from "@components/AppButton";
 import AppHeader from "@components/AppHeader";
-import { selectUser } from "@store/slices/authSlice";
+import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectIsRtl } from "@store/slices/appSlice";
 import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
@@ -23,9 +23,18 @@ import LanguageSelectorModal from "./components/LanguageSelectorModal";
 import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
 
 const ProfileScreen = () => {
+  const dispatch = useDispatch();
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const user = profile || reduxUser;
+  const rawUser = profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
+
+  useEffect(() => {
+    if (profile) {
+      const profileData = profile?.user || profile?.profile || profile;
+      dispatch(updateUser(profileData));
+    }
+  }, [profile, dispatch]);
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
