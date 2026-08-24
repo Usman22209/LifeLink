@@ -1409,11 +1409,6 @@
   dependencies:
     merge-options "^3.0.4"
 
-"@react-native-community/blur@^4.4.1":
-  version "4.4.1"
-  resolved "https://registry.npmjs.org/@react-native-community/blur/-/blur-4.4.1.tgz"
-  integrity sha512-XBSsRiYxE/MOEln2ayunShfJtWztHwUxLFcSL20o+HNNRnuUDv+GXkF6FmM2zE8ZUfrnhQ/zeTqvnuDPGw6O8A==
-
 "@react-native-community/cli-clean@20.0.0":
   version "20.0.0"
   resolved "https://registry.npmjs.org/@react-native-community/cli-clean/-/cli-clean-20.0.0.tgz"
@@ -1577,11 +1572,6 @@
   version "11.4.1"
   resolved "https://registry.npmjs.org/@react-native-community/netinfo/-/netinfo-11.4.1.tgz"
   integrity sha512-B0BYAkghz3Q2V09BF88RA601XursIEA111tnc2JOaN7axJWmNefmfjZqw/KdSxKZp7CZUuPpjBmz/WCR9uaHYg==
-
-"@react-native-community/slider@5.0.1":
-  version "5.0.1"
-  resolved "https://registry.npmjs.org/@react-native-community/slider/-/slider-5.0.1.tgz"
-  integrity sha512-K3JRWkIW4wQ79YJ6+BPZzp1SamoikxfPRw7Yw4B4PElEQmqZFrmH9M5LxvIo460/3QSrZF/wCgi3qizJt7g/iw==
 
 "@react-native-google-signin/google-signin@^16.0.0":
   version "16.1.1"
@@ -1762,11 +1752,6 @@
     metro-config "^0.83.1"
     metro-runtime "^0.83.1"
 
-"@react-native/new-app-screen@0.82.1":
-  version "0.82.1"
-  resolved "https://registry.npmjs.org/@react-native/new-app-screen/-/new-app-screen-0.82.1.tgz"
-  integrity sha512-cViiTco2ukQVd683tGk+7bwf8WMS6A9hg5HUB3LjFli4pzOinuDlC5jzym6RiROhS5B3NmQ3CTccJmWgsJQL1w==
-
 "@react-native/normalize-colors@0.82.1":
   version "0.82.1"
   resolved "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.82.1.tgz"
@@ -1807,16 +1792,6 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
-"@react-navigation/drawer@7.5.8":
-  version "7.5.8"
-  resolved "https://registry.npmjs.org/@react-navigation/drawer/-/drawer-7.5.8.tgz"
-  integrity sha512-x3yWHxNxEv1e3w0e72WpEVUq1g8DYQOfZnbdCcuYbLZtp6Glyk0r2rkPzpddFOby3tp05KDgwZfAZKpr3j6+6w==
-  dependencies:
-    "@react-navigation/elements" "^2.6.4"
-    color "^4.2.3"
-    react-native-drawer-layout "^4.1.13"
-    use-latest-callback "^0.2.4"
-
 "@react-navigation/elements@^2.3.8":
   version "2.9.26"
   resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-2.9.26.tgz#89cd09db890534c115031b1a6d99d916fdcda96c"
@@ -1834,15 +1809,6 @@
     color "^4.2.3"
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
-
-"@react-navigation/material-top-tabs@7.3.7":
-  version "7.3.7"
-  resolved "https://registry.npmjs.org/@react-navigation/material-top-tabs/-/material-top-tabs-7.3.7.tgz"
-  integrity sha512-lVgcJON9kqCETE628/E5da0jbSB1QxHdYaKetxAIEFCgcANebcg1wU80P2B3PBFp2qRrLfrPS9oHTUfaUIjLSA==
-  dependencies:
-    "@react-navigation/elements" "^2.6.4"
-    color "^4.2.3"
-    react-native-tab-view "^4.1.3"
 
 "@react-navigation/native@7.1.17":
   version "7.1.17"
@@ -6313,23 +6279,10 @@ react-native-dotenv@3.4.11:
   dependencies:
     dotenv "^16.4.5"
 
-react-native-drawer-layout@^4.1.13:
-  version "4.2.1"
-  resolved "https://registry.npmjs.org/react-native-drawer-layout/-/react-native-drawer-layout-4.2.1.tgz"
-  integrity sha512-liwRJ7ynRU/ogRlUdiK1Yoi1VzUSq2Vu/RU+UgqlMB3XduslZ1DZg/mTX0f1uCEV2dJ4ec+1fRa3OlIierfyZg==
-  dependencies:
-    color "^4.2.3"
-    use-latest-callback "^0.2.4"
-
 react-native-fast-image@^8.6.3:
   version "8.6.3"
   resolved "https://registry.npmjs.org/react-native-fast-image/-/react-native-fast-image-8.6.3.tgz"
   integrity sha512-Sdw4ESidXCXOmQ9EcYguNY2swyoWmx53kym2zRsvi+VeFCHEdkO+WG1DK+6W81juot40bbfLNhkc63QnWtesNg==
-
-react-native-fast-tflite@^1.6.1:
-  version "1.6.1"
-  resolved "https://registry.npmjs.org/react-native-fast-tflite/-/react-native-fast-tflite-1.6.1.tgz"
-  integrity sha512-qZpVLLtIDXRTnl4bavZAoAY0YbcghvU5Rok0rbJ3HSQptyfQCY9AG/mA/4Xjc29vybIWibvRd1hDbDR7HFXsTQ==
 
 react-native-geolocation-service@^5.3.1:
   version "5.3.1"
@@ -6423,11 +6376,6 @@ react-native-onesignal@^5.2.13:
   dependencies:
     invariant "^2.2.4"
 
-react-native-pager-view@^6.9.1:
-  version "6.9.1"
-  resolved "https://registry.npmjs.org/react-native-pager-view/-/react-native-pager-view-6.9.1.tgz"
-  integrity sha512-uUT0MMMbNtoSbxe9pRvdJJKEi9snjuJ3fXlZhG8F2vVMOBJVt/AFtqMPUHu9yMflmqOr08PewKzj9EPl/Yj+Gw==
-
 react-native-reanimated@4.1.3:
   version "4.1.3"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-4.1.3.tgz"
@@ -6479,13 +6427,6 @@ react-native-svg@15.12.1:
     css-tree "^1.1.3"
     warn-once "0.1.1"
 
-react-native-tab-view@4.1.3, react-native-tab-view@^4.1.3:
-  version "4.1.3"
-  resolved "https://registry.npmjs.org/react-native-tab-view/-/react-native-tab-view-4.1.3.tgz"
-  integrity sha512-COj2HBeM4IqKCAadUdZAUWrFyO8++wlgObsgOt6xrwqdEnu9HX/74uesC0MGlgwIalFffXqTh5F3CC3pUjFPug==
-  dependencies:
-    use-latest-callback "^0.2.4"
-
 react-native-toast-message@^2.3.3:
   version "2.3.3"
   resolved "https://registry.npmjs.org/react-native-toast-message/-/react-native-toast-message-2.3.3.tgz"
@@ -6505,11 +6446,6 @@ react-native-vector-icons@10.3.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
-
-react-native-video@6.16.1:
-  version "6.16.1"
-  resolved "https://registry.npmjs.org/react-native-video/-/react-native-video-6.16.1.tgz"
-  integrity sha512-+G6tVVGbwFqNTyPivqb+PhQzWr5OudDQ1dgvBNyBRAgcS8rOcbwuS6oX+m8cxOsXHn1UT9ofQnjQEwkGOsvomg==
 
 react-native-webview@^14.0.1:
   version "14.0.1"
