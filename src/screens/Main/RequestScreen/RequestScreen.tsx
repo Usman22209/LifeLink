@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { moderateScale } from "react-native-size-matters";
 import Toast from "react-native-toast-message";
@@ -23,6 +23,7 @@ import { useBloodRequestForm } from "@shared/forms/hooks/useBloodRequestForm";
 import { useCreateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { Coords } from "@shared/utils/locationService";
 import { formatPhoneNumber, toE164Phone } from "@shared/utils/phoneUtils";
+import { requireCompleteProfile, isProfileComplete } from "@shared/utils/profileUtils";
 import CitiesData from "@shared/data/cities.json";
 
 import { styles } from "./RequestScreen.styles";
@@ -42,6 +43,16 @@ const RequestScreen = () => {
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
   const user = profile || reduxUser;
+
+  // Check if profile is complete whenever user visits RequestScreen
+  useFocusEffect(
+    useCallback(() => {
+      const active = profile || reduxUser;
+      if (active && !isProfileComplete(active)) {
+        requireCompleteProfile(active, navigation, t);
+      }
+    }, [profile, reduxUser, navigation, t]),
+  );
 
   const {
     control,
@@ -67,23 +78,57 @@ const RequestScreen = () => {
 
   // Prefill user data (name, contact number, blood group, state, city)
   React.useEffect(() => {
+    console.log("🔍 [RequestScreen] useEffect user:", JSON.stringify(user));
     if (user) {
-      if (user.full_name && !watch("patient_name")) {
-        setValue("patient_name", user.full_name, { shouldValidate: true });
+      const name = user.full_name || (user as any).name || "";
+      const rawPhone = user.phone || (user as any).contact_number || "";
+      const bloodGroup = (
+        user.blood_group ||
+        (user as any).blood_type ||
+        ""
+      ).toUpperCase();
+      let state = user.state || (user as any).province || "";
+      let cityId = user.city_id || (user as any).city || "";
+
+      if (cityId) {
+        const foundCity = CitiesData.cities.find(
+          (c) =>
+            c.id === cityId ||
+            c.name.en.toLowerCase() === String(cityId).toLowerCase() ||
+            c.name.ur === cityId,
+        );
+        if (foundCity) {
+          cityId = foundCity.id;
+          if (!state) {
+            state = foundCity.province;
+          }
+        }
       }
-      if (user.phone && !watch("contact_number")) {
-        setValue("contact_number", formatPhoneNumber(user.phone), {
+
+      console.log("🔍 [RequestScreen] Extracted predata ->", {
+        name,
+        rawPhone,
+        bloodGroup,
+        state,
+        cityId,
+      });
+
+      if (name && !watch("patient_name")) {
+        setValue("patient_name", name, { shouldValidate: true });
+      }
+      if (rawPhone && !watch("contact_number")) {
+        setValue("contact_number", formatPhoneNumber(rawPhone), {
           shouldValidate: true,
         });
       }
-      if (user.blood_group && !watch("blood_group")) {
-        setValue("blood_group", user.blood_group, { shouldValidate: true });
+      if (bloodGroup && !watch("blood_group")) {
+        setValue("blood_group", bloodGroup, { shouldValidate: true });
       }
-      if (user.state && !watch("state")) {
-        setValue("state", user.state, { shouldValidate: true });
+      if (state && !watch("state")) {
+        setValue("state", state, { shouldValidate: true });
       }
-      if (user.city_id && !watch("city_id")) {
-        setValue("city_id", user.city_id, { shouldValidate: true });
+      if (cityId && !watch("city_id")) {
+        setValue("city_id", cityId, { shouldValidate: true });
       }
     }
   }, [user, setValue, watch]);
@@ -160,6 +205,12 @@ const RequestScreen = () => {
   }, [selectedCityId, selectedLang]);
 
   const onSubmit = async (data: any) => {
+    const active = profile || reduxUser;
+    if (active && !isProfileComplete(active)) {
+      requireCompleteProfile(active, navigation, t);
+      return;
+    }
+
     try {
       const { state, required_date, ...restData } = data;
 

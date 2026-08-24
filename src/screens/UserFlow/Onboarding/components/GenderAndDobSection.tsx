@@ -48,36 +48,40 @@ export const GenderAndDobSection: React.FC<GenderAndDobSectionProps> = ({
             { flexDirection: isRtl ? "row-reverse" : "row" },
           ]}
         >
-          {["male", "female"].map((g) => (
-            <TouchableOpacity
-              key={g}
-              onPress={() => setValue("gender", g, { shouldValidate: true })}
-              style={[
-                styles.genderCard,
-                watch("gender") === g && styles.genderCardActive,
-              ]}
-              activeOpacity={0.8}
-            >
-              <AnyIcon
-                type={Icons.MaterialCommunityIcons}
-                name={g === "male" ? "gender-male" : "gender-female"}
-                size={moderateScale(20)}
-                color={watch("gender") === g ? colors.white : colors.primary}
-              />
-              <Text
-                semiBold
-                FONT_13
+          {["male", "female"].map((g) => {
+            const isSelected =
+              watch("gender")?.toLowerCase() === g.toLowerCase();
+            return (
+              <TouchableOpacity
+                key={g}
+                onPress={() => setValue("gender", g, { shouldValidate: true })}
                 style={[
-                  styles.genderText,
-                  watch("gender") === g
-                    ? { color: colors.white }
-                    : { color: colors.textSecondary },
+                  styles.genderCard,
+                  isSelected && styles.genderCardActive,
                 ]}
+                activeOpacity={0.8}
               >
-                {t(`onboarding.${g}`)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <AnyIcon
+                  type={Icons.MaterialCommunityIcons}
+                  name={g === "male" ? "gender-male" : "gender-female"}
+                  size={moderateScale(20)}
+                  color={isSelected ? colors.white : colors.primary}
+                />
+                <Text
+                  semiBold
+                  FONT_13
+                  style={[
+                    styles.genderText,
+                    isSelected
+                      ? { color: colors.white }
+                      : { color: colors.textSecondary },
+                  ]}
+                >
+                  {t(`onboarding.${g}`)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
         {errors.gender && (
           <Text

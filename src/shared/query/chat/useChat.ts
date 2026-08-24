@@ -46,67 +46,11 @@ export const useChatThreads = (enabled = true) => {
       return response.data?.data || response.data;
     },
     enabled,
-    refetchInterval: 15000,
+    staleTime: 10000,
   });
 };
 
 export const useChatMessages = (threadId: string, enabled = true) => {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!threadId || !enabled) return;
-
-    // Real-time listener for instant message delivery in the active thread channel
-    const channel = supabase
-      .channel(`chat_messages:${threadId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `thread_id=eq.${threadId}`,
-        },
-        (payload) => {
-          const newMsg = payload.new;
-          queryClient.setQueryData(
-            chatKeys.messages(threadId),
-            (oldData: any) => {
-              if (!oldData) {
-                queryClient.invalidateQueries({
-                  queryKey: chatKeys.messages(threadId),
-                });
-                return oldData;
-              }
-
-              const rawList =
-                oldData.messages || (Array.isArray(oldData) ? oldData : []);
-
-              const exists = rawList.some(
-                (m: any) => String(m.id) === String(newMsg.id)
-              );
-              if (exists) return oldData;
-
-              const updatedList = [...rawList, newMsg];
-
-              if (oldData.messages) {
-                return { ...oldData, messages: updatedList };
-              }
-              return updatedList;
-            }
-          );
-
-          // Invalidate thread list to update thread last message preview and timestamp
-          queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [threadId, enabled, queryClient]);
-
   return useQuery({
     queryKey: chatKeys.messages(threadId),
     queryFn: async () => {
@@ -114,7 +58,7 @@ export const useChatMessages = (threadId: string, enabled = true) => {
       return response.data?.data || response.data;
     },
     enabled: !!threadId && enabled,
-    refetchInterval: 15000,
+    staleTime: 10000,
   });
 };
 
@@ -145,4 +89,24 @@ export const useSendMessage = () => {
       });
     },
   });
+};
+
+export const useMarkThreadAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return {
+    mutate: (threadId: string) => {
+      if (!threadId) return;
+      queryClient.setQueryData(chatKeys.threads(), (oldData: any) => {
+        if (!oldData) return oldData;
+        const raw = oldData.data || (Array.isArray(oldData) ? oldData : []);
+        const updated = raw.map((t: any) =>
+          String(t.id) === String(threadId)
+            ? { ...t, unreadCount: 0, unread_count: 0 }
+            : t
+        );
+        return oldData.data ? { ...oldData, data: updated } : updated;
+      });
+    },
+  };
 };

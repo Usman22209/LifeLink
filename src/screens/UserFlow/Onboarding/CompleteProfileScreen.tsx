@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
   View,
   TouchableOpacity,
@@ -59,7 +59,9 @@ const COUNTRIES = [{ name: "Pakistan", code: "PK", flag: "🇵🇰" }];
 const CompleteProfileScreen = () => {
   const navigation = useNavigation<CompleteProfileNavigationProp>();
   const route = useRoute<CompleteProfileRouteProp>();
-  const isEditing = (route.params as any)?.isEditing === true;
+  const isEditing =
+    route.name === ROUTES.EDIT_PROFILE ||
+    (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(true);
@@ -67,22 +69,68 @@ const CompleteProfileScreen = () => {
   const selectedLang = useSelector(selectLanguage);
   const { t } = useTranslation();
 
+  const resolveProfileDefaults = useCallback(
+    (profile: any) => {
+      if (!profile) return undefined;
+
+      let cityValue = profile.city_id || profile.city || "";
+      let stateValue = profile.state || profile.province || "";
+
+      if (cityValue) {
+        const foundCity = CitiesData.cities.find(
+          (c) =>
+            c.id === cityValue ||
+            c.name.en.toLowerCase() === String(cityValue).toLowerCase() ||
+            c.name.ur === cityValue,
+        );
+        if (foundCity) {
+          cityValue = foundCity.id;
+          if (!stateValue) {
+            stateValue = foundCity.province;
+          }
+        }
+      }
+
+      let genderValue: OnboardingFormValues["gender"] = "male";
+      if (profile.gender) {
+        const normalizedGender = String(profile.gender).toLowerCase();
+        if (normalizedGender === "female" || normalizedGender === "male") {
+          genderValue = normalizedGender;
+        }
+      }
+
+      let dobValue = "";
+      if (profile.dob) {
+        dobValue = typeof profile.dob === "string" ? profile.dob.split("T")[0] : "";
+      }
+
+      const bloodGroupValue = (
+        profile.blood_group ||
+        profile.blood_type ||
+        ""
+      ).toUpperCase();
+
+      return {
+        full_name: profile.full_name || profile.name || "",
+        email: profile.email || user?.email || "",
+        phone: profile.phone || profile.contact_number || "",
+        gender: genderValue,
+        dob: dobValue,
+        city: cityValue,
+        state: stateValue,
+        country: profile.country || "Pakistan",
+        blood_group: bloodGroupValue,
+        profile_image: profile.profile_image || profile.avatar_url || "",
+        confirmed_data: true,
+      };
+    },
+    [user?.email],
+  );
+
   const editDefaults = useMemo(() => {
-    if (!user) return undefined;
-    return {
-      full_name: user.full_name || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      gender: (user.gender || "male") as OnboardingFormValues["gender"],
-      dob: user.dob || "",
-      city: user.city_id || "",
-      state: user.state || "",
-      country: user.country || "Pakistan",
-      blood_group: user.blood_group || "",
-      profile_image: user.profile_image || "",
-      confirmed_data: true,
-    };
-  }, [user]);
+    const active = serverProfile || user;
+    return resolveProfileDefaults(active);
+  }, [user, serverProfile, resolveProfileDefaults]);
 
   const {
     control,
@@ -137,7 +185,10 @@ const CompleteProfileScreen = () => {
   const availableCities = useMemo(() => {
     if (!selectedProvince) return [];
     return CitiesData.cities
-      .filter((item) => item.province === selectedProvince)
+      .filter(
+        (item) =>
+          item.province?.toLowerCase() === selectedProvince?.toLowerCase(),
+      )
       .map((item) => ({
         label: item.name[selectedLang] || item.name.en,
         value: item.id,
@@ -146,8 +197,13 @@ const CompleteProfileScreen = () => {
 
   const selectedCityName = useMemo(() => {
     if (!selectedCity) return "";
-    const city = CitiesData.cities.find((c) => c.id === selectedCity);
-    if (!city) return "";
+    const city = CitiesData.cities.find(
+      (c) =>
+        c.id === selectedCity ||
+        c.name.en.toLowerCase() === String(selectedCity).toLowerCase() ||
+        c.name.ur === selectedCity,
+    );
+    if (!city) return selectedCity;
     return city.name[selectedLang] || city.name.en;
   }, [selectedCity, selectedLang]);
 
@@ -242,34 +298,18 @@ const CompleteProfileScreen = () => {
     handleUpload();
   }, [media, setValue, uploadImage]);
 
+  const isInitializedRef = React.useRef(false);
+
   useEffect(() => {
-    if (serverProfile) {
-      const isComplete =
-        serverProfile.is_onboarded ||
-        Boolean(serverProfile.phone && serverProfile.blood_group);
-
-      if (isComplete) {
-        dispatch(updateUser({ ...serverProfile, is_onboarded: true }));
-        if (!isEditing) return;
+    const active = serverProfile || user;
+    if (active && !isInitializedRef.current) {
+      const defaults = resolveProfileDefaults(active);
+      if (defaults && (defaults.full_name || defaults.phone || defaults.blood_group || defaults.email)) {
+        isInitializedRef.current = true;
+        reset(defaults);
       }
-
-      reset({
-        full_name: serverProfile.full_name || "",
-        email: serverProfile.email || user?.email || "",
-        phone: serverProfile.phone || "",
-        gender: (serverProfile.gender || "male") as OnboardingFormValues["gender"],
-        dob: serverProfile.dob || "",
-        city: serverProfile.city_id || "",
-        state: serverProfile.state || "",
-        country: serverProfile.country || "Pakistan",
-        blood_group: serverProfile.blood_group || "",
-        profile_image: serverProfile.profile_image || "",
-        confirmed_data: true,
-      });
-    } else if (user?.email) {
-      setValue("email", user.email);
     }
-  }, [serverProfile, user?.email, isEditing, dispatch, reset, setValue]);
+  }, [serverProfile, user, resolveProfileDefaults, reset]);
 
   useEffect(() => {
     if (isEditing) {

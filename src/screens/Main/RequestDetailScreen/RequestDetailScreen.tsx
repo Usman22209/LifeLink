@@ -18,9 +18,12 @@ import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useSelector } from "react-redux";
+import { selectUser } from "@store/slices/authSlice";
+import { useGetProfile } from "@shared/query/profile/useProfile";
+import { requireCompleteProfile } from "@shared/utils/profileUtils";
 import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { URGENCY_CONFIG } from "@screens/Main/FeedScreen/types";
-import type { MainStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
+import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
 import { useAcceptBloodRequest } from "@shared/query/donations/useDonations";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
@@ -34,7 +37,7 @@ import { StickyFooterActions } from "./components/StickyFooterActions";
 import { styles } from "./RequestDetailScreen.styles";
 
 type RequestDetailScreenRouteProp = RouteProp<
-  MainStackParamList,
+  UserStackParamList,
   typeof ROUTES.REQUEST_DETAIL
 >;
 
@@ -46,7 +49,7 @@ const RequestDetailScreen: React.FC = () => {
   const selectedLang = useSelector(selectLanguage);
   const userLocation = useUserLocation();
 
-  const rawRequest = route.params?.request || ({} as any);
+  const rawRequest: any = route.params?.request || {};
 
   // Normalize request schema to handle both camelCase and backend snake_case properties
   const request = useMemo(() => {
@@ -98,6 +101,10 @@ const RequestDetailScreen: React.FC = () => {
   const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
+  const reduxUser = useSelector(selectUser);
+  const { data: profile } = useGetProfile();
+  const user = profile || reduxUser;
+
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
@@ -109,10 +116,16 @@ const RequestDetailScreen: React.FC = () => {
   }, [request, cityName, t]);
 
   const handleContact = useCallback(() => {
+    if (user && !requireCompleteProfile(user, navigation, t)) {
+      return;
+    }
     (navigation as any).navigate(ROUTES.CHAT, { request });
-  }, [navigation, request]);
+  }, [navigation, request, user, t]);
 
   const handleConfirmMatch = useCallback(async () => {
+    if (user && !requireCompleteProfile(user, navigation, t)) {
+      return;
+    }
     if (!request.id) return;
     try {
       await acceptBloodRequestMutate(request.id);
@@ -133,7 +146,7 @@ const RequestDetailScreen: React.FC = () => {
       setMatchSheetVisible(false);
       Alert.alert("Error", err?.message || "Could not respond to request.");
     }
-  }, [acceptBloodRequestMutate, request, navigation]);
+  }, [acceptBloodRequestMutate, request, navigation, user, t]);
 
   const handleNavigate = useCallback(() => {
     const query = encodeURIComponent(`${request.hospital}, ${cityName || request.city}`);

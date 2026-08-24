@@ -104,6 +104,8 @@
     "deleteAccountConfirmButton": "Delete permanently",
     "deleteAccountSuccess": "Your account has been deleted successfully.",
     "guestDonor": "Guest Donor",
+    "completeProfileTitle": "Complete Your Profile",
+    "completeProfilePrompt": "Please complete your profile details first.",
     "aboutApp": "About LifeLink",
     "aboutAppDesc": "LifeLink v1.0.0 - Connecting Lives through Blood Donations.",
     "languageModalTitle": "Select Language",

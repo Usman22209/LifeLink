@@ -46,31 +46,34 @@ export const MedicalInfoSection: React.FC<MedicalInfoSectionProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        {BLOOD_GROUPS.map((group) => (
-          <TouchableOpacity
-            key={group}
-            onPress={() =>
-              setValue("blood_group", group, { shouldValidate: true })
-            }
-            style={[
-              styles.bloodGroupButton,
-              watch("blood_group") === group &&
-                styles.bloodGroupButtonActive,
-            ]}
-          >
-            <Text
-              bold
-              FONT_13
+        {BLOOD_GROUPS.map((group) => {
+          const isSelected =
+            watch("blood_group")?.trim().toUpperCase() === group.toUpperCase();
+          return (
+            <TouchableOpacity
+              key={group}
+              onPress={() =>
+                setValue("blood_group", group, { shouldValidate: true })
+              }
               style={[
-                watch("blood_group") === group
-                  ? { color: colors.white }
-                  : { color: colors.primary },
+                styles.bloodGroupButton,
+                isSelected && styles.bloodGroupButtonActive,
               ]}
             >
-              {group}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                bold
+                FONT_13
+                style={[
+                  isSelected
+                    ? { color: colors.white }
+                    : { color: colors.primary },
+                ]}
+              >
+                {group}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
       {errors.blood_group && (
         <Text
