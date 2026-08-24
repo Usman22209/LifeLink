@@ -17,8 +17,19 @@ interface ProfileHeaderCardProps {
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
-  const avatarUri = user?.avatar_url || user?.profile_image;
-  const userBloodType = user?.blood_type || user?.blood_group || "O+";
+  const actualUser = user?.user || user?.profile || user;
+
+  const avatarUri = actualUser?.avatar_url || actualUser?.profile_image;
+  const userBloodType = actualUser?.blood_type || actualUser?.blood_group || "O+";
+
+  const userName =
+    actualUser?.full_name ||
+    actualUser?.name ||
+    actualUser?.fullName ||
+    (actualUser?.email ? actualUser.email.split("@")[0] : null) ||
+    t("profile.guestDonor");
+
+  const userEmail = actualUser?.email || "guest@lifelink.com";
 
   return (
     <View
@@ -65,14 +76,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
           FONT_16
           style={[styles.name, { textAlign: isRtl ? "right" : "left" }]}
         >
-          {user?.full_name || t("profile.guestDonor")}
+          {userName}
         </Text>
         <Text
           regular
           FONT_12
           style={[styles.email, { textAlign: isRtl ? "right" : "left" }]}
         >
-          {user?.email || "guest@lifelink.com"}
+          {userEmail}
         </Text>
       </View>
     </View>

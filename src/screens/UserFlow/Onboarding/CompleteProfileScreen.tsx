@@ -62,7 +62,7 @@ const CompleteProfileScreen = () => {
   const isEditing = (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(!!user);
+  const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(true);
   const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t } = useTranslation();

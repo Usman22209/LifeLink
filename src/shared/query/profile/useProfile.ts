@@ -17,7 +17,16 @@ export const useGetProfile = (enabled = true) => {
     queryKey: profileKeys.me(),
     queryFn: async () => {
       const response = await PROFILE_SERVICE.getProfile();
-      return response.data?.data || response.data;
+      const rawData = response.data?.data || response.data;
+      const profileData = rawData?.user || rawData?.profile || rawData;
+      if (
+        profileData &&
+        typeof profileData === "object" &&
+        (profileData.id || profileData.email || profileData.full_name || profileData.name)
+      ) {
+        store.dispatch(updateUser(profileData));
+      }
+      return profileData;
     },
     enabled,
   });

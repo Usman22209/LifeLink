@@ -34,14 +34,17 @@ const HomeScreen = () => {
 
   useEffect(() => {
     if (profile) {
-      dispatch(updateUser(profile));
+      const profileData = profile?.user || profile?.profile || profile;
+      dispatch(updateUser(profileData));
     }
   }, [profile, dispatch]);
 
-  const user = profile || reduxUser;
+  const rawUser = profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
   const displayName =
     user?.full_name ||
     user?.name ||
+    user?.fullName ||
     (user?.email ? user.email.split("@")[0] : "User");
 
   const rawUrgent = Array.isArray(urgentRequestsData?.data)

@@ -33,27 +33,39 @@ const authSlice = createSlice({
       };
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.user) {
-        const wasOnboarded =
-          Boolean(state.user.is_onboarded) ||
-          Boolean(state.user.phone && state.user.blood_group);
+      if (!action.payload) return;
 
-        const incomingOnboarded = action.payload.is_onboarded;
-
-        const finalIsOnboarded =
-          wasOnboarded ||
-          Boolean(incomingOnboarded) ||
-          Boolean(
-            (action.payload.phone || state.user.phone) &&
-              (action.payload.blood_group || state.user.blood_group),
-          );
-
+      if (!state.user) {
+        const incoming = action.payload as any;
+        const isOnboarded =
+          Boolean(incoming.is_onboarded) ||
+          Boolean(incoming.phone && (incoming.blood_group || incoming.blood_type));
         state.user = {
-          ...state.user,
-          ...action.payload,
-          is_onboarded: finalIsOnboarded,
-        };
+          ...incoming,
+          is_onboarded: isOnboarded,
+        } as User;
+        return;
       }
+
+      const wasOnboarded =
+        Boolean(state.user.is_onboarded) ||
+        Boolean(state.user.phone && (state.user.blood_group || (state.user as any).blood_type));
+
+      const incomingOnboarded = action.payload.is_onboarded;
+
+      const finalIsOnboarded =
+        wasOnboarded ||
+        Boolean(incomingOnboarded) ||
+        Boolean(
+          (action.payload.phone || state.user.phone) &&
+            (action.payload.blood_group || (action.payload as any).blood_type || state.user.blood_group),
+        );
+
+      state.user = {
+        ...state.user,
+        ...action.payload,
+        is_onboarded: finalIsOnboarded,
+      };
     },
     logout: (state) => {
       state.accessToken = null;
