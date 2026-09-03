@@ -164,7 +164,7 @@ const ProfileScreen = () => {
             />
             <SettingItem
               iconName="file-text"
-              label="My Blood Requests"
+              label={t("profile.myBloodRequests") || "My Blood Requests"}
               onPress={() => {
                 navigation.navigate(ROUTES.MY_REQUESTS as any);
               }}
@@ -251,7 +251,7 @@ const ProfileScreen = () => {
         />
 
         <Text regular FONT_10 style={styles.versionText}>
-          Version 1.0.0 (Build 12)
+          {t("profile.appVersion", { version: "1.0.0", build: "12" }) || "Version 1.0.0 (Build 12)"}
         </Text>
       </ScrollView>
 

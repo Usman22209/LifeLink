@@ -8,12 +8,15 @@ import {
 } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { useBloodRequestDetails, useUpdateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { useDonationsForRequest, useUpdateDonationStatus } from "@shared/query/donations/useDonations";
 import { DonationStatus, BloodRequestStatus } from "@shared/interfaces/models/blood-request.interface";
@@ -24,6 +27,8 @@ import { DonorCard } from "./components/DonorCard";
 import { styles } from "./TrackRequestScreen.styles";
 
 const TrackRequestScreen: React.FC = () => {
+  const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const { requestId, request: initialRequest } = route.params || {};
@@ -54,12 +59,12 @@ const TrackRequestScreen: React.FC = () => {
 
   const handleConfirmUnitReceived = async (donationId: string, donorName: string) => {
     Alert.alert(
-      "Confirm Donation",
-      `Did ${donorName} donate 1 unit of blood?`,
+      t("trackRequest.confirmReceivedTitle") || "Confirm Donation",
+      t("trackRequest.confirmReceivedMsg", { name: donorName }) || `Did ${donorName} donate 1 unit of blood?`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel") || "Cancel", style: "cancel" },
         {
-          text: "Yes, Confirm",
+          text: t("common.yes") || "Yes, Confirm",
           onPress: async () => {
             try {
               await updateDonationStatus({
@@ -67,9 +72,12 @@ const TrackRequestScreen: React.FC = () => {
                 status: DonationStatus.COMPLETED,
               });
               refetchReq();
-              Alert.alert("Success! 🎉", "Donation marked as received.");
+              Alert.alert(
+                t("common.success") || "Success! 🎉",
+                t("trackRequest.confirmReceivedSuccess") || "Donation marked as received."
+              );
             } catch (err: any) {
-              Alert.alert("Error", err?.message || "Could not update donation status.");
+              Alert.alert(t("common.error") || "Error", err?.message || "Could not update donation status.");
             }
           },
         },
@@ -79,12 +87,12 @@ const TrackRequestScreen: React.FC = () => {
 
   const handleCloseRequest = async () => {
     Alert.alert(
-      "Mark as Fulfilled",
-      "Are all required blood units received for this patient? This will complete and close the request.",
+      t("trackRequest.markFulfilledTitle") || "Mark as Fulfilled",
+      t("trackRequest.markFulfilledConfirm") || "Are all required blood units received for this patient? This will complete and close the request.",
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel") || "Cancel", style: "cancel" },
         {
-          text: "Yes, Mark Fulfilled",
+          text: t("common.yes") || "Yes, Mark Fulfilled",
           onPress: async () => {
             try {
               await updateRequestStatus({
@@ -92,9 +100,12 @@ const TrackRequestScreen: React.FC = () => {
                 data: { status: BloodRequestStatus.FULFILLED },
               });
               refetchReq();
-              Alert.alert("Success 🎉", "Request marked as fulfilled.");
+              Alert.alert(
+                t("common.success") || "Success 🎉",
+                t("trackRequest.markFulfilledSuccess") || "Request marked as fulfilled."
+              );
             } catch (err: any) {
-              Alert.alert("Error", err?.message || "Could not close request.");
+              Alert.alert(t("common.error") || "Error", err?.message || "Could not close request.");
             }
           },
         },
@@ -104,12 +115,12 @@ const TrackRequestScreen: React.FC = () => {
 
   const handleWithdrawRequest = async () => {
     Alert.alert(
-      "Withdraw Request",
-      "Are you sure you want to withdraw this blood request? (e.g. arranged blood from another source or no longer needed).\n\nThis will remove it from the public feed.",
+      t("trackRequest.withdrawTitle") || "Withdraw Request",
+      t("trackRequest.withdrawConfirm") || "Are you sure you want to withdraw this blood request? (e.g. arranged blood from another source or no longer needed).\n\nThis will remove it from the public feed.",
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel") || "Cancel", style: "cancel" },
         {
-          text: "Withdraw Request",
+          text: t("trackRequest.withdrawTitle") || "Withdraw Request",
           style: "destructive",
           onPress: async () => {
             try {
@@ -118,11 +129,13 @@ const TrackRequestScreen: React.FC = () => {
                 data: { status: BloodRequestStatus.CANCELLED },
               });
               refetchReq();
-              Alert.alert("Request Withdrawn", "Your blood request has been withdrawn.", [
-                { text: "OK", onPress: () => navigation.goBack() },
-              ]);
+              Alert.alert(
+                t("trackRequest.withdrawTitle") || "Request Withdrawn",
+                t("trackRequest.withdrawSuccess") || "Your blood request has been withdrawn.",
+                [{ text: t("common.ok") || "OK", onPress: () => navigation.goBack() }]
+              );
             } catch (err: any) {
-              Alert.alert("Error", err?.message || "Could not withdraw request.");
+              Alert.alert(t("common.error") || "Error", err?.message || "Could not withdraw request.");
             }
           },
         },
@@ -133,7 +146,11 @@ const TrackRequestScreen: React.FC = () => {
   if (isReqLoading) {
     return (
       <ScreenWrapper backgroundColor={colors.background} safeArea>
-        <AppHeader title="Track Request" showBackButton onBackPress={() => navigation.goBack()} />
+        <AppHeader
+          title={t("trackRequest.title") || "Track Request"}
+          showBackButton
+          onBackPress={() => navigation.goBack()}
+        />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -144,7 +161,7 @@ const TrackRequestScreen: React.FC = () => {
   return (
     <ScreenWrapper backgroundColor={colors.background} safeArea>
       <AppHeader
-        title="Track Request"
+        title={t("trackRequest.title") || "Track Request"}
         showBackButton
         onBackPress={() => navigation.goBack()}
       />
@@ -172,12 +189,19 @@ const TrackRequestScreen: React.FC = () => {
         />
 
         {/* Donors Section Header */}
-        <View style={styles.sectionHeader}>
+        <View
+          style={[
+            styles.sectionHeader,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           <Text semiBold FONT_14 style={{ color: colors.text }}>
-            Responding Donors
+            {t("trackRequest.respondingDonors") || "Responding Donors"}
           </Text>
           <Text regular FONT_11 style={{ color: colors.textSecondary }}>
-            {donationsList.length} donor{donationsList.length !== 1 ? "s" : ""}
+            {donationsList.length === 1
+              ? (t("trackRequest.donorsCount", { count: 1 }) || "1 donor")
+              : (t("trackRequest.donorsCountPlural", { count: donationsList.length }) || `${donationsList.length} donors`)}
           </Text>
         </View>
 
@@ -190,10 +214,10 @@ const TrackRequestScreen: React.FC = () => {
                 <AnyIcon type={Icons.Feather} name="users" size={moderateScale(22)} color={colors.textSecondary} />
               </View>
               <Text semiBold FONT_13 style={{ color: colors.text, marginTop: verticalScale(10) }}>
-                No Donors Yet
+                {t("trackRequest.noDonorsYet") || "No Donors Yet"}
               </Text>
               <Text regular FONT_11 style={{ color: colors.textSecondary, textAlign: "center", marginTop: verticalScale(4), lineHeight: moderateScale(16) }}>
-                Matching donors in your area are being notified about this request.
+                {t("trackRequest.noDonorsDesc") || "Matching donors in your area are being notified about this request."}
               </Text>
             </View>
           </View>
@@ -224,26 +248,32 @@ const TrackRequestScreen: React.FC = () => {
         {!isFulfilled && !isExpired && request.status !== "cancelled" ? (
           <View style={{ marginTop: verticalScale(10) }}>
             <TouchableOpacity
-              style={styles.fulfillBtn}
+              style={[
+                styles.fulfillBtn,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
               activeOpacity={0.8}
               onPress={handleCloseRequest}
               disabled={isUpdatingReq}
             >
               <AnyIcon type={Icons.Feather} name="check-circle" size={moderateScale(15)} color={colors.white} />
-              <Text bold FONT_13 style={{ color: colors.white, marginLeft: scale(6) }}>
-                Mark as Fulfilled
+              <Text bold FONT_13 style={{ color: colors.white, marginHorizontal: scale(6) }}>
+                {t("trackRequest.markAsFulfilled") || "Mark as Fulfilled"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.withdrawBtn}
+              style={[
+                styles.withdrawBtn,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
               activeOpacity={0.8}
               onPress={handleWithdrawRequest}
               disabled={isUpdatingReq}
             >
               <AnyIcon type={Icons.Feather} name="x-circle" size={moderateScale(14)} color={colors.danger} />
-              <Text semiBold FONT_12 style={{ color: colors.danger, marginLeft: scale(6) }}>
-                Withdraw Request (Arranged Elsewhere)
+              <Text semiBold FONT_12 style={{ color: colors.danger, marginHorizontal: scale(6) }}>
+                {t("trackRequest.withdrawRequest") || "Withdraw Request (Arranged Elsewhere)"}
               </Text>
             </TouchableOpacity>
           </View>

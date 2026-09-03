@@ -71,7 +71,13 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { width: cardWidth }]}
+      style={[
+        styles.card,
+        {
+          width: cardWidth,
+          flexDirection: isRtl ? "row-reverse" : "row",
+        },
+      ]}
       activeOpacity={0.8}
       onPress={onPress}
     >
@@ -110,7 +116,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             <Text
               semiBold
               FONT_9
-              style={{ color: config.color, marginLeft: scale(3) }}
+              style={{ color: config.color, marginHorizontal: scale(3) }}
             >
               {getUrgencyText(urgency)}
             </Text>
@@ -146,8 +152,9 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             numberOfLines={1}
             style={{
               color: colors.textSecondary,
-              marginLeft: scale(3),
+              marginHorizontal: scale(3),
               flex: 1,
+              textAlign: isRtl ? "right" : "left",
             }}
           >
             {locationText}
@@ -177,9 +184,9 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             <Text
               medium
               FONT_10
-              style={{ color: colors.textSecondary, marginLeft: scale(3) }}
+              style={{ color: colors.textSecondary, marginHorizontal: scale(3) }}
             >
-              {units} {units === 1 ? t("home.unit") : t("home.units")}
+              {units} {units === 1 ? (t("feed.unit") || "unit") : (t("feed.units") || "units")}
             </Text>
           </View>
           <Text medium FONT_9 style={{ color: colors.textSecondary }}>

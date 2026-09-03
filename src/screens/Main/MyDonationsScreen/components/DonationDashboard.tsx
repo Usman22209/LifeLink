@@ -1,9 +1,12 @@
 import React from "react";
 import { View } from "react-native";
 import { moderateScale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { styles } from "../MyDonationsScreen.styles";
 
 interface DonationDashboardProps {
@@ -50,30 +53,37 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
   isEligible,
   nextEligibleDateStr,
 }) => {
+  const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
   const statusColor = isEligible ? colors.success : colors.warning;
 
   return (
     <>
       <View style={styles.summarySection}>
-        <View style={styles.summaryRow}>
+        <View
+          style={[
+            styles.summaryRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           <StatCard
             icon="droplet"
             value={totalDonations}
-            label="Donations"
+            label={t("myDonations.donations") || "Donations"}
             iconBg={withOpacity(colors.primary, 0.08)}
             iconColor={colors.primary}
           />
           <StatCard
             icon="heart"
             value={livesSaved}
-            label="Lives Saved"
+            label={t("myDonations.livesSaved") || "Lives Saved"}
             iconBg={withOpacity(colors.success, 0.08)}
             iconColor={colors.success}
           />
           <StatCard
             icon="calendar"
             value={`${totalDonations > 0 ? Math.round((totalDonations / 5) * 12) : 0}mo`}
-            label="Active Since"
+            label={t("myDonations.activeSince") || "Active Since"}
             iconBg={withOpacity(colors.info, 0.08)}
             iconColor={colors.info}
           />
@@ -86,6 +96,7 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           {
             backgroundColor: withOpacity(statusColor, 0.04),
             borderColor: withOpacity(statusColor, 0.15),
+            flexDirection: isRtl ? "row-reverse" : "row",
           },
         ]}
       >
@@ -95,18 +106,33 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           size={moderateScale(18)}
           color={statusColor}
         />
-        <View style={styles.eligibilityTextWrap}>
+        <View
+          style={[
+            styles.eligibilityTextWrap,
+            {
+              alignItems: isRtl ? "flex-end" : "flex-start",
+              marginHorizontal: moderateScale(10),
+            },
+          ]}
+        >
           <AppText
             semiBold
             FONT_12
-            style={[styles.eligibilityTitle, { color: statusColor }]}
+            style={[styles.eligibilityTitle, { color: statusColor, textAlign: isRtl ? "right" : "left" }]}
           >
-            {isEligible ? "Eligible to Donate" : "Cooldown Period"}
-          </AppText>
-          <AppText regular FONT_10 style={styles.eligibilityDesc}>
             {isEligible
-              ? "You are eligible to donate blood again."
-              : `Next eligible on ${nextEligibleDateStr}`}
+              ? t("myDonations.eligibleToDonate") || "Eligible to Donate"
+              : t("myDonations.cooldownPeriod") || "Cooldown Period"}
+          </AppText>
+          <AppText
+            regular
+            FONT_10
+            style={[styles.eligibilityDesc, { textAlign: isRtl ? "right" : "left" }]}
+          >
+            {isEligible
+              ? t("myDonations.eligibleDesc") || "You are eligible to donate blood again."
+              : t("myDonations.nextEligibleOn", { date: nextEligibleDateStr }) ||
+                `Next eligible on ${nextEligibleDateStr}`}
           </AppText>
         </View>
       </View>

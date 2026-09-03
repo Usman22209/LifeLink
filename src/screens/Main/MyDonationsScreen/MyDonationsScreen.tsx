@@ -9,6 +9,8 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { ROUTES } from "@utils/Routes";
+import { useSelector } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useMyDonations } from "@shared/query/donations/useDonations";
 import { styles } from "./MyDonationsScreen.styles";
@@ -19,6 +21,7 @@ import { MOCK_DONATIONS } from "@shared/constants/mockData";
 
 const MyDonationsScreen = () => {
   const { t } = useTranslation();
+  const isRtl = useSelector(selectIsRtl);
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const { data: myDonationsData } = useMyDonations();
@@ -125,7 +128,12 @@ const MyDonationsScreen = () => {
               nextEligibleDateStr={stats.nextEligibleDateStr}
             />
 
-            <View style={styles.sectionHeader}>
+            <View
+              style={[
+                styles.sectionHeader,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
+            >
               <View style={styles.sectionIconWrap}>
                 <AnyIcon
                   type={Icons.Feather}
@@ -134,8 +142,8 @@ const MyDonationsScreen = () => {
                   color={colors.primary}
                 />
               </View>
-              <AppText bold FONT_14 style={styles.sectionTitle}>
-                Donation History
+              <AppText bold FONT_14 style={[styles.sectionTitle, { marginHorizontal: moderateScale(6) }]}>
+                {t("myDonations.donationHistory") || "Donation History"}
               </AppText>
             </View>
           </>

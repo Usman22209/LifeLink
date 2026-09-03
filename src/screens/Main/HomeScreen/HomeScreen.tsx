@@ -132,7 +132,6 @@ const HomeScreen = () => {
             styles.urgentScroll,
             { flexDirection: isRtl ? "row-reverse" : "row" },
           ]}
-          contentOffset={isRtl ? { x: 9999, y: 0 } : { x: 0, y: 0 }}
         >
           {urgentRequests.map((request: UrgentRequest) => (
             <UrgentRequestCard
