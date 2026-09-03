@@ -97,6 +97,10 @@
     "logoutConfirm": "Are you sure you want to sign out? You will need to log in again to receive emergency blood requests in your area.",
     "language": "Language",
     "notifications": "Notifications",
+    "hidePhoneNumber": "Hide Phone Number",
+    "hidePhoneNumberDesc": "Only allow in-app chat; hide phone number on your requests",
+    "call": "Call",
+    "chatOnly": "In-App Chat Only",
     "saveChanges": "Save Changes",
     "myDonationsTitle": "My Donations",
     "deleteAccount": "Delete Account",
@@ -119,7 +123,8 @@
       "donations": "Donations",
       "livesSaved": "Lives Saved",
       "status": "Status",
-      "eligible": "Eligible"
+      "eligible": "Eligible",
+      "ineligible": "Ineligible"
     }
   },
   "common": {
@@ -160,6 +165,7 @@
     "unitsMinOne": "At least 1 unit is required",
     "hospitalNameRequired": "Hospital name is required (minimum 3 characters)",
     "descriptionTooLong": "Description must not exceed 500 characters",
+    "underageError": "You must be at least 18 years old to register as a donor",
     "confirmRequired": "You must confirm the information is correct"
   },
   "onboarding": {

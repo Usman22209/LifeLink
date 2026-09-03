@@ -21,6 +21,7 @@ import StatsSection from "./components/StatsSection";
 import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
 import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
+import { OneSignal } from "react-native-onesignal";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
@@ -49,10 +50,39 @@ const ProfileScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
   );
+  const [hidePhoneNumber, setHidePhoneNumber] = useState(
+    user?.hide_phone_number ?? false,
+  );
+
+  useEffect(() => {
+    if (user?.notifications_enabled !== undefined) {
+      setNotificationsEnabled(Boolean(user.notifications_enabled));
+    }
+  }, [user?.notifications_enabled]);
+
+  useEffect(() => {
+    if (user?.hide_phone_number !== undefined) {
+      setHidePhoneNumber(Boolean(user.hide_phone_number));
+    }
+  }, [user?.hide_phone_number]);
 
   const handleNotificationToggle = (val: boolean) => {
     setNotificationsEnabled(val);
     updateSettingsMutate({ notifications_enabled: val });
+    try {
+      if (val) {
+        OneSignal.User.pushSubscription.optIn();
+      } else {
+        OneSignal.User.pushSubscription.optOut();
+      }
+    } catch (e: any) {
+      console.log("OneSignal push subscription toggle error:", e?.message);
+    }
+  };
+
+  const handleHidePhoneToggle = (val: boolean) => {
+    setHidePhoneNumber(val);
+    updateSettingsMutate({ hide_phone_number: val });
   };
 
   const handleLogout = () => {
@@ -143,11 +173,19 @@ const ProfileScreen = () => {
             <SettingItem
               iconName="bell"
               label={t("profile.notifications")}
-              isLast={true}
               iconColor={colors.primary}
               hasSwitch={true}
               switchValue={notificationsEnabled}
               onSwitchValueChange={handleNotificationToggle}
+            />
+            <SettingItem
+              iconName="phone-off"
+              label={t("profile.hidePhoneNumber") || "Hide Phone Number"}
+              isLast={true}
+              iconColor={colors.primary}
+              hasSwitch={true}
+              switchValue={hidePhoneNumber}
+              onSwitchValueChange={handleHidePhoneToggle}
             />
           </View>
         </View>

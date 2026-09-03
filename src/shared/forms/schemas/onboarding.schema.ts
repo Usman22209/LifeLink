@@ -6,7 +6,25 @@ export const getOnboardingSchema = (t: any) =>
     email: z.string().email(t("errors.invalidEmail")),
     phone: z.string().min(10, t("errors.invalidPhone")),
     gender: z.string().min(1, t("errors.genderRequired")),
-    dob: z.string().min(1, t("errors.dobRequired")),
+    dob: z
+      .string()
+      .min(1, t("errors.dobRequired"))
+      .refine(
+        (val) => {
+          const birthDate = new Date(val);
+          if (isNaN(birthDate.getTime())) return false;
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age >= 18;
+        },
+        {
+          message: t("errors.underageError") || "You must be at least 18 years old",
+        },
+      ),
     city: z.string().min(2, t("errors.cityRequired")),
     state: z.string().min(2, t("errors.stateRequired")),
     country: z.string().min(2, t("errors.countryRequired")),

@@ -16,6 +16,7 @@ export interface BloodRequest {
   distance: string;
   latitude?: number;
   longitude?: number;
+  requester_id?: string;
 }
 
 export interface FilterState {

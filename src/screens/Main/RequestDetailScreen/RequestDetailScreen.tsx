@@ -25,7 +25,9 @@ import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { URGENCY_CONFIG } from "@screens/Main/FeedScreen/types";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
-import { useAcceptBloodRequest } from "@shared/query/donations/useDonations";
+import { useAcceptBloodRequest, useMyDonations } from "@shared/query/donations/useDonations";
+import { useBloodRequestDetails } from "@shared/query/blood-requests/useBloodRequests";
+import { useChatThreads } from "@shared/query/chat/useChat";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
 
 import { HeroBanner } from "./components/HeroBanner";
@@ -51,25 +53,76 @@ const RequestDetailScreen: React.FC = () => {
 
   const rawRequest: any = route.params?.request || {};
 
+  const { data: requestDetails } = useBloodRequestDetails(rawRequest.id, !!rawRequest.id);
+  const detailData = requestDetails?.data || requestDetails || {};
+
+  // Fetch existing chat threads to avoid duplicate thread creation
+  const { data: chatThreadsData } = useChatThreads();
+  const threadsList = Array.isArray(chatThreadsData?.data)
+    ? chatThreadsData.data
+    : Array.isArray(chatThreadsData)
+    ? chatThreadsData
+    : [];
+
+  // Fetch user donations to check if already pledged for this request
+  const { data: myDonationsData } = useMyDonations();
+  const myDonationsList: any[] = Array.isArray(myDonationsData?.history)
+    ? myDonationsData.history
+    : Array.isArray(myDonationsData?.data)
+    ? myDonationsData.data
+    : Array.isArray(myDonationsData)
+    ? myDonationsData
+    : [];
+
   // Normalize request schema to handle both camelCase and backend snake_case properties
   const request = useMemo(() => {
+    const combined = { ...rawRequest, ...detailData };
     return {
-      ...rawRequest,
-      id: rawRequest.id || "",
-      patientName: rawRequest.patientName || rawRequest.patient_name || "Anonymous Patient",
-      bloodType: rawRequest.bloodType || rawRequest.blood_group || "O+",
-      hospital: rawRequest.hospital || rawRequest.hospital_name || "Hospital",
-      city: rawRequest.city || rawRequest.city_id || "",
-      units: rawRequest.units || rawRequest.units_required || 1,
-      urgency: (rawRequest.urgency || "normal").toLowerCase(),
-      time: rawRequest.time || "Recently",
-      time_left: rawRequest.time_left || "",
-      patientImage: rawRequest.patientImage || rawRequest.patient_image || rawRequest.requester?.profile_image,
-      latitude: rawRequest.latitude ? Number(rawRequest.latitude) : undefined,
-      longitude: rawRequest.longitude ? Number(rawRequest.longitude) : undefined,
-      distance: rawRequest.distance || "",
+      ...combined,
+      id: combined.id || "",
+      patientName: combined.patientName || combined.patient_name || "Anonymous Patient",
+      bloodType: combined.bloodType || combined.blood_group || "O+",
+      hospital: combined.hospital || combined.hospital_name || "Hospital",
+      city: combined.city || combined.city_id || "",
+      units: combined.units || combined.units_required || 1,
+      urgency: (combined.urgency || "normal").toLowerCase(),
+      time: combined.time || "Recently",
+      time_left: combined.time_left || "",
+      patientImage: combined.patientImage || combined.patient_image || combined.requester?.profile_image,
+      latitude: combined.latitude ? Number(combined.latitude) : undefined,
+      longitude: combined.longitude ? Number(combined.longitude) : undefined,
+      distance: combined.distance || "",
+      requester_id: combined.requester_id || combined.requesterId || combined.requester?.id,
+      contact_number: combined.contact_number || combined.contactNumber || combined.requester?.phone,
+      hide_phone_number: Boolean(
+        combined.hide_phone_number ||
+        combined.requester?.hide_phone_number ||
+        detailData.hide_phone_number ||
+        detailData.requester?.hide_phone_number
+      ),
     };
-  }, [rawRequest]);
+  }, [rawRequest, detailData]);
+
+  const existingThread = useMemo(() => {
+    if (!request.id) return null;
+    return threadsList.find(
+      (t: any) =>
+        String(t.request_id || t.request?.id) === String(request.id)
+    );
+  }, [threadsList, request.id]);
+
+  const existingDonation = useMemo(() => {
+    if (!request.id) return null;
+    return myDonationsList.find(
+      (d: any) =>
+        (String(d.request?.id || d.request_id) === String(request.id) ||
+          String(d.requestId) === String(request.id)) &&
+        d.status !== "cancelled"
+    );
+  }, [myDonationsList, request.id]);
+
+  const donationPledged = Boolean(existingDonation && existingDonation.status === "intent");
+  const donationCompleted = Boolean(existingDonation && existingDonation.status === "completed");
 
   const cityName = useMemo(
     () => getCityNameById(request.city, selectedLang),
@@ -103,7 +156,24 @@ const RequestDetailScreen: React.FC = () => {
 
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const user = profile || reduxUser;
+  const rawUser = profile?.data || profile?.user || profile?.profile || profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
+  const currentUserId = user?.id || reduxUser?.id;
+
+  const requesterId =
+    detailData?.requester_id ||
+    detailData?.requesterId ||
+    detailData?.requester?.id ||
+    request?.requester_id ||
+    rawRequest?.requester_id ||
+    rawRequest?.requesterId ||
+    rawRequest?.requester?.id;
+
+  const isOwner = Boolean(
+    currentUserId &&
+      requesterId &&
+      String(currentUserId).trim().toLowerCase() === String(requesterId).trim().toLowerCase()
+  );
 
   const handleShare = useCallback(async () => {
     try {
@@ -116,11 +186,22 @@ const RequestDetailScreen: React.FC = () => {
   }, [request, cityName, t]);
 
   const handleContact = useCallback(() => {
+    if (isOwner) {
+      (navigation as any).navigate(ROUTES.MY_REQUESTS);
+      return;
+    }
     if (user && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
-    (navigation as any).navigate(ROUTES.CHAT, { request });
-  }, [navigation, request, user, t]);
+    (navigation as any).navigate(ROUTES.CHAT, {
+      request,
+      threadId: existingThread?.id,
+    });
+  }, [navigation, request, user, t, isOwner, existingThread]);
+
+  const handleManageRequest = useCallback(() => {
+    (navigation as any).navigate(ROUTES.MY_REQUESTS);
+  }, [navigation]);
 
   const handleConfirmMatch = useCallback(async () => {
     if (user && !requireCompleteProfile(user, navigation, t)) {
@@ -138,7 +219,10 @@ const RequestDetailScreen: React.FC = () => {
           {
             text: "Open Chat",
             onPress: () =>
-              (navigation as any).navigate(ROUTES.CHAT, { request }),
+              (navigation as any).navigate(ROUTES.CHAT, {
+                request,
+                threadId: existingThread?.id,
+              }),
           },
         ],
       );
@@ -146,7 +230,40 @@ const RequestDetailScreen: React.FC = () => {
       setMatchSheetVisible(false);
       Alert.alert("Error", err?.message || "Could not respond to request.");
     }
-  }, [acceptBloodRequestMutate, request, navigation, user, t]);
+  }, [acceptBloodRequestMutate, request, navigation, user, t, existingThread]);
+
+  const canCall = Boolean(
+    !isOwner &&
+      !request.hide_phone_number &&
+      (request.contact_number || request.contactNumber)
+  );
+
+  const handleCall = useCallback(() => {
+    const rawPhone = request.contact_number || request.contactNumber;
+    if (!rawPhone) {
+      Alert.alert(
+        "Direct Call Unavailable",
+        "This user prefers in-app chat. Please tap Message to contact them directly.",
+      );
+      return;
+    }
+    const cleanPhone = String(rawPhone).replace(/[^\d+]/g, "");
+    const phoneUrl = `tel:${cleanPhone}`;
+    Linking.canOpenURL(phoneUrl)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(phoneUrl);
+        } else {
+          Alert.alert(
+            "Cannot Make Call",
+            `Unable to initiate phone call to ${rawPhone} on this device.`,
+          );
+        }
+      })
+      .catch(() => {
+        Linking.openURL(phoneUrl);
+      });
+  }, [request]);
 
   const handleNavigate = useCallback(() => {
     const query = encodeURIComponent(`${request.hospital}, ${cityName || request.city}`);
@@ -226,8 +343,45 @@ const RequestDetailScreen: React.FC = () => {
         {/* Sticky Actions Footer */}
         <StickyFooterActions
           insetsBottom={insets.bottom}
+          isOwner={isOwner}
+          canCall={canCall}
+          donationPledged={donationPledged}
+          donationCompleted={donationCompleted}
+          onCall={handleCall}
           onContact={handleContact}
-          onDonate={() => setMatchSheetVisible(true)}
+          onDonate={() => {
+            if (donationPledged) {
+              Alert.alert(
+                "Donation Pledged",
+                "You have already offered to donate for this patient. The requester will confirm the donation once fulfilled at the hospital.",
+                [
+                  {
+                    text: "View My Donations",
+                    onPress: () => (navigation as any).navigate(ROUTES.MY_DONATIONS),
+                  },
+                  { text: "OK", style: "cancel" },
+                ],
+              );
+              return;
+            }
+            if (donationCompleted) {
+              Alert.alert(
+                "Donation Completed",
+                "Thank you! Your donation for this patient has already been confirmed as fulfilled.",
+                [
+                  {
+                    text: "View My Donations",
+                    onPress: () => (navigation as any).navigate(ROUTES.MY_DONATIONS),
+                  },
+                  { text: "OK", style: "cancel" },
+                ],
+              );
+              return;
+            }
+            setMatchSheetVisible(true);
+          }}
+          onManageRequest={handleManageRequest}
+          onViewMyDonations={() => (navigation as any).navigate(ROUTES.MY_DONATIONS)}
         />
       </ScreenWrapper>
 

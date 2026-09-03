@@ -32,6 +32,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   distance,
   latitude,
   longitude,
+  requester_id,
 }) => {
   const navigation = useNavigation<any>();
   const { t } = useTranslation();
@@ -230,6 +231,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 distance,
                 latitude,
                 longitude,
+                requester_id,
               },
             })
           }

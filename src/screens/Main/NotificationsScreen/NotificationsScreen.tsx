@@ -78,9 +78,9 @@ const NotificationsScreen = () => {
     const rawList = Array.isArray(rawNotifications)
       ? rawNotifications
       : rawNotifications?.data?.notifications ||
-        rawNotifications?.notifications ||
-        rawNotifications?.data ||
-        [];
+      rawNotifications?.notifications ||
+      rawNotifications?.data ||
+      [];
 
     if (!Array.isArray(rawList)) return [];
 
@@ -91,8 +91,8 @@ const NotificationsScreen = () => {
         (item.data?.blood_group || item.data?.request_id
           ? "blood_request"
           : item.data?.conversation_id
-          ? "chat_message"
-          : "system");
+            ? "chat_message"
+            : "system");
 
       const isRead =
         item.read === true ||

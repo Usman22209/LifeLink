@@ -236,6 +236,7 @@ const FeedScreen = () => {
     distance: item.distance || "",
     latitude: item.latitude ? Number(item.latitude) : undefined,
     longitude: item.longitude ? Number(item.longitude) : undefined,
+    requester_id: item.requester_id || item.requester?.id,
   }));
 
   const filteredData = formattedRequests.filter((item: BloodRequest) => {

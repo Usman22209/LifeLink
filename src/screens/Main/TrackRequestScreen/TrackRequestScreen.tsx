@@ -79,13 +79,12 @@ const TrackRequestScreen: React.FC = () => {
 
   const handleCloseRequest = async () => {
     Alert.alert(
-      "Close Request",
-      "Mark this request as fulfilled and close it?",
+      "Mark as Fulfilled",
+      "Are all required blood units received for this patient? This will complete and close the request.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Close Request",
-          style: "destructive",
+          text: "Yes, Mark Fulfilled",
           onPress: async () => {
             try {
               await updateRequestStatus({
@@ -93,9 +92,37 @@ const TrackRequestScreen: React.FC = () => {
                 data: { status: BloodRequestStatus.FULFILLED },
               });
               refetchReq();
-              Alert.alert("Done", "Request has been marked as fulfilled.");
+              Alert.alert("Success 🎉", "Request marked as fulfilled.");
             } catch (err: any) {
               Alert.alert("Error", err?.message || "Could not close request.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleWithdrawRequest = async () => {
+    Alert.alert(
+      "Withdraw Request",
+      "Are you sure you want to withdraw this blood request? (e.g. arranged blood from another source or no longer needed).\n\nThis will remove it from the public feed.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Withdraw Request",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await updateRequestStatus({
+                id: requestId,
+                data: { status: BloodRequestStatus.CANCELLED },
+              });
+              refetchReq();
+              Alert.alert("Request Withdrawn", "Your blood request has been withdrawn.", [
+                { text: "OK", onPress: () => navigation.goBack() },
+              ]);
+            } catch (err: any) {
+              Alert.alert("Error", err?.message || "Could not withdraw request.");
             }
           },
         },
@@ -193,19 +220,33 @@ const TrackRequestScreen: React.FC = () => {
           ))
         )}
 
-        {/* Close Request Button */}
-        {!isFulfilled && !isExpired ? (
-          <TouchableOpacity
-            style={styles.closeBtn}
-            activeOpacity={0.8}
-            onPress={handleCloseRequest}
-            disabled={isUpdatingReq}
-          >
-            <AnyIcon type={Icons.Feather} name="x-circle" size={moderateScale(14)} color={colors.danger} />
-            <Text semiBold FONT_12 style={{ color: colors.danger, marginLeft: scale(6) }}>
-              Close Request
-            </Text>
-          </TouchableOpacity>
+        {/* Action Buttons */}
+        {!isFulfilled && !isExpired && request.status !== "cancelled" ? (
+          <View style={{ marginTop: verticalScale(10) }}>
+            <TouchableOpacity
+              style={styles.fulfillBtn}
+              activeOpacity={0.8}
+              onPress={handleCloseRequest}
+              disabled={isUpdatingReq}
+            >
+              <AnyIcon type={Icons.Feather} name="check-circle" size={moderateScale(15)} color={colors.white} />
+              <Text bold FONT_13 style={{ color: colors.white, marginLeft: scale(6) }}>
+                Mark as Fulfilled
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.withdrawBtn}
+              activeOpacity={0.8}
+              onPress={handleWithdrawRequest}
+              disabled={isUpdatingReq}
+            >
+              <AnyIcon type={Icons.Feather} name="x-circle" size={moderateScale(14)} color={colors.danger} />
+              <Text semiBold FONT_12 style={{ color: colors.danger, marginLeft: scale(6) }}>
+                Withdraw Request (Arranged Elsewhere)
+              </Text>
+            </TouchableOpacity>
+          </View>
         ) : null}
       </ScrollView>
     </ScreenWrapper>

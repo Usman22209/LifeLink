@@ -79,6 +79,7 @@ export const useUpdateSettings = () => {
     mutationFn: async (data: {
       notifications_enabled?: boolean;
       language_preference?: string;
+      hide_phone_number?: boolean;
     }) => {
       const response = await PROFILE_SERVICE.updateSettings(data);
       return response.data;

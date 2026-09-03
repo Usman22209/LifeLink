@@ -184,7 +184,28 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  /* ── Close Button ── */
+  /* ── Action Buttons ── */
+  fulfillBtn: {
+    height: verticalScale(44),
+    borderRadius: moderateScale(12),
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: verticalScale(8),
+    marginBottom: verticalScale(8),
+  },
+  withdrawBtn: {
+    height: verticalScale(44),
+    borderRadius: moderateScale(12),
+    borderWidth: 1,
+    borderColor: withOpacity(colors.danger, 0.25),
+    backgroundColor: withOpacity(colors.danger, 0.04),
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: verticalScale(16),
+  },
   closeBtn: {
     height: verticalScale(44),
     borderRadius: moderateScale(12),

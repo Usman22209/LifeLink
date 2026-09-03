@@ -25,11 +25,21 @@ const ChatsListScreen = () => {
     }, [refetch]),
   );
 
-  const threads: ChatThread[] = Array.isArray(chatThreadsData?.data)
+  const rawThreads: any[] = Array.isArray(chatThreadsData?.data)
     ? chatThreadsData.data
     : Array.isArray(chatThreadsData)
     ? chatThreadsData
     : [];
+
+  const threads: ChatThread[] = React.useMemo(() => {
+    const seen = new Set<string>();
+    return rawThreads.filter((t: any) => {
+      const key = `${t.request_id || t.request?.id}_${t.participant?.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [rawThreads]);
 
   const handleThreadPress = (item: ChatThread) => {
     markReadMutate(item.id);

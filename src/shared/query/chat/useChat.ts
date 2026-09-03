@@ -58,7 +58,8 @@ export const useChatMessages = (threadId: string, enabled = true) => {
       return response.data?.data || response.data;
     },
     enabled: !!threadId && enabled,
-    staleTime: 10000,
+    staleTime: 1500,
+    refetchInterval: 2500,
   });
 };
 

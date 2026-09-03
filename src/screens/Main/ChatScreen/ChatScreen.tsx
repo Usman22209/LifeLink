@@ -53,6 +53,7 @@ const ChatScreen = () => {
   const { mutate: markReadMutate } = useMarkThreadAsRead();
 
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
+  const [receivedRealtimeMessages, setReceivedRealtimeMessages] = useState<any[]>([]);
 
   // Mark thread as read on mount / when threadId is available
   useEffect(() => {
@@ -66,6 +67,7 @@ const ChatScreen = () => {
     if (threadId) ids.add(threadId);
     if (request?.id) ids.add(request.id);
     const remoteThreadId =
+      (remoteMessagesData as any)?.data?.thread_id ||
       (remoteMessagesData as any)?.thread_id ||
       (remoteMessagesData as any)?.thread?.id;
     if (remoteThreadId) ids.add(remoteThreadId);
@@ -94,11 +96,16 @@ const ChatScreen = () => {
           (payload) => {
             const newMsg = payload.new;
             if (newMsg) {
+              setReceivedRealtimeMessages((prev) => {
+                if (prev.some((m) => String(m.id) === String(newMsg.id))) return prev;
+                return [...prev, newMsg];
+              });
               channelIds.forEach((targetId) => {
                 queryClient.setQueryData(
                   chatKeys.messages(targetId),
                   (oldData: any) => {
                     const rawList =
+                      oldData?.data?.messages ||
                       oldData?.messages ||
                       (Array.isArray(oldData) ? oldData : []);
                     if (
@@ -107,23 +114,32 @@ const ChatScreen = () => {
                       return oldData;
                     }
                     const updatedList = [...rawList, newMsg];
-                    return oldData?.messages
+                    return oldData?.data?.messages
+                      ? { ...oldData, data: { ...oldData.data, messages: updatedList } }
+                      : oldData?.messages
                       ? { ...oldData, messages: updatedList }
                       : updatedList;
                   }
                 );
               });
-              queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+              setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+              }, 1200);
             }
           }
         )
         .on("broadcast", { event: "message" }, ({ payload: newMsg }) => {
           if (newMsg) {
+            setReceivedRealtimeMessages((prev) => {
+              if (prev.some((m) => String(m.id) === String(newMsg.id) || (m.text === newMsg.text && String(m.sender_id) === String(newMsg.sender_id)))) return prev;
+              return [...prev, newMsg];
+            });
             channelIds.forEach((targetId) => {
               queryClient.setQueryData(
                 chatKeys.messages(targetId),
                 (oldData: any) => {
                   const rawList =
+                    oldData?.data?.messages ||
                     oldData?.messages ||
                     (Array.isArray(oldData) ? oldData : []);
                   if (
@@ -132,13 +148,17 @@ const ChatScreen = () => {
                     return oldData;
                   }
                   const updatedList = [...rawList, newMsg];
-                  return oldData?.messages
+                  return oldData?.data?.messages
+                    ? { ...oldData, data: { ...oldData.data, messages: updatedList } }
+                    : oldData?.messages
                     ? { ...oldData, messages: updatedList }
                     : updatedList;
                 }
               );
             });
-            queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+            setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
+            }, 1200);
           }
         })
         .on("broadcast", { event: "typing" }, ({ payload }) => {
@@ -167,6 +187,7 @@ const ChatScreen = () => {
 
   const messages: Message[] = useMemo(() => {
     const rawMsgs =
+      remoteMessagesData?.data?.messages ||
       remoteMessagesData?.messages ||
       (Array.isArray(remoteMessagesData) ? remoteMessagesData : []);
 
@@ -174,15 +195,42 @@ const ChatScreen = () => {
       id: String(m.id),
       text: m.text,
       createdAt: new Date(m.sent_at || m.created_at || Date.now()),
-      senderId: m.sender_id === user?.id ? "me" : "them",
+      senderId:
+        String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+          ? "me"
+          : "them",
     }));
 
-    // Merge server messages with unsynced local optimistic messages for instant 0ms UI feedback
-    const serverTexts = new Set(serverFormatted.map((m) => m.text));
-    const pendingLocal = localMessages.filter((m) => !serverTexts.has(m.text));
+    const serverIds = new Set(serverFormatted.map((m) => m.id));
+    const serverTexts = new Set(serverFormatted.map((m) => `${m.text}_${m.senderId}`));
 
-    return [...serverFormatted, ...pendingLocal];
-  }, [remoteMessagesData, localMessages, user]);
+    // Pending local optimistic messages
+    const pendingLocal = localMessages.filter(
+      (m) => !serverTexts.has(`${m.text}_me`)
+    );
+
+    // Realtime broadcast messages from others that aren't in server list yet
+    const pendingRealtime: Message[] = receivedRealtimeMessages
+      .filter((m) => {
+        if (serverIds.has(String(m.id))) return false;
+        const sender =
+          String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+            ? "me"
+            : "them";
+        return !serverTexts.has(`${m.text}_${sender}`);
+      })
+      .map((m) => ({
+        id: String(m.id),
+        text: m.text,
+        createdAt: new Date(m.sent_at || m.created_at || Date.now()),
+        senderId:
+          String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+            ? "me"
+            : "them",
+      }));
+
+    return [...serverFormatted, ...pendingLocal, ...pendingRealtime];
+  }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {

@@ -58,7 +58,15 @@ export const DetailsSheet: React.FC<DetailsSheetProps> = ({
       )}
       {renderInfoRow("home", "Hospital", request?.hospital || "Hospital")}
       {renderInfoRow("navigation", "City", cityName || "Unknown City")}
-      {renderInfoRow("map", "State / Province", provinceName || "N/A", true)}
+      {renderInfoRow("map", "State / Province", provinceName || "N/A")}
+      {request?.hide_phone_number
+        ? renderInfoRow("shield", "Contact Privacy", "In-App Chat Only", true)
+        : renderInfoRow(
+            "phone",
+            "Contact Number",
+            request?.contact_number || request?.contactNumber || "Available via Chat",
+            true,
+          )}
     </View>
   );
 };

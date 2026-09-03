@@ -12,6 +12,7 @@ export interface UrgentRequest {
   distance?: string;
   latitude?: number;
   longitude?: number;
+  requester_id?: string;
 }
 
 export { MOCK_URGENT_REQUESTS } from "../../../shared/constants/mockData";

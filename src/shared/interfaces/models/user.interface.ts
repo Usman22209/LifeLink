@@ -15,6 +15,7 @@ export interface User {
   profile_image?: string;
   language_preference?: string;
   notifications_enabled?: boolean;
+  hide_phone_number?: boolean;
   stats?: {
     donations_count?: number;
     lives_saved?: number;
@@ -39,6 +40,7 @@ export interface Profile {
   is_onboarded: boolean;
   language_preference?: string;
   notifications_enabled?: boolean;
+  hide_phone_number?: boolean;
   stats?: {
     donations_count?: number;
     lives_saved?: number;

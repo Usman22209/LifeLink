@@ -26,7 +26,7 @@ const MyDonationsScreen = () => {
   const donations: DonationLog[] =
     myDonationsData?.history && Array.isArray(myDonationsData.history)
       ? myDonationsData.history
-      : MOCK_DONATIONS;
+      : [];
 
   const stats = useMemo(() => {
     if (myDonationsData?.stats) {
@@ -39,29 +39,33 @@ const MyDonationsScreen = () => {
     }
 
     const totalDonations = donations.length;
-    const totalUnits = donations.reduce((sum, item) => sum + item.units, 0);
+    const totalUnits = donations.reduce((sum, item) => sum + (item.units || 1), 0);
     const livesSaved = totalUnits * 3;
 
     let isEligible = true;
     let nextEligibleDateStr = "";
 
     if (totalDonations > 0) {
-      const sorted = [...donations].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      );
-      const latestDonationDate = new Date(sorted[0].date);
-      const nextEligibleDate = new Date(latestDonationDate);
-      nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
+      const validDates = donations
+        .map((d) => (d.date ? new Date(d.date) : null))
+        .filter((d): d is Date => d !== null && !isNaN(d.getTime()))
+        .sort((a, b) => b.getTime() - a.getTime());
 
-      const today = new Date();
-      isEligible = today.getTime() >= nextEligibleDate.getTime();
+      if (validDates.length > 0) {
+        const latestDonationDate = validDates[0];
+        const nextEligibleDate = new Date(latestDonationDate);
+        nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
 
-      if (!isEligible) {
-        nextEligibleDateStr = nextEligibleDate.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
+        const today = new Date();
+        isEligible = today.getTime() >= nextEligibleDate.getTime();
+
+        if (!isEligible) {
+          nextEligibleDateStr = nextEligibleDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
       }
     }
 
@@ -69,7 +73,9 @@ const MyDonationsScreen = () => {
   }, [myDonationsData, donations]);
 
   const handleItemPress = (item: DonationLog) => {
-    navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });
+    if (item.request) {
+      navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });
+    }
   };
 
   const renderEmptyState = () => (

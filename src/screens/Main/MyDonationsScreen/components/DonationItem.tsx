@@ -22,13 +22,38 @@ interface DonationItemProps {
 }
 
 const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
-  const formattedDate = new Date(item.date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const formattedDate =
+    item.date && !isNaN(new Date(item.date).getTime())
+      ? new Date(item.date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "Recently";
 
-  const cfg = URGENCY_CONFIG[item.request.urgency];
+  const urgencyKey = (
+    item.request?.urgency || "normal"
+  ).toLowerCase() as keyof typeof URGENCY_CONFIG;
+  const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+
+  const patientName =
+    item.request?.patientName ||
+    item.request?.patient_name ||
+    "Blood Request";
+
+  const hospitalName =
+    item.hospitalName ||
+    item.request?.hospital ||
+    item.request?.hospital_name ||
+    "Hospital";
+
+  const bloodType =
+    item.bloodType ||
+    item.request?.bloodType ||
+    item.request?.blood_group ||
+    "O+";
+
+  const units = item.units || 1;
 
   return (
     <TouchableOpacity
@@ -41,7 +66,7 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
         <View style={styles.cardTopRow}>
           <View style={styles.cardInfoSection}>
             <AppText semiBold FONT_13 style={styles.patientName}>
-              {item.request.patientName}
+              {patientName}
             </AppText>
             <View style={styles.hospitalRow}>
               <AnyIcon
@@ -51,7 +76,7 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
                 color={colors.textSecondary}
               />
               <AppText regular FONT_11 style={styles.hospitalName}>
-                {item.hospitalName}
+                {hospitalName}
               </AppText>
             </View>
           </View>
@@ -62,7 +87,7 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
             ]}
           >
             <AppText extraBold FONT_14 style={{ color: cfg.color }}>
-              {item.bloodType}
+              {bloodType}
             </AppText>
           </View>
         </View>
@@ -90,7 +115,7 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
                 color={colors.textSecondary}
               />
               <AppText regular FONT_10 style={styles.metaText}>
-                {item.units} {item.units === 1 ? "unit" : "units"}
+                {units} {units === 1 ? "unit" : "units"}
               </AppText>
             </View>
           </View>
