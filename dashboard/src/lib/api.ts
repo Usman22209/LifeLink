@@ -88,6 +88,14 @@ export const api = {
     return fetchFromApi<any>(`/blood-requests/${id}`);
   },
 
+  // Update Request Status
+  updateRequestStatus: async (id: string, status: string) => {
+    return fetchFromApi<any>(`/blood-requests/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+  },
+
   // Support FAQs
   
   // Moderation & Reports Center

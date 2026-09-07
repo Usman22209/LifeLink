@@ -2,14 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { StatCard } from "@/components/StatCard";
 import { BloodBadge } from "@/components/BloodBadge";
 import { StatusPill } from "@/components/StatusPill";
 import { api } from "@/lib/api";
-import { ArrowRight, MapPin, Building2, Phone } from "lucide-react";
+import { resolveCityFromItem } from "@/lib/cityUtils";
+import { ArrowRight, MapPin, Building2, Phone, ChevronRight } from "lucide-react";
 
 export default function OverviewPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState<any[]>([]);
   const [urgentRequests, setUrgentRequests] = useState<any[]>([]);
@@ -41,7 +44,7 @@ export default function OverviewPage() {
   const totalUnits = requests.reduce((acc, r) => acc + (Number(r.units_required || r.units) || 1), 0);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       <Header
         title="Operations Overview"
         subtitle="Live emergency blood demand and requests fetched from backend"
@@ -59,24 +62,26 @@ export default function OverviewPage() {
             badge="Live Feed"
           />
           <StatCard
-            label="Urgent Emergencies"
+            label="Urgent Blood Needed"
             value={urgentRequests.length}
-            subtitle="High priority hospital cases"
+            subtitle="High / Critical priority"
+            badge={urgentRequests.length > 0 ? "Requires Attention" : "Stable"}
           />
           <StatCard
-            label="Total Units Needed"
-            value={totalUnits}
-            subtitle="Blood units requested"
+            label="Total Units Demanded"
+            value={`${totalUnits} Pints`}
+            subtitle="Across top 10 requests"
           />
           <StatCard
-            label="System Status"
-            value="Operational"
-            subtitle="NestJS + Supabase active"
+            label="Average Triage Level"
+            value={urgentRequests.length > 2 ? "Elevated" : "Normal"}
+            subtitle="National response status"
+            badge="Pakistan"
           />
         </div>
 
-        {/* Live Feed Table */}
-        <div className="app-card overflow-hidden">
+        {/* Live Requests Feed Table */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-slate-900">Recent Blood Requests</h2>
@@ -100,7 +105,7 @@ export default function OverviewPage() {
                   <th className="py-3 px-4">Units</th>
                   <th className="py-3 px-4">Urgency</th>
                   <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Contact</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -118,22 +123,26 @@ export default function OverviewPage() {
                   </tr>
                 ) : (
                   requests.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr
+                      key={item.id}
+                      onClick={() => router.push(`/requests/${item.id}`)}
+                      className="hover:bg-slate-50/75 transition-colors cursor-pointer group"
+                    >
                       <td className="py-3 px-4">
                         <BloodBadge bloodGroup={item.blood_group || item.bloodType || "O+"} size="sm" />
                       </td>
-                      <td className="py-3 px-4 font-semibold text-slate-900">
+                      <td className="py-3 px-4 font-bold text-slate-900 group-hover:text-[#E53935] transition-colors">
                         {item.patient_name || item.patientName || "Patient"}
                       </td>
                       <td className="py-3 px-4">
                         <div className="text-slate-800 font-medium">{item.hospital_name || item.hospital || "Hospital"}</div>
-                        <div className="text-slate-400 text-[11px] flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-slate-400" />
-                          {item.city_id || item.city || "Pakistan"}
+                        <div className="text-slate-500 text-[11px] flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                          <span className="font-semibold text-slate-700">{resolveCityFromItem(item)}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-semibold text-slate-900">{item.units_required || item.units || 1}</span>{" "}
+                        <span className="font-bold text-slate-900">{item.units_required || item.units || 1}</span>{" "}
                         <span className="text-slate-400 text-[11px]">units</span>
                       </td>
                       <td className="py-3 px-4">
@@ -142,8 +151,15 @@ export default function OverviewPage() {
                       <td className="py-3 px-4">
                         <StatusPill status={item.status || "open"} type="status" />
                       </td>
-                      <td className="py-3 px-4 text-right font-medium text-slate-600">
-                        {item.contact_number || item.requester?.phone || "—"}
+                      <td className="py-3 px-4 text-right">
+                        <Link
+                          href={`/requests/${item.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1.5 rounded-lg bg-slate-100 group-hover:bg-[#E53935] group-hover:text-white text-slate-700 font-semibold text-xs transition-all shadow-2xs inline-flex items-center gap-1"
+                        >
+                          <span>Details</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </Link>
                       </td>
                     </tr>
                   ))

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { api } from "@/lib/api";
+import { resolveCityFromItem } from "@/lib/cityUtils";
 import {
   ShieldAlert,
   AlertTriangle,
@@ -464,116 +465,433 @@ export default function SupportAndModerationPage() {
         </div>
       </div>
 
-      {/* Moderation Action Modal */}
+      {/* High-Impact Trust & Safety Moderation Action Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-[#E53935]" />
-                Enforce Disciplinary Action
-              </h3>
+        <div className="fixed inset-0 bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 z-50 overflow-y-auto animate-in fade-in duration-150">
+          <div className="bg-white border border-slate-200/80 rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-red-50/80 via-slate-50 to-white p-6 pb-4 border-b border-slate-100 flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-red-100 border border-red-200 flex items-center justify-center text-[#E53935] shadow-2xs shrink-0">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-slate-900 tracking-tight">
+                    Trust & Safety Moderation Review
+                  </h3>
+                  <p className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                    <span className="font-mono font-bold text-slate-700">
+                      Case #{selectedReport.id.slice(0, 8)}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      {selectedReport.created_at
+                        ? new Date(selectedReport.created_at).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : "Recent Incident"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
               <button
                 onClick={() => setSelectedReport(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors shadow-2xs shrink-0"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Target Card */}
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs">
-              <span className="text-slate-400 font-bold uppercase text-[10px]">
-                Reported Incident:
-              </span>
-              <p className="font-extrabold text-slate-900 text-sm mt-0.5">
-                {selectedReport.target_type === "user"
-                  ? `User: ${selectedReport.target?.full_name || selectedReport.target_id}`
-                  : `Request: ${selectedReport.target?.patient_name || selectedReport.target_id}`}
-              </p>
-              <p className="text-red-600 mt-1 font-semibold italic">"{selectedReport.reason}"</p>
-              {selectedReport.description && (
-                <p className="text-slate-600 mt-1 text-[11px] leading-relaxed">
-                  {selectedReport.description}
-                </p>
+            {/* Modal Body */}
+            <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+              {/* Evidence & Target Card */}
+              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Reported Entity
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-200/80 text-slate-700 uppercase">
+                      {selectedReport.target_type === "user" ? "User Profile" : "Blood Request"}
+                    </span>
+                    {selectedReport.priority && (
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase ${
+                          selectedReport.priority === "urgent"
+                            ? "bg-red-100 text-red-700"
+                            : selectedReport.priority === "high"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {selectedReport.priority} Priority
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-1">
+                  {selectedReport.target_type === "user" ? (
+                    <div className="w-10 h-10 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-red-100 border border-red-200 text-[#E53935] flex items-center justify-center font-black text-xs shrink-0">
+                      {selectedReport.target?.blood_group || "O+"}
+                    </div>
+                  )}
+
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-extrabold text-slate-900 text-sm truncate">
+                      {selectedReport.target_type === "user"
+                        ? selectedReport.target?.full_name || "User Account"
+                        : selectedReport.target?.patient_name || "Blood Request"}
+                    </h4>
+                    <p className="text-xs text-slate-500 truncate">
+                      {selectedReport.target_type === "user"
+                        ? selectedReport.target?.phone || `ID: ${selectedReport.target_id.slice(0, 16)}`
+                        : `${selectedReport.target?.hospital_name || "Hospital"} • ${resolveCityFromItem(
+                            selectedReport.target
+                          )}`}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Violation Statement */}
+                <div className="pt-2 border-t border-slate-200/60 space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-slate-700">Reported Violation:</span>
+                    <span className="text-slate-400">
+                      Reported by {selectedReport.reporter?.full_name || "Community Member"}
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-[#E53935]">
+                    "{selectedReport.reason}"
+                  </p>
+                  {selectedReport.description && (
+                    <div className="bg-white border-l-3 border-[#E53935] p-2.5 rounded-r-xl text-xs text-slate-600 leading-relaxed font-medium mt-1">
+                      {selectedReport.description}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Selection (Interactive Cards) */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+                  Select Disciplinary Action
+                </label>
+
+                <div className="space-y-2">
+                  {selectedReport.target_type === "user" ? (
+                    <>
+                      {/* Suspend */}
+                      <div
+                        onClick={() => setActionType("user_suspended")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "user_suspended"
+                            ? "border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "user_suspended"
+                              ? "bg-amber-500 text-white"
+                              : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          <UserX className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-slate-900">
+                              Temporary Account Suspension
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                              Reversible
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Temporarily disables user profile and hides from all donor searches.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Permanent Ban */}
+                      <div
+                        onClick={() => setActionType("user_banned")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "user_banned"
+                            ? "border-red-500 bg-red-50/60 ring-2 ring-red-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "user_banned"
+                              ? "bg-red-600 text-white"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          <Ban className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-slate-900">
+                              Permanent Account Ban
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">
+                              High Severity
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Permanently bans account, revokes sessions, and cancels open blood requests.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Warning */}
+                      <div
+                        onClick={() => setActionType("warning_issued")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "warning_issued"
+                            ? "border-blue-500 bg-blue-50/60 ring-2 ring-blue-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "warning_issued"
+                              ? "bg-blue-600 text-white"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
+                        >
+                          <AlertTriangle className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-bold text-xs text-slate-900 block">
+                            Issue Official Warning Notice
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Logs infraction in records and pushes a disciplinary warning alert to the user.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Dismiss */}
+                      <div
+                        onClick={() => setActionType("dismissed")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "dismissed"
+                            ? "border-slate-500 bg-slate-100 ring-2 ring-slate-400/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "dismissed"
+                              ? "bg-slate-700 text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-bold text-xs text-slate-900 block">
+                            Dismiss Report (Unfounded or Invalid)
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Marks report as resolved without penalizing the user.
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Cancel Request */}
+                      <div
+                        onClick={() => setActionType("request_cancelled")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "request_cancelled"
+                            ? "border-red-500 bg-red-50/60 ring-2 ring-red-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "request_cancelled"
+                              ? "bg-red-600 text-white"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          <FileWarning className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-slate-900">
+                              Cancel & Take Down Request
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">
+                              Immediate Takedown
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Immediately marks request as cancelled and removes it from the donor feed.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Requester Warning */}
+                      <div
+                        onClick={() => setActionType("warning_issued")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "warning_issued"
+                            ? "border-amber-500 bg-amber-50/60 ring-2 ring-amber-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "warning_issued"
+                              ? "bg-amber-500 text-white"
+                              : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          <AlertTriangle className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-bold text-xs text-slate-900 block">
+                            Issue Warning to Requester
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Notifies the patient/requester about inaccurate data or guidelines.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Dismiss */}
+                      <div
+                        onClick={() => setActionType("dismissed")}
+                        className={`cursor-pointer rounded-2xl p-3.5 border transition-all flex items-start gap-3 ${
+                          actionType === "dismissed"
+                            ? "border-emerald-500 bg-emerald-50/60 ring-2 ring-emerald-500/20 shadow-2xs"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                            actionType === "dismissed"
+                              ? "bg-emerald-600 text-white"
+                              : "bg-emerald-100 text-emerald-700"
+                          }`}
+                        >
+                          <ShieldCheck className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-bold text-xs text-slate-900 block">
+                            Dismiss Report (Verified Legitimate)
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            Verified as valid hospital emergency. Request remains live on feed.
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Internal Notes & Quick Chips */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+                    Internal Audit Compliance Log
+                  </label>
+                  <span className="text-[11px] text-slate-400">Stored in database audit trail</span>
+                </div>
+
+                {/* Quick Chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "Confirmed fraudulent activity",
+                    "Fake contact number",
+                    "Inappropriate communication",
+                    "Duplicate spam listing",
+                    "Verified genuine patient case",
+                  ].map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => setAdminNotes(chip)}
+                      className="text-[10px] font-medium px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                    >
+                      + {chip}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={2}
+                  placeholder="State operational justification for audit logs and user appeals..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#E53935] focus:ring-1 focus:ring-[#E53935]"
+                />
+              </div>
+
+              {/* Feedback Alert */}
+              {actionNotice && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-3 rounded-xl text-center font-bold animate-in fade-in flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  {actionNotice}
+                </div>
               )}
             </div>
 
-            {/* Action Select */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Select Moderation Action
-              </label>
-              <select
-                value={actionType}
-                onChange={(e) => setActionType(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-              >
-                {selectedReport.target_type === "user" ? (
-                  <>
-                    <option value="user_suspended">
-                      ⏸️ Suspend User Account (Temporarily disable profile)
-                    </option>
-                    <option value="user_banned">
-                      🚫 Ban User Account (Permanent ban & cancel open requests)
-                    </option>
-                    <option value="warning_issued">
-                      ⚠️ Issue Disciplinary Warning Notice
-                    </option>
-                    <option value="dismissed">
-                      ❌ Dismiss Report (False or invalid claim)
-                    </option>
-                  </>
-                ) : (
-                  <>
-                    <option value="request_cancelled">
-                      🛑 Cancel & Take Down Blood Request
-                    </option>
-                    <option value="warning_issued">
-                      ⚠️ Issue Warning to Requester
-                    </option>
-                    <option value="dismissed">
-                      ❌ Dismiss Report (Legitimate request)
-                    </option>
-                  </>
-                )}
-              </select>
-            </div>
-
-            {/* Notes */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Internal Admin Audit Log / Notes
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Explain reason for taking this action (stored for compliance)..."
-                value={adminNotes}
-                onChange={(e) => setAdminNotes(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-              />
-            </div>
-
-            {actionNotice && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs p-2.5 rounded-xl text-center font-bold">
-                {actionNotice}
-              </div>
-            )}
-
-            {/* Footer Buttons */}
-            <div className="flex items-center justify-end gap-2 pt-2">
+            {/* Modal Footer */}
+            <div className="p-4 px-6 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setSelectedReport(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200/80 transition-colors"
               >
                 Cancel
               </button>
               <button
                 disabled={isSubmitting}
                 onClick={handleApplyAction}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#E53935] hover:bg-red-700 text-white shadow-sm transition-all disabled:opacity-50"
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50 flex items-center gap-1.5 ${
+                  actionType === "user_banned" || actionType === "request_cancelled"
+                    ? "bg-[#E53935] hover:bg-red-700"
+                    : actionType === "user_suspended"
+                    ? "bg-amber-600 hover:bg-amber-700"
+                    : actionType === "dismissed"
+                    ? "bg-slate-800 hover:bg-slate-900"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
-                {isSubmitting ? "Applying..." : "Confirm & Apply Action"}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Enforcing...</span>
+                  </>
+                ) : (
+                  <span>
+                    {actionType === "user_banned"
+                      ? "Enforce Permanent Ban"
+                      : actionType === "user_suspended"
+                      ? "Enforce Suspension"
+                      : actionType === "request_cancelled"
+                      ? "Cancel Blood Request"
+                      : actionType === "dismissed"
+                      ? "Dismiss & Close Report"
+                      : "Confirm & Issue Warning"}
+                  </span>
+                )}
               </button>
             </div>
           </div>

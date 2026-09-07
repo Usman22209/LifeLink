@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { api } from "@/lib/api";
+import CitiesData from "@/data/cities.json";
 import {
   Radio,
   Send,
@@ -31,6 +32,20 @@ export default function BroadcastPage() {
     blood_group?: string;
   } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Pre-populate from query params if dispatched from a case record
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlCity = params.get("city");
+      const urlGroup = params.get("blood_group");
+      const urlTitle = params.get("title");
+
+      if (urlCity) setSelectedCity(urlCity);
+      if (urlGroup) setSelectedGroup(urlGroup);
+      if (urlTitle) setTitle(urlTitle);
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
@@ -68,36 +83,38 @@ export default function BroadcastPage() {
     }
   };
 
+  // Distinct sorted cities from official dictionary
+  const distinctCities = Array.from(
+    new Set(CitiesData.cities.map((c) => c.name.en))
+  ).sort();
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       <Header
-        title="Broadcast Alerts"
-        subtitle="Send emergency push notifications and in-app alerts directly to matching mobile donors"
+        title="Broadcast Alert Dispatcher"
+        subtitle="Push instant emergency push notifications to verified donors via OneSignal"
       />
 
-      <div className="p-8 max-w-5xl mx-auto w-full space-y-6">
-        {/* Success / Feedback Banner */}
+      <div className="p-8 max-w-4xl mx-auto w-full space-y-6">
+        {/* Status / Success Alert Banner */}
         {dispatchResult && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-xs flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-sm text-emerald-900">
-                Broadcast Dispatched Successfully!
-              </h3>
-              <p className="text-xs text-emerald-700 mt-0.5">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-start gap-3.5 shadow-sm animate-in fade-in">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-emerald-900">
                 {dispatchResult.message}
+              </h4>
+              <p className="text-xs text-emerald-700">
+                OneSignal notification dispatched to registered mobile devices.
               </p>
-              <div className="flex flex-wrap items-center gap-3 mt-3 text-xs">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-semibold">
-                  <Users className="w-3.5 h-3.5" />
-                  {dispatchResult.recipients} Mobile Donor{dispatchResult.recipients === 1 ? "" : "s"} Notified
+              <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-emerald-800 pt-1">
+                <span className="flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5" /> {dispatchResult.recipients} Device(s) Tagged
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-800 font-medium">
+                <span className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5" /> {dispatchResult.city}
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-800 font-medium">
+                <span className="flex items-center gap-1">
                   <Droplet className="w-3.5 h-3.5 text-[#E53935]" /> {dispatchResult.blood_group}
                 </span>
               </div>
@@ -105,27 +122,26 @@ export default function BroadcastPage() {
           </div>
         )}
 
-        {/* Error Banner */}
+        {/* Error Alert Banner */}
         {errorMsg && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 shadow-xs flex items-center gap-3 text-red-700 text-xs">
-            <AlertCircle className="w-5 h-5 text-[#E53935] shrink-0" />
-            <span className="font-semibold">{errorMsg}</span>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-start gap-3.5 shadow-sm animate-in fade-in">
+            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-red-900">Broadcast Failed</h4>
+              <p className="text-xs text-red-700">{errorMsg}</p>
+            </div>
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Composer Form (7 cols) */}
-          <div className="md:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Radio className="w-4 h-4 text-[#E53935]" /> Compose Emergency Alert
-              </h2>
-              <span className="text-[11px] font-semibold text-slate-400">
-                Push + In-App Notification
-              </span>
+          {/* Dispatch Form Card */}
+          <div className="md:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+              <Radio className="w-4 h-4 text-[#E53935]" />
+              <h3 className="font-bold text-sm text-slate-900">Dispatch Push Alert</h3>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-semibold text-slate-700 block mb-1">
                   Target City
@@ -136,12 +152,11 @@ export default function BroadcastPage() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#E53935] focus:ring-1 focus:ring-[#E53935]"
                 >
                   <option value="all">All Pakistan</option>
-                  <option value="Lahore">Lahore</option>
-                  <option value="Karachi">Karachi</option>
-                  <option value="Islamabad">Islamabad / Rawalpindi</option>
-                  <option value="Multan">Multan</option>
-                  <option value="Faisalabad">Faisalabad</option>
-                  <option value="Peshawar">Peshawar</option>
+                  {distinctCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -200,31 +215,34 @@ export default function BroadcastPage() {
             </button>
           </div>
 
-          {/* Mobile Lock Screen Preview (5 cols) */}
-          <div className="md:col-span-5 flex flex-col items-center justify-center p-4">
-            <span className="text-xs font-semibold text-slate-500 mb-3 flex items-center gap-1.5">
-              <Smartphone className="w-4 h-4 text-slate-400" /> Mobile Lock Screen Preview
-            </span>
+          {/* Device Preview Card */}
+          <div className="md:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+              <Smartphone className="w-4 h-4 text-slate-400" />
+              <h3 className="font-bold text-sm text-slate-900">Mobile Device Preview</h3>
+            </div>
 
-            <div className="w-68 rounded-3xl bg-slate-900 p-4 shadow-xl text-white space-y-3">
-              <div className="w-16 h-3 bg-slate-800 rounded-full mx-auto" />
-              <div className="text-center pt-1">
-                <span className="text-2xl font-light tracking-tight">09:41</span>
+            <p className="text-xs text-slate-400">
+              Live preview of lock-screen push banner delivered to donor devices.
+            </p>
+
+            <div className="bg-slate-900 text-white rounded-2xl p-4 shadow-md space-y-2 border border-slate-800">
+              <div className="flex items-center justify-between text-[11px] text-slate-400">
+                <span className="font-bold text-[#E53935] flex items-center gap-1">
+                  <BellRing className="w-3.5 h-3.5" /> LifeLink Emergency
+                </span>
+                <span>Just Now</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700/50 space-y-1.5 shadow-lg">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-4 h-4 rounded bg-[#E53935] flex items-center justify-center">
-                    <Droplet className="w-2.5 h-2.5 text-white fill-white" />
-                  </div>
-                  <span className="text-[11px] font-bold tracking-tight">LifeLink Alert</span>
-                  <span className="text-[9px] text-slate-400 ml-auto">now</span>
-                </div>
-                <p className="text-xs font-bold line-clamp-1">{title || "Alert Title"}</p>
-                <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
-                  {message || "Message body preview..."}
-                </p>
+              <h4 className="font-bold text-xs text-white leading-tight">
+                {title || "Alert Headline"}
+              </h4>
+              <p className="text-[11px] text-slate-300 leading-snug">
+                {message || "Message body will appear here..."}
+              </p>
+              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400">
+                <span>📍 {selectedCity === "all" ? "Nationwide" : selectedCity}</span>
+                <span>🩸 {selectedGroup === "all" ? "All Groups" : selectedGroup}</span>
               </div>
-              <div className="w-16 h-1 bg-slate-700 rounded-full mx-auto mt-4" />
             </div>
           </div>
         </div>
