@@ -12,12 +12,14 @@ interface ChatHeaderProps {
   patientName: string;
   patientImage?: string;
   onBackPress: () => void;
+  onReportPress?: () => void;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   patientName,
   patientImage,
   onBackPress,
+  onReportPress,
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -74,6 +76,21 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         </View>
       </View>
       <View style={styles.headerRight}>
+        {onReportPress && (
+          <TouchableOpacity
+            style={[styles.headerAction, { marginRight: scale(8) }]}
+            onPress={onReportPress}
+            activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="flag"
+              size={moderateScale(16)}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.headerAction}
           onPress={handleCall}

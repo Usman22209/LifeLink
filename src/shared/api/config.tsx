@@ -1,4 +1,11 @@
-const API_URL = "http://192.168.18.123:3001/";
+// USB connection (physical Android device with `adb reverse tcp:3001 tcp:3001`):
+const API_URL = "http://localhost:3001/";
+
+// Direct Wi-Fi connection fallback (ensure port 3001 is open on Windows Firewall):
+// const API_URL = "http://192.168.18.123:3001/";
+
+export const BASE_URL = API_URL;
+
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
@@ -42,9 +49,14 @@ const API_CONFIG = {
     readAll: "notifications/read-all",
     deviceToken: "notifications/device-token",
   },
+  REPORTS: {
+    base: "reports",
+    create: "reports",
+  },
   SUPPORT: {
     faqs: "support/faqs",
     contact: "support/contact",
+    reports: "support/reports",
   },
 };
 export { API_CONFIG };

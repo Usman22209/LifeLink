@@ -1,0 +1,32 @@
+[
+  {
+    "id": "faq-1",
+    "question": "Who is eligible to donate blood?",
+    "answer": "Anyone aged 18 to 65, weighing at least 50 kg, and in good general health without active blood-borne conditions or infections is eligible to donate."
+  },
+  {
+    "id": "faq-2",
+    "question": "How often can I donate blood?",
+    "answer": "Whole blood donations can be safely made once every 90 days (3 months) for men and every 120 days for women, allowing your body to replenish iron and hemoglobin levels."
+  },
+  {
+    "id": "faq-3",
+    "question": "Is my personal contact information secure?",
+    "answer": "Yes. Your contact number is encrypted. You can also choose to hide your phone number in Profile Settings so other users can only communicate with you via LifeLink in-app chat."
+  },
+  {
+    "id": "faq-4",
+    "question": "How do I create an emergency blood request?",
+    "answer": "Tap the 'Request' tab in the bottom bar, enter the patient details, hospital name, units needed, and urgency level. Verified donors nearby in your city will immediately receive notifications."
+  },
+  {
+    "id": "faq-5",
+    "question": "What should I do if a request or user is suspicious?",
+    "answer": "LifeLink strictly prohibits selling blood or demanding monetary payment. If you encounter any fraudulent request or abusive user, tap the 'Report' button on the request or chat screen to alert our moderation team immediately."
+  },
+  {
+    "id": "faq-6",
+    "question": "What should I do before donating blood?",
+    "answer": "Drink plenty of water (at least 500ml), have a healthy iron-rich meal 2-3 hours prior, avoid fatty foods, and get a good night's sleep before your donation."
+  }
+]

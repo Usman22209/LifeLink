@@ -29,6 +29,7 @@ import { useAcceptBloodRequest, useMyDonations } from "@shared/query/donations/u
 import { useBloodRequestDetails } from "@shared/query/blood-requests/useBloodRequests";
 import { useChatThreads } from "@shared/query/chat/useChat";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
+import ReportModal from "@shared/components/ReportModal";
 
 import { HeroBanner } from "./components/HeroBanner";
 import { MedicalCaseNotesCard } from "./components/MedicalCaseNotesCard";
@@ -54,7 +55,7 @@ const RequestDetailScreen: React.FC = () => {
   const rawRequest: any = route.params?.request || {};
 
   const { data: requestDetails } = useBloodRequestDetails(rawRequest.id, !!rawRequest.id);
-  const detailData = requestDetails?.data || requestDetails || {};
+  const detailData: any = requestDetails?.data || requestDetails || {};
 
   // Fetch existing chat threads to avoid duplicate thread creation
   const { data: chatThreadsData } = useChatThreads();
@@ -148,6 +149,7 @@ const RequestDetailScreen: React.FC = () => {
   const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
 
@@ -289,18 +291,32 @@ const RequestDetailScreen: React.FC = () => {
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={
-              <TouchableOpacity
-                onPress={handleShare}
-                activeOpacity={0.7}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <AnyIcon
-                  type={Icons.Feather}
-                  name="share-2"
-                  size={moderateScale(18)}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+                <TouchableOpacity
+                  onPress={handleShare}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="share-2"
+                    size={moderateScale(18)}
+                    color={colors.text}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setReportModalVisible(true)}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="flag"
+                    size={moderateScale(17)}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
             }
             titleSize={15}
             hasBorder={true}
@@ -390,6 +406,14 @@ const RequestDetailScreen: React.FC = () => {
         onClose={() => setMatchSheetVisible(false)}
         onConfirm={handleConfirmMatch}
         isLoading={isAccepting}
+      />
+
+      <ReportModal
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+        targetType="request"
+        targetId={String(request.id)}
+        targetTitle={`Request: ${request.patientName} (${request.bloodType})`}
       />
     </View>
   );

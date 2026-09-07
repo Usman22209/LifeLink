@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { View, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -13,7 +13,6 @@ import RequestCard from "./components/RequestCard";
 import FilterSheet from "./components/FilterSheet";
 import SortSheet from "./components/SortSheet";
 import {
-  MOCK_REQUESTS,
   FilterState,
   DEFAULT_FILTERS,
   countActiveFilters,
@@ -169,6 +168,7 @@ const FeedScreen = () => {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isRefetching,
     refetch,
   } = useInfiniteBloodRequestFeed({
     limit: 10,
@@ -220,7 +220,7 @@ const FeedScreen = () => {
       )
     : [];
 
-  const rawItems = fetchedItems.length > 0 ? fetchedItems : MOCK_REQUESTS;
+  const rawItems = fetchedItems;
 
   const formattedRequests: BloodRequest[] = rawItems.map((item: any) => ({
     id: String(item.id),
@@ -351,7 +351,7 @@ const FeedScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <RequestCard {...item} />}
           estimatedItemSize={120}
-          refreshing={isLoading}
+          refreshing={isRefetching}
           onRefresh={refetch}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
@@ -367,6 +367,81 @@ const FeedScreen = () => {
               sortBy={filters.sortBy}
               onSortToggle={handleSortToggle}
             />
+          }
+          ListEmptyComponent={
+            isLoading ? (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: verticalScale(60),
+                }}
+              >
+                <ActivityIndicator size="large" color={colors.primary} />
+                <AppText
+                  regular
+                  FONT_12
+                  style={{
+                    color: colors.textSecondary,
+                    marginTop: verticalScale(12),
+                  }}
+                >
+                  {t("feed.loading") || "Finding blood requests near you..."}
+                </AppText>
+              </View>
+            ) : (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: verticalScale(60),
+                  paddingHorizontal: moderateScale(24),
+                }}
+              >
+                <View
+                  style={{
+                    width: moderateScale(56),
+                    height: moderateScale(56),
+                    borderRadius: moderateScale(28),
+                    backgroundColor: "#FFEBEE",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: verticalScale(14),
+                  }}
+                >
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="inbox"
+                    size={moderateScale(26)}
+                    color={colors.primary}
+                  />
+                </View>
+                <AppText
+                  bold
+                  FONT_15
+                  style={{
+                    color: colors.text,
+                    textAlign: "center",
+                    marginBottom: verticalScale(6),
+                  }}
+                >
+                  {t("feed.noRequests") || "No Blood Requests Found"}
+                </AppText>
+                <AppText
+                  regular
+                  FONT_12
+                  style={{
+                    color: colors.textSecondary,
+                    textAlign: "center",
+                    lineHeight: 18,
+                  }}
+                >
+                  {searchQuery.trim() || activeFilterCount > 0
+                    ? "Try adjusting your filters or search terms to find more requests."
+                    : "There are no active blood requests right now. Check back soon!"}
+                </AppText>
+              </View>
+            )
           }
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}

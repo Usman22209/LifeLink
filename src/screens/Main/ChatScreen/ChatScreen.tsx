@@ -19,6 +19,7 @@ import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
 import MessageInput from "./components/MessageInput";
 import TypingBubble from "./components/TypingBubble";
+import ReportModal from "@shared/components/ReportModal";
 
 type ChatScreenRouteProp = RouteProp<UserStackParamList, typeof ROUTES.CHAT>;
 
@@ -44,6 +45,7 @@ const ChatScreen = () => {
   const flatListRef = useRef<FlatList>(null);
   const [inputText, setInputText] = useState("");
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const realtimeChannelRef = useRef<any>(null);
@@ -229,8 +231,29 @@ const ChatScreen = () => {
             : "them",
       }));
 
-    return [...serverFormatted, ...pendingLocal, ...pendingRealtime];
-  }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user]);
+    return [...serverFormatted, ...pendingLocal, ...pendingRealtime].sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+    );
+  }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user?.id]);
+
+  const otherUserId = useMemo(() => {
+    if ((request as any)?.requester_id) return String((request as any).requester_id);
+    if ((request as any)?.requester?.id) return String((request as any).requester.id);
+    if ((request as any)?.user?.id) return String((request as any).user.id);
+
+    const rawMsgs =
+      remoteMessagesData?.data?.messages ||
+      remoteMessagesData?.messages ||
+      (Array.isArray(remoteMessagesData) ? remoteMessagesData : []);
+
+    const otherMsg = rawMsgs.find(
+      (m: any) =>
+        m.sender_id && user?.id && String(m.sender_id).toLowerCase() !== String(user.id).toLowerCase()
+    );
+    if (otherMsg?.sender_id) return String(otherMsg.sender_id);
+
+    return String(threadId || "unknown");
+  }, [request, remoteMessagesData, user?.id, threadId]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
@@ -321,6 +344,7 @@ const ChatScreen = () => {
           patientName={patientName}
           patientImage={patientImage}
           onBackPress={() => navigation.goBack()}
+          onReportPress={() => setReportModalVisible(true)}
         />
       }
     >
@@ -371,6 +395,14 @@ const ChatScreen = () => {
           onSend={handleSend}
         />
       </KeyboardAvoidingView>
+
+      <ReportModal
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+        targetType="user"
+        targetId={otherUserId}
+        targetTitle={`User: ${patientName}`}
+      />
     </ScreenWrapper>
   );
 };

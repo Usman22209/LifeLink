@@ -118,11 +118,30 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     if (user?.id) {
       OneSignal.login(user.id);
       console.log("🔔 [OneSignal] Logged in user:", user.id);
+
+      try {
+        const bloodGroup = user.blood_group || (user as any).blood_type;
+        if (bloodGroup) {
+          OneSignal.User.addTag("blood_group", String(bloodGroup).toUpperCase());
+        }
+        const city = user.city_id || (user as any).city;
+        if (city) {
+          OneSignal.User.addTag("city", String(city).toLowerCase());
+        }
+      } catch (tagErr: any) {
+        console.log("Error syncing OneSignal user tags:", tagErr?.message);
+      }
     } else {
       OneSignal.logout();
       console.log("🔔 [OneSignal] Logged out user");
     }
-  }, [user?.id]);
+  }, [
+    user?.id,
+    user?.blood_group,
+    (user as any)?.blood_type,
+    user?.city_id,
+    (user as any)?.city,
+  ]);
 
   return <>{children}</>;
 };

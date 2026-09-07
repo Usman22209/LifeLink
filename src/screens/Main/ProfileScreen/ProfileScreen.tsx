@@ -21,6 +21,7 @@ import StatsSection from "./components/StatsSection";
 import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
 import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
+import ReportModal from "@shared/components/ReportModal";
 import { OneSignal } from "react-native-onesignal";
 
 const ProfileScreen = () => {
@@ -46,6 +47,7 @@ const ProfileScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
@@ -232,6 +234,12 @@ const ProfileScreen = () => {
               iconColor={colors.success}
             />
             <SettingItem
+              iconName="flag"
+              label="Report Safety Concern"
+              onPress={() => setReportModalVisible(true)}
+              iconColor={colors.warning}
+            />
+            <SettingItem
               iconName="trash-2"
               label={t("profile.deleteAccount")}
               onPress={handleDeleteAccount}
@@ -271,6 +279,14 @@ const ProfileScreen = () => {
           logoutMutate();
         }}
         isLoading={logoutPending}
+      />
+
+      <ReportModal
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+        targetType="user"
+        targetId={user?.id || "general"}
+        targetTitle="LifeLink Safety & Policy Report"
       />
     </ScreenWrapper>
   );
