@@ -137,8 +137,9 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     switch (opt) {
       case "All":
         return t("feed.all");
+      case "High":
       case "Urgent":
-        return t("feed.urgent");
+        return t("feed.high") || t("feed.urgent") || "High";
       case "Critical":
         return t("feed.critical");
       case "Normal":

@@ -9,7 +9,7 @@ export interface BloodRequest {
   state?: string;
   patientImage?: string;
   units: number;
-  urgency: "critical" | "urgent" | "normal";
+  urgency: "critical" | "high" | "urgent" | "normal";
   time: string;
   time_left?: string;
   is_expired?: boolean;
@@ -32,15 +32,15 @@ export const URGENCY_CONFIG: Record<
 > = {
   critical: { color: colors.danger, label: "Critical" },
   emergency: { color: colors.danger, label: "Critical" },
-  urgent: { color: colors.warning, label: "Urgent" },
-  high: { color: colors.warning, label: "Urgent" },
+  urgent: { color: colors.warning, label: "High" },
+  high: { color: colors.warning, label: "High" },
   medium: { color: colors.info, label: "Normal" },
   normal: { color: colors.info, label: "Normal" },
   low: { color: colors.info, label: "Normal" },
 };
 
 export const SORT_OPTIONS = ["Newest First", "Nearest First", "Most Units"];
-export const URGENCY_OPTIONS = ["All", "Critical", "Urgent", "Normal"];
+export const URGENCY_OPTIONS = ["All", "Critical", "High", "Normal"];
 export const DISTANCE_OPTIONS = [
   "Any Distance",
   "< 5 km",

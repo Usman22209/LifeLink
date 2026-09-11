@@ -260,10 +260,10 @@ const FeedScreen = () => {
     if (filters.urgency !== "All") {
       const itemUrgency = item.urgency.toLowerCase();
       const filterUrgency = filters.urgency.toLowerCase();
-      if (
-        itemUrgency !== filterUrgency &&
-        !(filterUrgency === "urgent" && itemUrgency === "high")
-      ) {
+      const isHighUrgentMatch =
+        (filterUrgency === "high" || filterUrgency === "urgent") &&
+        (itemUrgency === "high" || itemUrgency === "urgent");
+      if (itemUrgency !== filterUrgency && !isHighUrgentMatch) {
         return false;
       }
     }

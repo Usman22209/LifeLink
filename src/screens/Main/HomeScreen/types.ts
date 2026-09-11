@@ -7,7 +7,7 @@ export interface UrgentRequest {
   patientName?: string;
   patientImage?: string;
   units: number;
-  urgency: "critical" | "urgent" | "normal";
+  urgency: "critical" | "high" | "urgent" | "normal";
   time: string;
   distance?: string;
   latitude?: number;

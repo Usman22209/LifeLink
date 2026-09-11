@@ -37,7 +37,7 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
     urgencyKey === "critical"
       ? (t("feed.critical") || "Critical")
       : urgencyKey === "high" || urgencyKey === "urgent"
-      ? (t("feed.urgent") || "Urgent")
+      ? (t("feed.high") || t("feed.urgent") || "High")
       : (t("feed.normal") || "Normal");
 
   const isCancelled = request.status === "cancelled";

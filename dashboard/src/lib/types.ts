@@ -1,6 +1,6 @@
 export type BloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
-export type UrgencyLevel = 'normal' | 'urgent' | 'critical';
+export type UrgencyLevel = 'normal' | 'high' | 'critical' | 'urgent';
 
 export type RequestStatus = 'open' | 'partially_fulfilled' | 'fulfilled' | 'expired' | 'cancelled';
 

@@ -15,7 +15,7 @@ export interface Alert {
   body: string;
   time: string;
   read: boolean;
-  urgency?: "critical" | "urgent" | "normal";
+  urgency?: "critical" | "high" | "urgent" | "normal";
   bloodType?: string;
   hospital?: string;
   patientName?: string;

@@ -1,5 +1,5 @@
 // USB connection (physical Android device with `adb reverse tcp:3001 tcp:3001`):
-const API_URL = "http://localhost:3001/";
+const API_URL = "https://life-link-backend-production-7226.up.railway.app/";
 
 // Direct Wi-Fi connection fallback (ensure port 3001 is open on Windows Firewall):
 // const API_URL = "http://192.168.18.123:3001/";

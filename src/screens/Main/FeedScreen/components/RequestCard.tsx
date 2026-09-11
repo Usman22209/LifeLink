@@ -53,7 +53,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
         return t("feed.critical");
       case "urgent":
       case "high":
-        return t("feed.urgent");
+        return t("feed.high") || t("feed.urgent") || "High";
       case "normal":
       default:
         return t("feed.normal");
