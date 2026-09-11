@@ -12,6 +12,7 @@ import { moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
+import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
@@ -30,6 +31,7 @@ import { useBloodRequestDetails } from "@shared/query/blood-requests/useBloodReq
 import { useChatThreads } from "@shared/query/chat/useChat";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
 import ReportModal from "@shared/components/ReportModal";
+import DonationPledgedModal from "@components/DonationPledgedModal";
 
 import { HeroBanner } from "./components/HeroBanner";
 import { MedicalCaseNotesCard } from "./components/MedicalCaseNotesCard";
@@ -150,11 +152,14 @@ const RequestDetailScreen: React.FC = () => {
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [pledgedModalVisible, setPledgedModalVisible] = useState(false);
+  const [isAlreadyPledgedModal, setIsAlreadyPledgedModal] = useState(false);
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
 
   const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+  const isUrgent = urgencyKey === "urgent" || urgencyKey === "critical";
 
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
@@ -213,26 +218,13 @@ const RequestDetailScreen: React.FC = () => {
     try {
       await acceptBloodRequestMutate(request.id);
       setMatchSheetVisible(false);
-
-      Alert.alert(
-        "Donation Pledged! 🎉",
-        `Thank you for offering to save a life!\n\nWe have initiated a chat thread with the requester for ${request.hospital}.`,
-        [
-          {
-            text: "Open Chat",
-            onPress: () =>
-              (navigation as any).navigate(ROUTES.CHAT, {
-                request,
-                threadId: existingThread?.id,
-              }),
-          },
-        ],
-      );
+      setIsAlreadyPledgedModal(false);
+      setPledgedModalVisible(true);
     } catch (err: any) {
       setMatchSheetVisible(false);
       Alert.alert("Error", err?.message || "Could not respond to request.");
     }
-  }, [acceptBloodRequestMutate, request, navigation, user, t, existingThread]);
+  }, [acceptBloodRequestMutate, request.id, navigation, user, t]);
 
   const canCall = Boolean(
     !isOwner &&
@@ -291,8 +283,9 @@ const RequestDetailScreen: React.FC = () => {
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <TouchableOpacity
+                  style={styles.headerShareBtn}
                   onPress={handleShare}
                   activeOpacity={0.7}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -300,21 +293,25 @@ const RequestDetailScreen: React.FC = () => {
                   <AnyIcon
                     type={Icons.Feather}
                     name="share-2"
-                    size={moderateScale(18)}
+                    size={moderateScale(15)}
                     color={colors.text}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
+                  style={styles.headerReportPill}
                   onPress={() => setReportModalVisible(true)}
                   activeOpacity={0.7}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <AnyIcon
                     type={Icons.Feather}
-                    name="flag"
-                    size={moderateScale(17)}
-                    color={colors.primary}
+                    name="shield"
+                    size={moderateScale(12)}
+                    color={colors.error}
                   />
+                  <AppText bold FONT_11 style={styles.headerReportText}>
+                    Report
+                  </AppText>
                 </TouchableOpacity>
               </View>
             }
@@ -354,6 +351,43 @@ const RequestDetailScreen: React.FC = () => {
             mapOverlayText={mapOverlayText}
             onNavigate={handleNavigate}
           />
+
+          {/* In-Page Safety Concern & Report Card */}
+          <TouchableOpacity
+            style={styles.safetyReportCard}
+            onPress={() => setReportModalVisible(true)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.safetyReportLeft}>
+              <View style={styles.safetyShieldWrap}>
+                <AnyIcon
+                  type={Icons.Feather}
+                  name="shield"
+                  size={moderateScale(16)}
+                  color={colors.textSecondary}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <AppText bold FONT_12 style={{ color: colors.text }}>
+                  Notice something suspicious?
+                </AppText>
+                <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }}>
+                  Report fake or fraudulent blood requests to protect our community.
+                </AppText>
+              </View>
+            </View>
+            <View style={styles.reportBadge}>
+              <AppText bold FONT_11 style={{ color: colors.error }}>
+                Report
+              </AppText>
+              <AnyIcon
+                type={Icons.Feather}
+                name="chevron-right"
+                size={moderateScale(12)}
+                color={colors.error}
+              />
+            </View>
+          </TouchableOpacity>
         </ScrollView>
 
         {/* Sticky Actions Footer */}
@@ -363,21 +397,13 @@ const RequestDetailScreen: React.FC = () => {
           canCall={canCall}
           donationPledged={donationPledged}
           donationCompleted={donationCompleted}
+          isUrgent={isUrgent}
           onCall={handleCall}
           onContact={handleContact}
           onDonate={() => {
             if (donationPledged) {
-              Alert.alert(
-                "Donation Pledged",
-                "You have already offered to donate for this patient. The requester will confirm the donation once fulfilled at the hospital.",
-                [
-                  {
-                    text: "View My Donations",
-                    onPress: () => (navigation as any).navigate(ROUTES.MY_DONATIONS),
-                  },
-                  { text: "OK", style: "cancel" },
-                ],
-              );
+              setIsAlreadyPledgedModal(true);
+              setPledgedModalVisible(true);
               return;
             }
             if (donationCompleted) {
@@ -414,6 +440,26 @@ const RequestDetailScreen: React.FC = () => {
         targetType="request"
         targetId={String(request.id)}
         targetTitle={`Request: ${request.patientName} (${request.bloodType})`}
+      />
+
+      <DonationPledgedModal
+        isVisible={pledgedModalVisible}
+        onClose={() => setPledgedModalVisible(false)}
+        isAlreadyPledged={isAlreadyPledgedModal}
+        hospitalName={request.hospital}
+        patientName={request.patientName}
+        bloodType={request.bloodType}
+        onOpenChat={() => {
+          setPledgedModalVisible(false);
+          (navigation as any).navigate(ROUTES.CHAT, {
+            request,
+            threadId: existingThread?.id,
+          });
+        }}
+        onViewMyDonations={() => {
+          setPledgedModalVisible(false);
+          (navigation as any).navigate(ROUTES.MY_DONATIONS);
+        }}
       />
     </View>
   );

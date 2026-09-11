@@ -1,30 +1,9 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { SUPPORT_SERVICE, CreateReportPayload } from "../../api/service/support.service";
 import Toast from "react-native-toast-message";
-import staticFaqs from "../../data/faqs.json";
-
 export const supportKeys = {
   all: ["support"] as const,
-  faqs: () => [...supportKeys.all, "faqs"] as const,
   reports: () => [...supportKeys.all, "reports"] as const,
-};
-
-export const useFaqs = (enabled = true) => {
-  return useQuery({
-    queryKey: supportKeys.faqs(),
-    queryFn: async () => {
-      try {
-        const response = await SUPPORT_SERVICE.getFaqs();
-        const data = response.data?.data || response.data;
-        if (Array.isArray(data) && data.length > 0) return data;
-      } catch {
-        // Fall back to local static faqs.json
-      }
-      return staticFaqs;
-    },
-    initialData: staticFaqs,
-    enabled,
-  });
 };
 
 export const useContactSupport = () => {

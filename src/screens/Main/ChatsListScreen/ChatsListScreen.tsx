@@ -46,6 +46,7 @@ const ChatsListScreen = () => {
     (navigation as any).navigate(ROUTES.CHAT, {
       request: item.request,
       threadId: item.id,
+      participant: (item as any)?.participant,
     });
   };
 

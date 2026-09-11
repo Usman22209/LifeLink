@@ -237,6 +237,7 @@
   },
   "feed": {
     "title": "Blood Feed",
+    "loading": "Finding blood requests near you...",
     "searchPlaceholder": "Search by city, hospital or name…",
     "requestsFound": "requests found",
     "sort": "Sort",

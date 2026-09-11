@@ -5,6 +5,7 @@ import { AUTH_SERVICE } from "../../api/service/auth.service";
 import { setAuth } from "../../../store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import { Platform } from "react-native";
+import { captureLoginFailure } from "@shared/utils/sentryLogger";
 
 interface GoogleLoginPayload {
   idToken: string;
@@ -65,6 +66,10 @@ export const useGoogleLogin = () => {
     },
 
     onError: (error: any) => {
+      captureLoginFailure(error, {
+        loginMethod: "google",
+      });
+
       Toast.show({
         type: "error",
         text2:

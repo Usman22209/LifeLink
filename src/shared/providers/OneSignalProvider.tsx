@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, ReactNode } from "react";
+import React, { useEffect, useRef, useState, ReactNode } from "react";
 import {
-  Alert,
   Linking,
   Platform,
   PermissionsAndroid,
@@ -17,8 +16,11 @@ import {
 import { showInfoToast } from "@components/Toast";
 import { selectUser } from "@store/slices/authSlice";
 import ENV from "@config/env";
+import NotificationPermissionModal from "@components/NotificationPermissionModal";
 
 const ONESIGNAL_APP_ID = ENV.ONESIGNAL_APP_ID;
+
+let promptPermissionCallback: (() => void) | null = null;
 
 export const checkAndPromptNotificationPermission = async () => {
   try {
@@ -36,26 +38,9 @@ export const checkAndPromptNotificationPermission = async () => {
       return true;
     }
 
-    Alert.alert(
-      "Enable Emergency Alerts 🚨",
-      "LifeLink requires notification permission to alert you instantly when a patient urgently needs blood in your area or when someone messages you about a donation.\n\nPlease enable notifications to save lives.",
-      [
-        {
-          text: "Later",
-          style: "cancel",
-        },
-        {
-          text: "Enable in Settings",
-          onPress: async () => {
-            const granted = await OneSignal.Notifications.requestPermission(true);
-            if (!granted) {
-              Linking.openSettings();
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+    if (promptPermissionCallback) {
+      promptPermissionCallback();
+    }
     return false;
   } catch (err: any) {
     console.log("Error checking notification permission:", err?.message);
@@ -66,6 +51,38 @@ export const checkAndPromptNotificationPermission = async () => {
 const OneSignalProvider = ({ children }: { children: ReactNode }) => {
   const user = useSelector(selectUser);
   const appState = useRef(AppState.currentState);
+  const [permissionModalVisible, setPermissionModalVisible] = useState(false);
+
+  useEffect(() => {
+    promptPermissionCallback = () => {
+      setPermissionModalVisible(true);
+    };
+
+    return () => {
+      promptPermissionCallback = null;
+    };
+  }, []);
+
+  const handleEnableNotifications = async () => {
+    setPermissionModalVisible(false);
+    try {
+      if (Platform.OS === "android" && Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Linking.openSettings();
+        }
+      } else {
+        const granted = await OneSignal.Notifications.requestPermission(true);
+        if (!granted) {
+          Linking.openSettings();
+        }
+      }
+    } catch {
+      Linking.openSettings();
+    }
+  };
 
   useEffect(() => {
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
@@ -143,7 +160,16 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     (user as any)?.city,
   ]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <NotificationPermissionModal
+        isVisible={permissionModalVisible}
+        onClose={() => setPermissionModalVisible(false)}
+        onEnable={handleEnableNotifications}
+      />
+    </>
+  );
 };
 
 export default OneSignalProvider;

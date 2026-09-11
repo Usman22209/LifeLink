@@ -21,7 +21,7 @@ const EmptyAlerts: React.FC<EmptyAlertsProps> = ({ onDevSeed }) => {
           type={Icons.Feather}
           name="bell"
           size={moderateScale(26)}
-          color={colors.gray500}
+          color={colors.gray600}
         />
       </View>
       <AppText bold FONT_15 style={styles.emptyTitle}>

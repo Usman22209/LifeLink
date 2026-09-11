@@ -22,6 +22,9 @@ const AppImage: React.FC<AppImageProps> = ({
     console.warn("❌ Image load failed", err);
     if (fallbackSource) setUseFallback(true);
     setLoading(false);
+    if (props.onError) {
+      props.onError();
+    }
   };
 
   return (

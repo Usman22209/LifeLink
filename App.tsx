@@ -5,6 +5,7 @@ import store, { persistor } from "@store/store";
 import AppNavigation from "@navigation/index";
 import "@shared/i18n";
 import OneSignalProvider from "@providers/OneSignalProvider";
+import PresenceProvider from "@providers/PresenceProvider";
 import Toast from "react-native-toast-message";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
@@ -83,12 +84,14 @@ const App = (): React.JSX.Element => {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <QueryClientProvider client={queryClient}>
-            <OneSignalProvider>
-              <NavigationContainer linking={linking}>
-                <AppNavigation />
-                <AppToast />
-              </NavigationContainer>
-            </OneSignalProvider>
+            <PresenceProvider>
+              <OneSignalProvider>
+                <NavigationContainer linking={linking}>
+                  <AppNavigation />
+                  <AppToast />
+                </NavigationContainer>
+              </OneSignalProvider>
+            </PresenceProvider>
           </QueryClientProvider>
         </PersistGate>
       </Provider>

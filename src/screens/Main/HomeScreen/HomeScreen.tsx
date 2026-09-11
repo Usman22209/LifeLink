@@ -87,7 +87,12 @@ const HomeScreen = () => {
       header={
         <HomeHeader
           userName={displayName}
-          profileImage={user?.profile_image}
+          profileImage={
+            user?.profile_image ||
+            user?.profileImage ||
+            user?.avatar_url ||
+            user?.avatar
+          }
           notificationCount={unreadCount}
           onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
           onProfilePress={() => navigation.navigate(ROUTES.PROFILE)}

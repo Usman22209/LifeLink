@@ -11,6 +11,9 @@ import { styles } from "../ChatScreen.styles";
 interface ChatHeaderProps {
   patientName: string;
   patientImage?: string;
+  isOnline?: boolean;
+  isTyping?: boolean;
+  statusText?: string;
   onBackPress: () => void;
   onReportPress?: () => void;
 }
@@ -18,6 +21,9 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   patientName,
   patientImage,
+  isOnline = false,
+  isTyping = false,
+  statusText,
   onBackPress,
   onReportPress,
 }) => {
@@ -27,6 +33,16 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     const phone = "+9242111222333";
     Alert.alert("Call Recipient", `Calling request contact at ${phone}...`);
   };
+
+  const dotColor = isTyping
+    ? colors.primary
+    : isOnline
+    ? colors.success
+    : colors.gray300;
+
+  const displayStatus = isTyping
+    ? "Typing..."
+    : statusText || (isOnline ? "Online" : "Offline");
 
   return (
     <View
@@ -69,8 +85,21 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               {patientName || "User"}
             </AppText>
             <View style={styles.headerStatus}>
-              <View style={styles.headerStatusDot} />
-              <AppText style={styles.headerStatusText}>Online</AppText>
+              <View
+                style={[
+                  styles.headerStatusDot,
+                  { backgroundColor: dotColor },
+                ]}
+              />
+              <AppText
+                style={[
+                  styles.headerStatusText,
+                  isTyping && { color: colors.primary, fontWeight: "600" },
+                  isOnline && !isTyping && { color: colors.success, fontWeight: "500" },
+                ]}
+              >
+                {displayStatus}
+              </AppText>
             </View>
           </View>
         </View>
@@ -78,17 +107,32 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       <View style={styles.headerRight}>
         {onReportPress && (
           <TouchableOpacity
-            style={[styles.headerAction, { marginRight: scale(8) }]}
+            style={[
+              styles.headerAction,
+              {
+                marginRight: scale(6),
+                paddingHorizontal: scale(8),
+                paddingVertical: verticalScale(4),
+                borderRadius: moderateScale(10),
+                backgroundColor: "rgba(229, 57, 53, 0.08)",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: scale(3),
+              },
+            ]}
             onPress={onReportPress}
             activeOpacity={0.7}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <AnyIcon
               type={Icons.Feather}
-              name="flag"
-              size={moderateScale(16)}
-              color={colors.primary}
+              name="shield"
+              size={moderateScale(13)}
+              color={colors.error}
             />
+            <AppText bold FONT_10 style={{ color: colors.error }}>
+              Report
+            </AppText>
           </TouchableOpacity>
         )}
         <TouchableOpacity

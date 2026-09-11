@@ -44,7 +44,10 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
-  const isOffline = !netInfo.isConnected;
+  // Avoid flashing offline banner during initial launch while NetInfo is probing (isConnected === null)
+  const isOffline =
+    netInfo.isConnected === false ||
+    (netInfo.isConnected === true && netInfo.isInternetReachable === false);
 
   const Container = scrollable ? ScrollView : View;
   const bgColor = backgroundColor || colors.background;

@@ -14,7 +14,7 @@ import AppButton from "@components/AppButton";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useFaqs, useContactSupport } from "@shared/query/support/useSupport";
+import { useContactSupport } from "@shared/query/support/useSupport";
 import staticFaqs from "@shared/data/faqs.json";
 import { styles } from "./HelpSupportScreen.styles";
 
@@ -55,7 +55,6 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 const HelpSupportScreen = () => {
   const { t } = useTranslation();
 
-  const { data: remoteFaqs } = useFaqs();
   const { mutate: submitContact, isPending: isSubmitting } = useContactSupport();
 
   const handleContactEmail = () => {
@@ -68,7 +67,7 @@ const HelpSupportScreen = () => {
     );
   };
 
-  const faqs = remoteFaqs && Array.isArray(remoteFaqs) && remoteFaqs.length > 0 ? remoteFaqs : staticFaqs;
+  const faqs = staticFaqs;
 
   return (
     <ScreenWrapper

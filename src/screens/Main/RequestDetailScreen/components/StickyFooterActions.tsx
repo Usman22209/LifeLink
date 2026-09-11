@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, verticalScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
@@ -12,6 +12,7 @@ interface StickyFooterActionsProps {
   canCall?: boolean;
   donationPledged?: boolean;
   donationCompleted?: boolean;
+  isUrgent?: boolean;
   onCall?: () => void;
   onContact: () => void;
   onDonate: () => void;
@@ -25,18 +26,21 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
   canCall,
   donationPledged,
   donationCompleted,
+  isUrgent = false,
   onCall,
   onContact,
   onDonate,
   onManageRequest,
   onViewMyDonations,
 }) => {
+  const safeBottomPadding = Math.max(verticalScale(18), insetsBottom + verticalScale(8));
+
   if (isOwner) {
     return (
       <View
         style={[
           styles.footer,
-          { paddingBottom: Math.max(moderateScale(12), insetsBottom) },
+          { paddingBottom: safeBottomPadding },
         ]}
       >
         <TouchableOpacity
@@ -62,7 +66,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
     <View
       style={[
         styles.footer,
-        { paddingBottom: Math.max(moderateScale(12), insetsBottom) },
+        { paddingBottom: safeBottomPadding },
       ]}
     >
       {canCall && (
@@ -74,45 +78,45 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
           <AnyIcon
             type={Icons.Feather}
             name="phone"
-            size={moderateScale(14)}
+            size={moderateScale(15)}
             color={colors.primary}
           />
-          <AppText bold FONT_11 style={{ color: colors.primary }}>
+          <AppText bold FONT_12 style={styles.callText}>
             Call
           </AppText>
         </TouchableOpacity>
       )}
 
       <TouchableOpacity
-        style={canCall ? styles.callBtn : styles.contactBtn}
+        style={styles.contactBtn}
         onPress={onContact}
         activeOpacity={0.75}
       >
         <AnyIcon
           type={Icons.Feather}
           name="message-square"
-          size={moderateScale(14)}
+          size={moderateScale(15)}
           color={colors.text}
         />
-        <AppText bold FONT_11 style={styles.contactText}>
+        <AppText bold FONT_12 style={styles.contactText}>
           Message
         </AppText>
       </TouchableOpacity>
 
       {donationCompleted ? (
         <TouchableOpacity
-          style={[styles.pledgedBtn, { backgroundColor: colors.success }]}
+          style={styles.pledgedBtn}
           onPress={onViewMyDonations}
           activeOpacity={0.8}
         >
           <AnyIcon
             type={Icons.Feather}
             name="check"
-            size={moderateScale(14)}
+            size={moderateScale(15)}
             color={colors.white}
           />
-          <AppText bold FONT_11 style={styles.donateText}>
-            Completed
+          <AppText bold FONT_12 style={styles.donateText} numberOfLines={1}>
+            Fulfilled
           </AppText>
         </TouchableOpacity>
       ) : donationPledged ? (
@@ -124,30 +128,31 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
           <AnyIcon
             type={Icons.Feather}
             name="check-circle"
-            size={moderateScale(14)}
+            size={moderateScale(15)}
             color={colors.white}
           />
-          <AppText bold FONT_11 style={styles.donateText}>
-            Pledged (Pending)
+          <AppText bold FONT_12 style={styles.donateText} numberOfLines={1}>
+            Pledged
           </AppText>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
           style={styles.donateBtn}
           onPress={onDonate}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
         >
           <AnyIcon
             type={Icons.Feather}
-            name="heart"
-            size={moderateScale(14)}
+            name={isUrgent ? "zap" : "heart"}
+            size={moderateScale(15)}
             color={colors.white}
           />
-          <AppText bold FONT_12 style={styles.donateText}>
-            Donate Now
+          <AppText bold FONT_13 style={styles.donateText} numberOfLines={1}>
+            {isUrgent ? "Respond Now" : "Donate Now"}
           </AppText>
         </TouchableOpacity>
       )}
     </View>
   );
 };
+

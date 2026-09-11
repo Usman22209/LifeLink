@@ -58,7 +58,7 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
                 FONT_13
                 style={[
                   styles.cardTitle,
-                  { color: read ? colors.gray700 : colors.text },
+                  { color: read ? colors.textSecondary : colors.text },
                 ]}
                 numberOfLines={1}
               >
@@ -87,7 +87,7 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
             type={Icons.Feather}
             name={isRtl ? "chevron-left" : "chevron-right"}
             size={moderateScale(16)}
-            color={colors.gray400}
+            color={colors.gray600}
           />
         </View>
       </TouchableOpacity>

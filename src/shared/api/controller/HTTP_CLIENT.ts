@@ -4,6 +4,7 @@ import store from "@store/store";
 import { logout, updateUser } from "@store/slices/authSlice";
 import { Alert } from "react-native";
 import { refreshTokenFlow } from "./tokenRefresh";
+import { captureBackendError } from "@shared/utils/sentryLogger";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -58,12 +59,29 @@ HTTP_CLIENT.interceptors.response.use(
     const originalRequest = error.config;
     const fullUrl = `${originalRequest?.baseURL || ""}${originalRequest?.url || ""}`;
 
-    console.error(
-      `❌ [HTTP_CLIENT Error] ${error.response?.status || "NETWORK_ERROR"} from ${fullUrl}`,
-    );
+    const status = error?.response?.status;
+    const isInitial401 = status === 401 && !originalRequest?._retry;
 
-    if (error.response?.data) {
-      console.error(`🚨 [HTTP_CLIENT Error Response Body]:`, error.response.data);
+    if (isInitial401) {
+      console.log(
+        `🔄 [HTTP_CLIENT Token Expired] 401 from ${fullUrl} — auto-refreshing token...`,
+      );
+    } else {
+      console.error(
+        `❌ [HTTP_CLIENT Error] ${status || "NETWORK_ERROR"} from ${fullUrl}`,
+      );
+
+      if (error.response?.data) {
+        console.error(`🚨 [HTTP_CLIENT Error Response Body]:`, error.response.data);
+      }
+    }
+
+    // Automatically log server errors (5xx) and network connectivity breakdowns to Sentry
+    if (!status || status >= 500) {
+      captureBackendError(error, {
+        feature: "network",
+        action: "http_request",
+      });
     }
 
     // Handle 413 Content Too Large

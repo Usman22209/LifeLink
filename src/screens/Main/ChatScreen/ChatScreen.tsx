@@ -14,6 +14,7 @@ import useTranslation from "@shared/hooks/useTranslation";
 import { useChatMessages, useSendMessage, useMarkThreadAsRead, chatKeys } from "@shared/query/chat/useChat";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@shared/config/supabase";
+import { usePresence } from "@shared/providers/PresenceProvider";
 import ChatHeader from "./components/ChatHeader";
 import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
@@ -28,13 +29,19 @@ const ChatScreen = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const user = useSelector(selectUser);
+  const { isUserOnline, formatLastSeen } = usePresence();
+
   const request = route.params?.request;
+  const participant = (route.params as any)?.participant;
+
   const patientName =
+    participant?.name ||
     request?.patientName ||
     (request as any)?.patient_name ||
     (request as any)?.user?.full_name ||
     "User";
   const patientImage =
+    participant?.avatar ||
     request?.patientImage ||
     (request as any)?.patient_image ||
     (request as any)?.user?.profile_image;
@@ -45,6 +52,11 @@ const ChatScreen = () => {
   const flatListRef = useRef<FlatList>(null);
   const [inputText, setInputText] = useState("");
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const [isInRoomOnline, setIsInRoomOnline] = useState(false);
+  const [otherUserLastSeen, setOtherUserLastSeen] = useState<string | null>(
+    participant?.last_seen_at || participant?.updated_at || null
+  );
+  const otherUserIdRef = useRef<string | null>(null);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,10 +96,47 @@ const ChatScreen = () => {
       const channel = supabase.channel(`chat_room_${id}`, {
         config: {
           broadcast: { self: false },
+          presence: { key: user?.id ? String(user.id) : undefined },
         },
       });
 
+      const checkInRoomPresence = () => {
+        const state = channel.presenceState();
+        const targetId = otherUserIdRef.current;
+        if (!targetId) return;
+        const present = Object.values(state).flat().some(
+          (p: any) =>
+            String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
+        );
+        setIsInRoomOnline(present);
+      };
+
       channel
+        .on("presence", { event: "sync" }, checkInRoomPresence)
+        .on("presence", { event: "join" }, ({ newPresences }) => {
+          const targetId = otherUserIdRef.current;
+          if (
+            targetId &&
+            newPresences?.some(
+              (p: any) =>
+                String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
+            )
+          ) {
+            setIsInRoomOnline(true);
+          }
+        })
+        .on("presence", { event: "leave" }, ({ leftPresences }) => {
+          const targetId = otherUserIdRef.current;
+          if (
+            targetId &&
+            leftPresences?.some(
+              (p: any) =>
+                String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
+            )
+          ) {
+            checkInRoomPresence();
+          }
+        })
         .on(
           "postgres_changes",
           {
@@ -174,7 +223,16 @@ const ChatScreen = () => {
             }
           }
         })
-        .subscribe();
+        .subscribe(async (status) => {
+          if (status === "SUBSCRIBED" && user?.id) {
+            try {
+              await channel.track({
+                user_id: String(user.id),
+                online_at: new Date().toISOString(),
+              });
+            } catch {}
+          }
+        });
 
       return channel;
     });
@@ -183,7 +241,12 @@ const ChatScreen = () => {
 
     return () => {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-      channels.forEach((ch) => supabase.removeChannel(ch));
+      channels.forEach(async (ch) => {
+        try {
+          await ch.untrack();
+        } catch {}
+        supabase.removeChannel(ch);
+      });
     };
   }, [channelIds, user?.id, queryClient]);
 
@@ -237,9 +300,14 @@ const ChatScreen = () => {
   }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user?.id]);
 
   const otherUserId = useMemo(() => {
-    if ((request as any)?.requester_id) return String((request as any).requester_id);
-    if ((request as any)?.requester?.id) return String((request as any).requester.id);
-    if ((request as any)?.user?.id) return String((request as any).user.id);
+    if (participant?.id && String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()) {
+      return String(participant.id);
+    }
+
+    const reqRequesterId = (request as any)?.requester_id || (request as any)?.requester?.id || (request as any)?.user?.id;
+    if (reqRequesterId && String(reqRequesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+      return String(reqRequesterId);
+    }
 
     const rawMsgs =
       remoteMessagesData?.data?.messages ||
@@ -252,8 +320,48 @@ const ChatScreen = () => {
     );
     if (otherMsg?.sender_id) return String(otherMsg.sender_id);
 
-    return String(threadId || "unknown");
-  }, [request, remoteMessagesData, user?.id, threadId]);
+    return null;
+  }, [participant?.id, request, remoteMessagesData, user?.id]);
+
+  useEffect(() => {
+    otherUserIdRef.current = otherUserId;
+  }, [otherUserId]);
+
+  // Fetch latest last seen and presence timestamp for recipient
+  useEffect(() => {
+    if (!otherUserId) return;
+    let isMounted = true;
+
+    const fetchProfile = async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("updated_at, last_seen_at")
+          .eq("id", otherUserId)
+          .maybeSingle();
+
+        if (isMounted && data) {
+          setOtherUserLastSeen((data as any)?.last_seen_at || data.updated_at || null);
+        }
+      } catch {}
+    };
+
+    fetchProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [otherUserId]);
+
+  const isRecipientOnline = Boolean(
+    isInRoomOnline || (otherUserId && isUserOnline(otherUserId))
+  );
+
+  const headerStatusText = useMemo(() => {
+    if (isOtherUserTyping) return "Typing...";
+    if (isRecipientOnline) return "Online";
+    return formatLastSeen(otherUserLastSeen, false);
+  }, [isOtherUserTyping, isRecipientOnline, otherUserLastSeen, formatLastSeen]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
@@ -343,6 +451,9 @@ const ChatScreen = () => {
         <ChatHeader
           patientName={patientName}
           patientImage={patientImage}
+          isOnline={isRecipientOnline}
+          isTyping={isOtherUserTyping}
+          statusText={headerStatusText}
           onBackPress={() => navigation.goBack()}
           onReportPress={() => setReportModalVisible(true)}
         />
@@ -400,7 +511,7 @@ const ChatScreen = () => {
         visible={reportModalVisible}
         onClose={() => setReportModalVisible(false)}
         targetType="user"
-        targetId={otherUserId}
+        targetId={otherUserId || ""}
         targetTitle={`User: ${patientName}`}
       />
     </ScreenWrapper>

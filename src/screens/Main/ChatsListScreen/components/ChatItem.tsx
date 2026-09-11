@@ -5,10 +5,19 @@ import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import { usePresence } from "@shared/providers/PresenceProvider";
 import { styles } from "../ChatsListScreen.styles";
 
 export interface ChatThread {
   id: string;
+  request_id?: string;
+  participant?: {
+    id: string;
+    name: string;
+    avatar?: string;
+    last_seen_at?: string;
+    is_online?: boolean;
+  };
   request?: {
     id?: string;
     bloodType?: string;
@@ -35,11 +44,24 @@ interface ChatItemProps {
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ item, onPress }) => {
+  const { isUserOnline } = usePresence();
   const isUnread = (item?.unreadCount ?? 0) > 0;
   const request = item?.request;
-  const patientImage = request?.patientImage;
-  const patientName = request?.patientName || "User";
+  const participant = (item as any)?.participant;
+  const patientImage = participant?.avatar || request?.patientImage;
+  const patientName = participant?.name || request?.patientName || "User";
   const bloodType = request?.bloodType || "";
+
+  const participantId =
+    participant?.id ||
+    (item as any)?.requester_id ||
+    (item as any)?.donor_id ||
+    (request as any)?.requester_id ||
+    (request as any)?.user?.id;
+
+  const isOnline = Boolean(
+    (participantId && isUserOnline(participantId)) || item?.isOnline
+  );
 
   return (
     <TouchableOpacity
@@ -60,7 +82,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, onPress }) => {
             />
           </View>
         )}
-        {item?.isOnline && <View style={styles.onlineIndicator} />}
+        {isOnline && <View style={styles.onlineIndicator} />}
       </View>
 
       <View style={styles.content}>
