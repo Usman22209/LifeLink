@@ -19,7 +19,7 @@ import {
 } from "@shared/query/notifications/useNotifications";
 import AlertCard from "./components/AlertCard";
 import EmptyAlerts from "./components/EmptyAlerts";
-import { Alert, MOCK_ALERTS } from "./types";
+import { Alert } from "./types";
 import { styles } from "./NotificationsScreen.styles";
 
 const formatRelativeTime = (timeStr?: string, createdAt?: string): string => {
@@ -55,9 +55,6 @@ const NotificationsScreen = () => {
   const navigation = useNavigation<any>();
   const isRtl = useSelector(selectIsRtl);
 
-  // DEV-only state to test mock notifications when backend has no data
-  const [devMockList, setDevMockList] = useState<Alert[] | null>(null);
-
   const {
     data: rawNotifications,
     refetch,
@@ -67,12 +64,8 @@ const NotificationsScreen = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: clearAll, isPending: isClearing } = useClearAllNotifications();
 
-  // Normalize notifications dynamically from backend API (or dev test list if active)
+  // Normalize notifications dynamically from backend API
   const alerts: Alert[] = useMemo(() => {
-    if (devMockList) {
-      return devMockList;
-    }
-
     if (!rawNotifications) return [];
 
     const rawList = Array.isArray(rawNotifications)
@@ -138,7 +131,7 @@ const NotificationsScreen = () => {
         createdAt: item.created_at || item.createdAt,
       };
     });
-  }, [rawNotifications, devMockList]);
+  }, [rawNotifications]);
 
   const unreadCount = useMemo(
     () => alerts.filter((a) => !a.read).length,
@@ -148,77 +141,51 @@ const NotificationsScreen = () => {
   // Smart Navigation Handler
   const handlePress = useCallback(
     (item: Alert) => {
-      // Mark as read in dev state or backend
-      if (devMockList) {
-        setDevMockList((prev) =>
-          prev
-            ? prev.map((a) => (a.id === item.id ? { ...a, read: true } : a))
-            : prev,
-        );
-      } else if (!item.read) {
+      if (!item.read) {
         markRead(item.id);
       }
 
       // Smart Route Navigation based on payload
       switch (item.type) {
         case "blood_request":
-        case "urgent_request": {
-          const reqPayload = item.data?.request || {
-            id: item.requestId || item.data?.request_id || item.id || "req_1",
-            patientName:
-              item.patientName ||
-              item.data?.patient_name ||
-              "Ahmad Raza",
-            bloodType:
-              item.bloodType || item.data?.blood_group || "B+",
-            hospital:
-              item.hospital || item.data?.hospital_name || "Mayo Hospital",
-            city: item.city || item.data?.city_id || "1172451",
-            units: item.data?.units_required || 3,
-            urgency: item.urgency || item.data?.urgency || "critical",
-            time: item.time || "Recently",
-            description:
-              item.body || "Mayo Hospital in Lahore urgently needs 3 units of B+ blood for an emergency surgery.",
-            latitude: item.data?.latitude || 31.5799,
-            longitude: item.data?.longitude || 74.3168,
-            contact_number:
-              item.data?.contact_number || "+92 300 1234567",
-          };
-
-          navigation.navigate(ROUTES.REQUEST_DETAIL, {
-            request: reqPayload,
-          });
-          break;
-        }
-
+        case "urgent_request":
         case "donation_match": {
-          const matchPayload = item.data?.request || {
-            id: item.requestId || item.data?.request_id || item.id || "req_2",
-            patientName:
-              item.patientName ||
-              item.data?.patient_name ||
-              "Fatima Noor",
-            bloodType:
-              item.bloodType || item.data?.blood_group || "O+",
-            hospital:
-              item.hospital ||
-              item.data?.hospital_name ||
-              "Sheikh Zayed Hospital",
-            city: item.city || item.data?.city_id || "1172451",
-            units: item.data?.units_required || 1,
-            urgency: item.urgency || item.data?.urgency || "urgent",
-            time: item.time || "Recently",
-            description:
-              item.body || "Matched blood donation request at Sheikh Zayed Hospital.",
-            latitude: item.data?.latitude || 31.5034,
-            longitude: item.data?.longitude || 74.3318,
-            contact_number:
-              item.data?.contact_number || "+92 321 9876543",
-          };
+          const reqId =
+            item.requestId ||
+            item.data?.request_id ||
+            item.data?.request?.id;
 
-          navigation.navigate(ROUTES.REQUEST_DETAIL, {
-            request: matchPayload,
-          });
+          if (reqId) {
+            const reqPayload = item.data?.request || {
+              id: reqId,
+              patientName:
+                item.patientName ||
+                item.data?.patient_name ||
+                item.title ||
+                "Blood Patient",
+              bloodType:
+                item.bloodType || item.data?.blood_group || "Emergency",
+              hospital:
+                item.hospital || item.data?.hospital_name || "Hospital",
+              city: item.city || item.data?.city_id || "",
+              units: item.data?.units_required || 1,
+              urgency: item.urgency || item.data?.urgency || "urgent",
+              time: item.time || "Recently",
+              description: item.body || "",
+              latitude: item.data?.latitude,
+              longitude: item.data?.longitude,
+              contact_number: item.data?.contact_number,
+            };
+
+            navigation.navigate(ROUTES.REQUEST_DETAIL, {
+              request: reqPayload,
+            });
+          } else {
+            // General announcement or broadcast without a specific request ID
+            navigation.navigate(ROUTES.MAIN_FLOW, {
+              screen: ROUTES.FEED,
+            });
+          }
           break;
         }
 
@@ -228,15 +195,19 @@ const NotificationsScreen = () => {
         }
 
         case "chat_message": {
-          navigation.navigate(ROUTES.CHAT, {
-            threadId: item.conversationId || "thread_1",
-            request: item.data?.request || {
-              id: item.requestId || "req_1",
-              patientName: item.patientName || "Ahmad Raza",
-              bloodType: item.bloodType || "B+",
-              hospital: item.hospital || "Mayo Hospital",
-            },
-          });
+          const threadId =
+            item.conversationId ||
+            item.data?.conversation_id ||
+            item.data?.thread_id;
+
+          if (threadId) {
+            navigation.navigate(ROUTES.CHAT, {
+              threadId,
+              request: item.data?.request,
+            });
+          } else {
+            navigation.navigate(ROUTES.CHATS_LIST);
+          }
           break;
         }
 
@@ -263,18 +234,12 @@ const NotificationsScreen = () => {
         }
       }
     },
-    [navigation, markRead, devMockList],
+    [navigation, markRead],
   );
 
   const handleClearAll = useCallback(() => {
-    if (devMockList) {
-      setDevMockList((prev) =>
-        prev ? prev.map((a) => ({ ...a, read: true })) : prev,
-      );
-    } else {
-      clearAll();
-    }
-  }, [clearAll, devMockList]);
+    clearAll();
+  }, [clearAll]);
 
   return (
     <ScreenWrapper
@@ -288,43 +253,22 @@ const NotificationsScreen = () => {
           showBackButton
           onBackPress={() => navigation.goBack()}
           rightComponent={
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {__DEV__ && (
-                <TouchableOpacity
-                  onPress={() =>
-                    setDevMockList((prev) => (prev ? null : MOCK_ALERTS))
-                  }
-                  activeOpacity={0.7}
-                  style={styles.headerDevButton}
-                >
-                  <AppText
-                    bold
-                    FONT_10
-                    style={{
-                      color: devMockList ? colors.primary : colors.textSecondary,
-                    }}
-                  >
-                    {devMockList ? "DEV ON" : "DEV"}
-                  </AppText>
-                </TouchableOpacity>
-              )}
-              {unreadCount > 0 && (
-                <TouchableOpacity
-                  onPress={handleClearAll}
-                  activeOpacity={0.7}
-                  disabled={isClearing}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  style={styles.headerIconButton}
-                >
-                  <AnyIcon
-                    type={Icons.MaterialCommunityIcons}
-                    name="check-all"
-                    size={moderateScale(19)}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
+            unreadCount > 0 ? (
+              <TouchableOpacity
+                onPress={handleClearAll}
+                activeOpacity={0.7}
+                disabled={isClearing}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.headerIconButton}
+              >
+                <AnyIcon
+                  type={Icons.MaterialCommunityIcons}
+                  name="check-all"
+                  size={moderateScale(19)}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            ) : null
           }
           titleSize={15}
           hasBorder={true}
@@ -341,18 +285,11 @@ const NotificationsScreen = () => {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: vs(8) }} />}
-        ListEmptyComponent={
-          <EmptyAlerts
-            onDevSeed={() => setDevMockList(MOCK_ALERTS)}
-          />
-        }
+        ListEmptyComponent={<EmptyAlerts />}
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={() => {
-              if (devMockList) setDevMockList(null);
-              refetch();
-            }}
+            onRefresh={refetch}
             tintColor={colors.primary}
             colors={[colors.primary]}
           />

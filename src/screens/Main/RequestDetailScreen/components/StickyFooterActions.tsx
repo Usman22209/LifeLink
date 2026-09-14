@@ -13,9 +13,11 @@ interface StickyFooterActionsProps {
   donationPledged?: boolean;
   donationCompleted?: boolean;
   isUrgent?: boolean;
+  isCompatible?: boolean;
   onCall?: () => void;
   onContact: () => void;
   onDonate: () => void;
+  onShare?: () => void;
   onManageRequest?: () => void;
   onViewMyDonations?: () => void;
 }
@@ -27,9 +29,11 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
   donationPledged,
   donationCompleted,
   isUrgent = false,
+  isCompatible = true,
   onCall,
   onContact,
   onDonate,
+  onShare,
   onManageRequest,
   onViewMyDonations,
 }) => {
@@ -122,7 +126,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
       ) : donationPledged ? (
         <TouchableOpacity
           style={styles.pledgedBtn}
-          onPress={onViewMyDonations}
+          onPress={onDonate}
           activeOpacity={0.8}
         >
           <AnyIcon
@@ -133,6 +137,22 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
           />
           <AppText bold FONT_12 style={styles.donateText} numberOfLines={1}>
             Pledged
+          </AppText>
+        </TouchableOpacity>
+      ) : !isCompatible ? (
+        <TouchableOpacity
+          style={[styles.donateBtn, { backgroundColor: "#D97706" }]}
+          onPress={onShare || onDonate}
+          activeOpacity={0.85}
+        >
+          <AnyIcon
+            type={Icons.Feather}
+            name="share-2"
+            size={moderateScale(15)}
+            color={colors.white}
+          />
+          <AppText bold FONT_13 style={styles.donateText} numberOfLines={1}>
+            Share to Help
           </AppText>
         </TouchableOpacity>
       ) : (

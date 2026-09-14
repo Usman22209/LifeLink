@@ -13,10 +13,10 @@ import {
   NotificationWillDisplayEvent,
   NotificationClickEvent,
 } from "react-native-onesignal";
-import { showInfoToast } from "@components/Toast";
 import { selectUser } from "@store/slices/authSlice";
 import ENV from "@config/env";
 import NotificationPermissionModal from "@components/NotificationPermissionModal";
+import { playNotificationSound } from "@shared/utils/soundService";
 
 const ONESIGNAL_APP_ID = ENV.ONESIGNAL_APP_ID;
 
@@ -96,11 +96,11 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     OneSignal.Notifications.addEventListener(
       "foregroundWillDisplay",
       (event: NotificationWillDisplayEvent) => {
-        event.notification.display();
-        const title = event.notification.title || "New Notification";
-        const description = event.notification.body || "";
-        showInfoToast(title, description);
-        console.log("Notification received in foreground:", event.notification);
+        // Suppress OS notification banner popup and toasts while app is active
+        event.preventDefault();
+
+        // Play ring.mp3 inside active app
+        playNotificationSound();
       },
     );
 

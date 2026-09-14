@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Alert } from "react-native";
+import { View, TouchableOpacity, Alert, Linking } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
@@ -14,6 +14,7 @@ interface ChatHeaderProps {
   isOnline?: boolean;
   isTyping?: boolean;
   statusText?: string;
+  phoneNumber?: string | null;
   onBackPress: () => void;
   onReportPress?: () => void;
 }
@@ -24,14 +25,24 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   isOnline = false,
   isTyping = false,
   statusText,
+  phoneNumber,
   onBackPress,
   onReportPress,
 }) => {
   const insets = useSafeAreaInsets();
 
   const handleCall = () => {
-    const phone = "+9242111222333";
-    Alert.alert("Call Recipient", `Calling request contact at ${phone}...`);
+    if (!phoneNumber) {
+      Alert.alert(
+        "Phone Call",
+        "No direct contact phone number is available for this recipient. Please message them directly in chat."
+      );
+      return;
+    }
+    const cleanPhone = phoneNumber.replace(/[^0-9+]/g, "");
+    Linking.openURL(`tel:${cleanPhone}`).catch(() => {
+      Alert.alert("Phone Call", `Could not initiate call to ${phoneNumber}.`);
+    });
   };
 
   const dotColor = isTyping
@@ -43,6 +54,28 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const displayStatus = isTyping
     ? "Typing..."
     : statusText || (isOnline ? "Online" : "Offline");
+
+  const isValidAvatar = (url?: string | null) =>
+    Boolean(
+      url &&
+        typeof url === "string" &&
+        url.trim().length > 0 &&
+        !url.includes("cdn.lifelink.org") &&
+        (url.startsWith("http://") || url.startsWith("https://"))
+    );
+
+  const cleanPatientImage = isValidAvatar(patientImage) ? patientImage : null;
+
+  const defaultAvatarNode = (
+    <View style={[styles.headerAvatar, styles.defaultHeaderAvatar]}>
+      <AnyIcon
+        type={Icons.Feather}
+        name="user"
+        size={moderateScale(18)}
+        color={colors.textSecondary}
+      />
+    </View>
+  );
 
   return (
     <View
@@ -65,20 +98,15 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          {patientImage ? (
+          {cleanPatientImage ? (
             <AppImage
-              source={{ uri: patientImage }}
+              source={{ uri: cleanPatientImage }}
               style={styles.headerAvatar}
+              placeholder={defaultAvatarNode}
+              fallbackComponent={defaultAvatarNode}
             />
           ) : (
-            <View style={[styles.headerAvatar, styles.defaultHeaderAvatar]}>
-              <AnyIcon
-                type={Icons.Feather}
-                name="user"
-                size={moderateScale(18)}
-                color={colors.textSecondary}
-              />
-            </View>
+            defaultAvatarNode
           )}
           <View style={styles.headerTextContainer}>
             <AppText bold style={styles.headerName}>

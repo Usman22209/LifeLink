@@ -1,12 +1,14 @@
 import React from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { moderateScale } from "react-native-size-matters";
+import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { selectIsRtl } from "@store/slices/appSlice";
+import { ROUTES } from "@utils/Routes";
 import { styles } from "../MyDonationsScreen.styles";
 
 interface DonationDashboardProps {
@@ -54,6 +56,7 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
   nextEligibleDateStr,
 }) => {
   const { t } = useTranslation();
+  const navigation = useNavigation<any>();
   const isRtl = useSelector(selectIsRtl);
   const statusColor = isEligible ? colors.success : colors.warning;
 
@@ -90,7 +93,9 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
         </View>
       </View>
 
-      <View
+      <TouchableOpacity
+        activeOpacity={0.75}
+        onPress={() => (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE, { isEditing: true })}
         style={[
           styles.eligibilityBanner,
           {
@@ -112,6 +117,7 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
             {
               alignItems: isRtl ? "flex-end" : "flex-start",
               marginHorizontal: moderateScale(10),
+              flex: 1,
             },
           ]}
         >
@@ -130,12 +136,18 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
             style={[styles.eligibilityDesc, { textAlign: isRtl ? "right" : "left" }]}
           >
             {isEligible
-              ? t("myDonations.eligibleDesc") || "You are eligible to donate blood again."
+              ? t("myDonations.eligibleDesc") || "You are eligible to donate blood. Tap to review questionnaire."
               : t("myDonations.nextEligibleOn", { date: nextEligibleDateStr }) ||
-                `Next eligible on ${nextEligibleDateStr}`}
+                `Next eligible on ${nextEligibleDateStr}. Tap to review status.`}
           </AppText>
         </View>
-      </View>
+        <AnyIcon
+          type={Icons.Feather}
+          name="chevron-right"
+          size={moderateScale(14)}
+          color={statusColor}
+        />
+      </TouchableOpacity>
     </>
   );
 };

@@ -87,6 +87,3 @@ export const ALERT_TYPE_CONFIG: Record<
     label: "Profile",
   },
 };
-
-export { MOCK_ALERTS } from "../../../shared/constants/mockData";
-

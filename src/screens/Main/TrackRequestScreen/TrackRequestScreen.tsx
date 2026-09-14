@@ -238,6 +238,11 @@ const TrackRequestScreen: React.FC = () => {
                     hospital: request.hospital_name || request.hospital,
                     city: request.city_id || request.city,
                   },
+                  participant: {
+                    id: donation.donor?.id || donation.donor_id,
+                    name: donation.donor?.full_name || donation.donor?.name || "Donor",
+                    avatar: donation.donor?.profile_image,
+                  },
                 })
               }
             />

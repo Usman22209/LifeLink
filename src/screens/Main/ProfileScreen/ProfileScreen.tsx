@@ -21,7 +21,7 @@ import StatsSection from "./components/StatsSection";
 import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
 import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
-import ReportModal from "@shared/components/ReportModal";
+import DeleteAccountConfirmationModal from "@shared/components/DeleteAccountConfirmationModal";
 import { OneSignal } from "react-native-onesignal";
 
 const ProfileScreen = () => {
@@ -41,13 +41,13 @@ const ProfileScreen = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
-  const { mutate: deleteAccountMutate } = useDeleteAccount();
+  const { mutate: deleteAccountMutate, isPending: deleteAccountPending } = useDeleteAccount();
   const { mutate: updateSettingsMutate } = useUpdateSettings();
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [deleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
@@ -92,21 +92,7 @@ const ProfileScreen = () => {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      t("profile.deleteAccount") || "Delete Account",
-      t("profile.deleteAccountConfirm") ||
-        "Are you sure you want to permanently delete your account? This action is irreversible.",
-      [
-        { text: t("common.cancel") || "Cancel", style: "cancel" },
-        {
-          text: t("profile.deleteAccountConfirmButton") || "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteAccountMutate();
-          },
-        },
-      ],
-    );
+    setDeleteAccountModalVisible(true);
   };
 
   const openLanguageModal = () => {
@@ -163,6 +149,16 @@ const ProfileScreen = () => {
               onPress={() => {
                 navigation.navigate(ROUTES.MY_DONATIONS as any);
               }}
+            />
+            <SettingItem
+              iconName="check-circle"
+              label="Donor Eligibility Check"
+              onPress={() => {
+                navigation.navigate(ROUTES.DONOR_QUESTIONNAIRE as any, {
+                  isEditing: true,
+                });
+              }}
+              iconColor={colors.success}
             />
             <SettingItem
               iconName="file-text"
@@ -234,17 +230,11 @@ const ProfileScreen = () => {
               iconColor={colors.success}
             />
             <SettingItem
-              iconName="flag"
-              label="Report Safety Concern"
-              onPress={() => setReportModalVisible(true)}
-              iconColor={colors.warning}
-            />
-            <SettingItem
               iconName="trash-2"
               label={t("profile.deleteAccount")}
               onPress={handleDeleteAccount}
-              iconColor={colors.error}
-              textColor={colors.error}
+              iconColor={colors.primary}
+              textColor={colors.primary}
               isLast={true}
             />
           </View>
@@ -281,12 +271,13 @@ const ProfileScreen = () => {
         isLoading={logoutPending}
       />
 
-      <ReportModal
-        visible={reportModalVisible}
-        onClose={() => setReportModalVisible(false)}
-        targetType="user"
-        targetId={user?.id || "general"}
-        targetTitle="LifeLink Safety & Policy Report"
+      <DeleteAccountConfirmationModal
+        visible={deleteAccountModalVisible}
+        onClose={() => setDeleteAccountModalVisible(false)}
+        onConfirm={() => {
+          deleteAccountMutate();
+        }}
+        isLoading={deleteAccountPending}
       />
     </ScreenWrapper>
   );

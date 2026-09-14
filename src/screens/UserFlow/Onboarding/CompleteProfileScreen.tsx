@@ -250,11 +250,7 @@ const CompleteProfileScreen = () => {
       if (isEditing) {
         navigation.goBack();
       } else {
-        dispatch(
-          updateUser({
-            is_onboarded: true,
-          }),
-        );
+        (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE);
       }
     } catch (error) {
       console.error("[CompleteProfile] Update error:", error);

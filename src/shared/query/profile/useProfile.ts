@@ -49,24 +49,33 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["deleteAccount"],
     mutationFn: async () => {
       const response = await PROFILE_SERVICE.deleteAccount();
       return response.data;
     },
     onSuccess: async () => {
-      queryClient.clear();
+      try {
+        await Promise.allSettled([
+          tokenStorage.clearToken(),
+        ]);
+      } catch (e) {
+        console.error("Token clear error:", e);
+      }
       store.dispatch(logout());
-      await tokenStorage.clearToken();
+      queryClient.clear();
       Toast.show({
         type: "success",
         text1: "Account Deleted",
-        text2: "Your account has been deleted.",
+        text2: "Your account has been permanently deleted.",
       });
     },
     onError: (error: any) => {
+      console.error("Delete account failed:", error);
       Toast.show({
         type: "error",
-        text2: error?.response?.data?.message || "Failed to delete account.",
+        text1: "Deletion Failed",
+        text2: error?.response?.data?.message || "Could not delete account. Please try again.",
       });
     },
   });

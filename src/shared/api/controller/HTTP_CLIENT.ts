@@ -16,6 +16,9 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
 
 HTTP_CLIENT.interceptors.request.use(
   (config) => {
+    if (config.url?.startsWith("/") && config.baseURL?.endsWith("/")) {
+      config.url = config.url.substring(1);
+    }
     const { accessToken } = store.getState().auth;
     const fullUrl = `${config.baseURL || ""}${config.url || ""}`;
 

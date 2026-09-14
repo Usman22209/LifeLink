@@ -14,5 +14,3 @@ export interface UrgentRequest {
   longitude?: number;
   requester_id?: string;
 }
-
-export { MOCK_URGENT_REQUESTS } from "../../../shared/constants/mockData";

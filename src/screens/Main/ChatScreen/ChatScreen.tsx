@@ -11,10 +11,11 @@ import { styles } from "./ChatScreen.styles";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useChatMessages, useSendMessage, useMarkThreadAsRead, chatKeys } from "@shared/query/chat/useChat";
+import { useChatMessages, useSendMessage, useMarkThreadAsRead, useChatThreads, chatKeys } from "@shared/query/chat/useChat";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@shared/config/supabase";
 import { usePresence } from "@shared/providers/PresenceProvider";
+import { PROFILE_SERVICE } from "@shared/api/service/profile.service";
 import ChatHeader from "./components/ChatHeader";
 import ChatContextBanner from "./components/ChatContextBanner";
 import MessageItem, { Message } from "./components/MessageItem";
@@ -29,25 +30,21 @@ const ChatScreen = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const user = useSelector(selectUser);
-  const { isUserOnline, formatLastSeen } = usePresence();
+  const { isUserOnline, formatLastSeen, isNetworkConnected } = usePresence();
 
   const request = route.params?.request;
   const participant = (route.params as any)?.participant;
 
-  const patientName =
-    participant?.name ||
-    request?.patientName ||
-    (request as any)?.patient_name ||
-    (request as any)?.user?.full_name ||
-    "User";
-  const patientImage =
-    participant?.avatar ||
-    request?.patientImage ||
-    (request as any)?.patient_image ||
-    (request as any)?.user?.profile_image;
+  const initialThreadId = (route.params as any)?.threadId || null;
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(initialThreadId);
+  const [recipientProfile, setRecipientProfile] = useState<{
+    name?: string;
+    avatar?: string;
+    lastSeen?: string | null;
+  } | null>(null);
+
   const bloodType = request?.bloodType || (request as any)?.blood_group || "";
   const hospital = request?.hospital || (request as any)?.hospital_name || "";
-  const threadId = (route.params as any)?.threadId || request?.id || "";
 
   const flatListRef = useRef<FlatList>(null);
   const [inputText, setInputText] = useState("");
@@ -62,23 +59,35 @@ const ChatScreen = () => {
   const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const realtimeChannelRef = useRef<any>(null);
 
-  const { data: remoteMessagesData, isLoading } = useChatMessages(threadId);
+  const { data: chatThreadsData } = useChatThreads();
+  const { data: remoteMessagesData, isLoading } = useChatMessages(
+    activeThreadId || "",
+    Boolean(activeThreadId)
+  );
   const { mutate: sendMessageMutate } = useSendMessage();
   const { mutate: markReadMutate } = useMarkThreadAsRead();
 
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [receivedRealtimeMessages, setReceivedRealtimeMessages] = useState<any[]>([]);
 
-  // Mark thread as read on mount / when threadId is available
+  // Mark thread as read on mount / when activeThreadId is available
   useEffect(() => {
-    if (threadId) {
-      markReadMutate(threadId);
+    if (activeThreadId) {
+      markReadMutate(activeThreadId);
     }
-  }, [threadId, markReadMutate]);
+  }, [activeThreadId, markReadMutate]);
+
+  // Clear in-room presence immediately when local network drops
+  useEffect(() => {
+    if (!isNetworkConnected) {
+      setIsInRoomOnline(false);
+      setIsOtherUserTyping(false);
+    }
+  }, [isNetworkConnected]);
 
   const channelIds = useMemo(() => {
     const ids = new Set<string>();
-    if (threadId) ids.add(threadId);
+    if (activeThreadId) ids.add(activeThreadId);
     if (request?.id) ids.add(request.id);
     const remoteThreadId =
       (remoteMessagesData as any)?.data?.thread_id ||
@@ -86,7 +95,7 @@ const ChatScreen = () => {
       (remoteMessagesData as any)?.thread?.id;
     if (remoteThreadId) ids.add(remoteThreadId);
     return Array.from(ids);
-  }, [threadId, request?.id, remoteMessagesData]);
+  }, [activeThreadId, request?.id, remoteMessagesData]);
 
   // Realtime Broadcast Channel for 0ms typing indicators and instant message delivery
   useEffect(() => {
@@ -299,13 +308,31 @@ const ChatScreen = () => {
     );
   }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user?.id]);
 
-  const otherUserId = useMemo(() => {
-    if (participant?.id && String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()) {
+  const rawThreads: any[] = useMemo(() => {
+    return Array.isArray(chatThreadsData?.data)
+      ? chatThreadsData.data
+      : Array.isArray(chatThreadsData)
+      ? chatThreadsData
+      : [];
+  }, [chatThreadsData]);
+
+  const isValidUserId = (id?: string | null): id is string =>
+    Boolean(
+      id &&
+        typeof id === "string" &&
+        id.trim().length > 0 &&
+        id !== "usr_unknown" &&
+        id !== "null" &&
+        id !== "undefined"
+    );
+
+  const initialOtherUserId = useMemo<string | null>(() => {
+    if (isValidUserId(participant?.id) && String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()) {
       return String(participant.id);
     }
 
     const reqRequesterId = (request as any)?.requester_id || (request as any)?.requester?.id || (request as any)?.user?.id;
-    if (reqRequesterId && String(reqRequesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (isValidUserId(reqRequesterId) && String(reqRequesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
       return String(reqRequesterId);
     }
 
@@ -316,34 +343,99 @@ const ChatScreen = () => {
 
     const otherMsg = rawMsgs.find(
       (m: any) =>
-        m.sender_id && user?.id && String(m.sender_id).toLowerCase() !== String(user.id).toLowerCase()
+        isValidUserId(m.sender_id) && user?.id && String(m.sender_id).toLowerCase() !== String(user.id).toLowerCase()
     );
     if (otherMsg?.sender_id) return String(otherMsg.sender_id);
 
     return null;
   }, [participant?.id, request, remoteMessagesData, user?.id]);
 
+  const matchedThread = useMemo<any>(() => {
+    if (activeThreadId) {
+      const byId = rawThreads.find((t: any) => String(t.id) === String(activeThreadId));
+      if (byId) return byId;
+    }
+    if (request?.id) {
+      const byReq = rawThreads.find(
+        (t: any) =>
+          String(t.request_id || t.request?.id) === String(request.id) &&
+          (!initialOtherUserId ||
+            String(t.participant?.id || t.recipient?.id).toLowerCase() ===
+              String(initialOtherUserId).toLowerCase())
+      );
+      if (byReq) return byReq;
+    }
+    return null;
+  }, [rawThreads, activeThreadId, request?.id, initialOtherUserId]);
+
+  const otherUserId = useMemo<string | null>(() => {
+    if (isValidUserId(initialOtherUserId)) return initialOtherUserId;
+    const threadPId = matchedThread?.participant?.id;
+    if (isValidUserId(threadPId) && String(threadPId).toLowerCase() !== String(user?.id).toLowerCase()) {
+      return String(threadPId);
+    }
+    const donorId = (matchedThread as any)?.donor_id;
+    if (isValidUserId(donorId) && String(donorId).toLowerCase() !== String(user?.id).toLowerCase()) {
+      return String(donorId);
+    }
+    const requesterId = (matchedThread as any)?.requester_id;
+    if (isValidUserId(requesterId) && String(requesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+      return String(requesterId);
+    }
+    return null;
+  }, [initialOtherUserId, matchedThread, user?.id]);
+
   useEffect(() => {
     otherUserIdRef.current = otherUserId;
   }, [otherUserId]);
 
-  // Fetch latest last seen and presence timestamp for recipient
+  // Match existing thread from threadsList if activeThreadId is not set yet
   useEffect(() => {
-    if (!otherUserId) return;
+    if (!activeThreadId && matchedThread?.id) {
+      setActiveThreadId(matchedThread.id);
+    }
+  }, [activeThreadId, matchedThread]);
+
+  // Fetch latest last seen and full profile for recipient via backend service (bypasses RLS)
+  useEffect(() => {
+    const targetUserId = otherUserId;
+    if (!isValidUserId(targetUserId)) return;
     let isMounted = true;
 
     const fetchProfile = async () => {
       try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("updated_at, last_seen_at")
-          .eq("id", otherUserId)
-          .maybeSingle();
-
+        const res = await PROFILE_SERVICE.getPublicProfile(targetUserId);
+        const data = res?.data?.data || res?.data;
         if (isMounted && data) {
-          setOtherUserLastSeen((data as any)?.last_seen_at || data.updated_at || null);
+          setRecipientProfile({
+            name: data.full_name || data.name,
+            avatar: data.profile_image,
+            lastSeen: data.last_seen_at || null,
+          });
+          if (data.last_seen_at) {
+            setOtherUserLastSeen(data.last_seen_at);
+          }
+          return;
         }
-      } catch {}
+      } catch {
+        // Fallback to direct supabase query
+        try {
+          const { data } = await supabase
+            .from("profiles")
+            .select("id, full_name, profile_image, updated_at, last_seen_at")
+            .eq("id", targetUserId)
+            .maybeSingle();
+
+          if (isMounted && data) {
+            setRecipientProfile({
+              name: (data as any)?.full_name || (data as any)?.name,
+              avatar: (data as any)?.profile_image,
+              lastSeen: (data as any)?.last_seen_at || data.updated_at || null,
+            });
+            setOtherUserLastSeen((data as any)?.last_seen_at || data.updated_at || null);
+          }
+        } catch {}
+      }
     };
 
     fetchProfile();
@@ -353,15 +445,84 @@ const ChatScreen = () => {
     };
   }, [otherUserId]);
 
+  const remoteParticipant =
+    (remoteMessagesData as any)?.data?.participant ||
+    (remoteMessagesData as any)?.participant;
+
+  const isGeneric = (name?: string | null) =>
+    !name || !name.trim() || name.trim().toLowerCase() === "user";
+
+  const displayName = useMemo(() => {
+    // 1. Participant name from route params if valid and not "User"
+    const pName = participant?.name || (participant as any)?.full_name;
+    if (!isGeneric(pName)) return pName;
+
+    // 2. Remote messages participant returned from backend
+    const remotePName = remoteParticipant?.name || remoteParticipant?.full_name;
+    if (!isGeneric(remotePName)) return remotePName;
+
+    // 3. Matched thread participant name from chatThreads
+    const threadPName = matchedThread?.participant?.name || matchedThread?.participant?.full_name;
+    if (!isGeneric(threadPName)) return threadPName;
+
+    // 4. Recipient profile fetched via backend API
+    const recName = recipientProfile?.name || (recipientProfile as any)?.full_name;
+    if (!isGeneric(recName)) return recName;
+
+    // 5. Requester full name from request details
+    const reqFullName =
+      (request as any)?.requester?.full_name ||
+      (request as any)?.requester?.name ||
+      (request as any)?.user?.full_name ||
+      (request as any)?.user?.name;
+    if (!isGeneric(reqFullName)) return reqFullName;
+
+    // 6. Patient Name
+    const patName = request?.patientName || matchedThread?.request?.patientName;
+    if (!isGeneric(patName)) return patName;
+
+    return "User";
+  }, [participant, remoteParticipant, matchedThread, recipientProfile, request]);
+
+  const isValidAvatar = (url?: string | null) =>
+    Boolean(
+      url &&
+        typeof url === "string" &&
+        url.trim().length > 0 &&
+        !url.includes("cdn.lifelink.org") &&
+        (url.startsWith("http://") || url.startsWith("https://"))
+    );
+
+  const displayAvatar = useMemo(() => {
+    const candidates = [
+      recipientProfile?.avatar,
+      (recipientProfile as any)?.profile_image,
+      remoteParticipant?.avatar,
+      (remoteParticipant as any)?.profile_image,
+      matchedThread?.participant?.avatar,
+      (matchedThread?.participant as any)?.profile_image,
+      participant?.avatar,
+      (participant as any)?.profile_image,
+      (request as any)?.requester?.profile_image,
+      request?.patientImage,
+    ];
+    for (const c of candidates) {
+      if (isValidAvatar(c)) return c;
+    }
+    return undefined;
+  }, [recipientProfile, remoteParticipant, matchedThread, participant, request]);
+
   const isRecipientOnline = Boolean(
-    isInRoomOnline || (otherUserId && isUserOnline(otherUserId))
+    isNetworkConnected &&
+      (isInRoomOnline || (otherUserId && isUserOnline(otherUserId)))
   );
 
   const headerStatusText = useMemo(() => {
+    if (!isNetworkConnected) return "Waiting for network...";
     if (isOtherUserTyping) return "Typing...";
     if (isRecipientOnline) return "Online";
     return formatLastSeen(otherUserLastSeen, false);
-  }, [isOtherUserTyping, isRecipientOnline, otherUserLastSeen, formatLastSeen]);
+  }, [isNetworkConnected, isOtherUserTyping, isRecipientOnline, otherUserLastSeen, formatLastSeen]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
@@ -426,20 +587,40 @@ const ChatScreen = () => {
       text: textToSend,
       sender_id: user?.id,
       created_at: new Date().toISOString(),
-      thread_id: threadId,
+      thread_id: activeThreadId || undefined,
       request_id: request?.id,
     });
 
     // 3. Background API Call
     const payload = {
-      ...(threadId ? { thread_id: threadId } : {}),
+      ...(activeThreadId ? { thread_id: activeThreadId } : {}),
       ...(request?.id ? { request_id: request.id } : {}),
       text: textToSend,
     };
 
-    sendMessageMutate(payload);
+    sendMessageMutate(payload, {
+      onSuccess: (resData: any) => {
+        const newThreadId =
+          resData?.thread_id || resData?.thread?.id || resData?.data?.thread_id;
+        if (newThreadId && !activeThreadId) {
+          setActiveThreadId(newThreadId);
+        }
+      },
+    });
     scrollToBottom(true);
   };
+
+  const contactPhone = useMemo(() => {
+    return (
+      remoteParticipant?.phone ||
+      (participant as any)?.phone ||
+      (participant as any)?.contact_number ||
+      (request as any)?.contact_number ||
+      (request as any)?.contactNumber ||
+      (request as any)?.requester?.phone ||
+      null
+    );
+  }, [remoteParticipant, participant, request]);
 
   return (
     <ScreenWrapper
@@ -449,13 +630,14 @@ const ChatScreen = () => {
       style={styles.wrapper}
       header={
         <ChatHeader
-          patientName={patientName}
-          patientImage={patientImage}
+          patientName={displayName}
+          patientImage={displayAvatar}
           isOnline={isRecipientOnline}
           isTyping={isOtherUserTyping}
           statusText={headerStatusText}
+          phoneNumber={contactPhone}
           onBackPress={() => navigation.goBack()}
-          onReportPress={() => setReportModalVisible(true)}
+          onReportPress={otherUserId ? () => setReportModalVisible(true) : undefined}
         />
       }
     >
@@ -484,7 +666,7 @@ const ChatScreen = () => {
             ref={flatListRef}
             data={messages}
             renderItem={({ item }) => (
-              <MessageItem item={item} patientImage={patientImage} />
+              <MessageItem item={item} patientImage={displayAvatar} />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}
@@ -494,7 +676,7 @@ const ChatScreen = () => {
             ListFooterComponent={
               <TypingBubble
                 isTyping={isOtherUserTyping}
-                patientImage={patientImage}
+                patientImage={displayAvatar}
               />
             }
           />
@@ -512,7 +694,7 @@ const ChatScreen = () => {
         onClose={() => setReportModalVisible(false)}
         targetType="user"
         targetId={otherUserId || ""}
-        targetTitle={`User: ${patientName}`}
+        targetTitle={`User: ${displayName}`}
       />
     </ScreenWrapper>
   );

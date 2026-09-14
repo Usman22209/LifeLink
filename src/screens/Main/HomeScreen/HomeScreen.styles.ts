@@ -24,6 +24,30 @@ export const styles = StyleSheet.create({
     paddingVertical: verticalScale(6),
     gap: scale(6),
   },
+  emptyUrgentCard: {
+    backgroundColor: colors.white,
+    borderRadius: moderateScale(14),
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: verticalScale(14),
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.gray300,
+  },
+  emptyUrgentIcon: {
+    width: moderateScale(36),
+    height: moderateScale(36),
+    borderRadius: moderateScale(18),
+    backgroundColor: "rgba(46, 125, 50, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyUrgentBtn: {
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(6),
+    borderRadius: moderateScale(8),
+    backgroundColor: "rgba(229, 57, 53, 0.08)",
+  },
 });
 
 export const headerStyles = StyleSheet.create({

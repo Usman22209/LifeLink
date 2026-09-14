@@ -22,4 +22,7 @@ export const PROFILE_SERVICE = {
     const url = API_CONFIG.PROFILE.settings;
     return HTTP_CLIENT.patch(url, data);
   },
+  getPublicProfile: (userId: string) => {
+    return HTTP_CLIENT.get(`profile/user/${userId}`);
+  },
 };

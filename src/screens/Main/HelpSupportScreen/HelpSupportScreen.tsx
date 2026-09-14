@@ -63,7 +63,7 @@ const HelpSupportScreen = () => {
       message: "User initiated contact support request from HelpSupportScreen",
     });
     Linking.openURL(
-      "mailto:support@lifelink.org?subject=LifeLink Support Request",
+      "mailto:usman.shafiq.dev@gmail.com?subject=LifeLink Support Request",
     );
   };
 
@@ -101,6 +101,30 @@ const HelpSupportScreen = () => {
             {t("helpSupport.contactSubtitle") ||
               "Have questions or feedback about LifeLink? Reach out to our support team."}
           </AppText>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: scale(6),
+              backgroundColor: "rgba(229, 57, 53, 0.08)",
+              paddingHorizontal: scale(12),
+              paddingVertical: verticalScale(6),
+              borderRadius: moderateScale(8),
+              marginBottom: verticalScale(14),
+            }}
+            onPress={handleContactEmail}
+            activeOpacity={0.7}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="mail"
+              size={moderateScale(13)}
+              color={colors.primary}
+            />
+            <AppText bold FONT_12 style={{ color: colors.primary }}>
+              usman.shafiq.dev@gmail.com
+            </AppText>
+          </TouchableOpacity>
           <AppButton
             title={t("helpSupport.emailSupport") || "Email Support"}
             onPress={handleContactEmail}

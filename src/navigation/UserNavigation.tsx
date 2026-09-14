@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AuthFlow from "./Auth";
 import MainFlow from "./Main";
 import CompleteProfileScreen from "@screens/UserFlow/Onboarding/CompleteProfileScreen";
+import DonorQuestionnaireScreen from "@screens/UserFlow/Onboarding/DonorQuestionnaireScreen";
 import RequestDetailScreen from "@screens/Main/RequestDetailScreen";
 import ChatScreen from "@screens/Main/ChatScreen";
 import NotificationsScreen from "@screens/Main/NotificationsScreen";
@@ -48,6 +49,10 @@ export default function UserNavigation() {
             name={ROUTES.EDIT_PROFILE}
             component={CompleteProfileScreen}
             initialParams={{ isEditing: true }}
+          />
+          <Stack.Screen
+            name={ROUTES.DONOR_QUESTIONNAIRE}
+            component={DonorQuestionnaireScreen}
           />
           <Stack.Screen name={ROUTES.CHAT} component={ChatScreen} />
           <Stack.Screen

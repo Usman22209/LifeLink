@@ -35,10 +35,12 @@ import DonationPledgedModal from "@components/DonationPledgedModal";
 
 import { HeroBanner } from "./components/HeroBanner";
 import { MedicalCaseNotesCard } from "./components/MedicalCaseNotesCard";
+import { BloodCompatibilityCard } from "./components/BloodCompatibilityCard";
 import { TimelineCard } from "./components/TimelineCard";
 import { DetailsSheet } from "./components/DetailsSheet";
 import { MapPreviewCard } from "./components/MapPreviewCard";
 import { StickyFooterActions } from "./components/StickyFooterActions";
+import { isBloodCompatible } from "@shared/utils/bloodCompatibility";
 import { styles } from "./RequestDetailScreen.styles";
 
 type RequestDetailScreenRouteProp = RouteProp<
@@ -124,8 +126,14 @@ const RequestDetailScreen: React.FC = () => {
     );
   }, [myDonationsList, request.id]);
 
-  const donationPledged = Boolean(existingDonation && existingDonation.status === "intent");
-  const donationCompleted = Boolean(existingDonation && existingDonation.status === "completed");
+  const [justPledged, setJustPledged] = useState(false);
+
+  const donationPledged =
+    justPledged ||
+    Boolean(existingDonation && existingDonation.status === "intent");
+  const donationCompleted = Boolean(
+    existingDonation && existingDonation.status === "completed"
+  );
 
   const cityName = useMemo(
     () => getCityNameById(request.city, selectedLang),
@@ -171,15 +179,27 @@ const RequestDetailScreen: React.FC = () => {
     detailData?.requester_id ||
     detailData?.requesterId ||
     detailData?.requester?.id ||
+    detailData?.user_id ||
     request?.requester_id ||
+    request?.requesterId ||
+    request?.requester?.id ||
+    request?.user_id ||
     rawRequest?.requester_id ||
     rawRequest?.requesterId ||
-    rawRequest?.requester?.id;
+    rawRequest?.requester?.id ||
+    rawRequest?.user_id;
 
   const isOwner = Boolean(
     currentUserId &&
       requesterId &&
       String(currentUserId).trim().toLowerCase() === String(requesterId).trim().toLowerCase()
+  );
+
+  const donorBloodGroup = user?.blood_group || (user as any)?.bloodType || reduxUser?.blood_group;
+  const patientBloodGroup = request.bloodType || (request as any)?.blood_group;
+  const isCompatible = useMemo(
+    () => isBloodCompatible(donorBloodGroup, patientBloodGroup),
+    [donorBloodGroup, patientBloodGroup]
   );
 
   const handleShare = useCallback(async () => {
@@ -192,6 +212,49 @@ const RequestDetailScreen: React.FC = () => {
     }
   }, [request, cityName, t]);
 
+  const participant = useMemo(() => {
+    const rawPId = existingThread?.participant?.id;
+    const pId = (rawPId && rawPId !== "usr_unknown" ? rawPId : requesterId) || null;
+    const pName =
+      existingThread?.participant?.name ||
+      detailData?.requester?.full_name ||
+      detailData?.requester?.name ||
+      (request as any)?.requester?.full_name ||
+      (request as any)?.requester?.name ||
+      (request as any)?.user?.full_name ||
+      (request as any)?.user?.name ||
+      request?.patientName;
+
+    const isValidAvatar = (url?: string | null) =>
+      Boolean(
+        url &&
+          typeof url === "string" &&
+          url.trim().length > 0 &&
+          !url.includes("cdn.lifelink.org") &&
+          (url.startsWith("http://") || url.startsWith("https://"))
+      );
+
+    const candidates = [
+      detailData?.requester?.profile_image,
+      (request as any)?.requester?.profile_image,
+      existingThread?.participant?.avatar,
+      request?.patientImage,
+    ];
+    let pAvatar: string | undefined = undefined;
+    for (const c of candidates) {
+      if (isValidAvatar(c)) {
+        pAvatar = c;
+        break;
+      }
+    }
+
+    return {
+      id: pId,
+      name: pName,
+      avatar: pAvatar,
+    };
+  }, [existingThread, requesterId, detailData, request]);
+
   const handleContact = useCallback(() => {
     if (isOwner) {
       (navigation as any).navigate(ROUTES.MY_REQUESTS);
@@ -203,20 +266,26 @@ const RequestDetailScreen: React.FC = () => {
     (navigation as any).navigate(ROUTES.CHAT, {
       request,
       threadId: existingThread?.id,
+      participant,
     });
-  }, [navigation, request, user, t, isOwner, existingThread]);
+  }, [navigation, request, user, t, isOwner, existingThread, participant]);
 
   const handleManageRequest = useCallback(() => {
     (navigation as any).navigate(ROUTES.MY_REQUESTS);
   }, [navigation]);
 
   const handleConfirmMatch = useCallback(async () => {
+    if (isOwner) {
+      Alert.alert("Action Not Allowed", "You cannot donate blood to your own request.");
+      return;
+    }
     if (user && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
     if (!request.id) return;
     try {
       await acceptBloodRequestMutate(request.id);
+      setJustPledged(true);
       setMatchSheetVisible(false);
       setIsAlreadyPledgedModal(false);
       setPledgedModalVisible(true);
@@ -224,7 +293,7 @@ const RequestDetailScreen: React.FC = () => {
       setMatchSheetVisible(false);
       Alert.alert("Error", err?.message || "Could not respond to request.");
     }
-  }, [acceptBloodRequestMutate, request.id, navigation, user, t]);
+  }, [isOwner, acceptBloodRequestMutate, request.id, navigation, user, t]);
 
   const canCall = Boolean(
     !isOwner &&
@@ -297,22 +366,24 @@ const RequestDetailScreen: React.FC = () => {
                     color={colors.text}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.headerReportPill}
-                  onPress={() => setReportModalVisible(true)}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <AnyIcon
-                    type={Icons.Feather}
-                    name="shield"
-                    size={moderateScale(12)}
-                    color={colors.error}
-                  />
-                  <AppText bold FONT_11 style={styles.headerReportText}>
-                    Report
-                  </AppText>
-                </TouchableOpacity>
+                {!isOwner && (
+                  <TouchableOpacity
+                    style={styles.headerReportPill}
+                    onPress={() => setReportModalVisible(true)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <AnyIcon
+                      type={Icons.Feather}
+                      name="shield"
+                      size={moderateScale(12)}
+                      color={colors.error}
+                    />
+                    <AppText bold FONT_11 style={styles.headerReportText}>
+                      Report
+                    </AppText>
+                  </TouchableOpacity>
+                )}
               </View>
             }
             titleSize={15}
@@ -331,6 +402,15 @@ const RequestDetailScreen: React.FC = () => {
             cfg={cfg}
             displayDistance={displayDistance}
           />
+
+          {/* Blood Compatibility Card */}
+          {!isOwner && (
+            <BloodCompatibilityCard
+              donorBloodGroup={donorBloodGroup}
+              patientBloodGroup={patientBloodGroup}
+              onShare={handleShare}
+            />
+          )}
 
           {/* Medical Case Notes */}
           <MedicalCaseNotesCard bloodType={request.bloodType} />
@@ -353,41 +433,43 @@ const RequestDetailScreen: React.FC = () => {
           />
 
           {/* In-Page Safety Concern & Report Card */}
-          <TouchableOpacity
-            style={styles.safetyReportCard}
-            onPress={() => setReportModalVisible(true)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.safetyReportLeft}>
-              <View style={styles.safetyShieldWrap}>
+          {!isOwner && (
+            <TouchableOpacity
+              style={styles.safetyReportCard}
+              onPress={() => setReportModalVisible(true)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.safetyReportLeft}>
+                <View style={styles.safetyShieldWrap}>
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="shield"
+                    size={moderateScale(16)}
+                    color={colors.textSecondary}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <AppText bold FONT_12 style={{ color: colors.text }}>
+                    Notice something suspicious?
+                  </AppText>
+                  <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }}>
+                    Report fake or fraudulent blood requests to protect our community.
+                  </AppText>
+                </View>
+              </View>
+              <View style={styles.reportBadge}>
+                <AppText bold FONT_11 style={{ color: colors.error }}>
+                  Report
+                </AppText>
                 <AnyIcon
                   type={Icons.Feather}
-                  name="shield"
-                  size={moderateScale(16)}
-                  color={colors.textSecondary}
+                  name="chevron-right"
+                  size={moderateScale(12)}
+                  color={colors.error}
                 />
               </View>
-              <View style={{ flex: 1 }}>
-                <AppText bold FONT_12 style={{ color: colors.text }}>
-                  Notice something suspicious?
-                </AppText>
-                <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }}>
-                  Report fake or fraudulent blood requests to protect our community.
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.reportBadge}>
-              <AppText bold FONT_11 style={{ color: colors.error }}>
-                Report
-              </AppText>
-              <AnyIcon
-                type={Icons.Feather}
-                name="chevron-right"
-                size={moderateScale(12)}
-                color={colors.error}
-              />
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          )}
         </ScrollView>
 
         {/* Sticky Actions Footer */}
@@ -398,9 +480,16 @@ const RequestDetailScreen: React.FC = () => {
           donationPledged={donationPledged}
           donationCompleted={donationCompleted}
           isUrgent={isUrgent}
+          isCompatible={isCompatible}
           onCall={handleCall}
           onContact={handleContact}
+          onShare={handleShare}
           onDonate={() => {
+            if (!isCompatible) {
+              handleShare();
+              return;
+            }
+
             if (donationPledged) {
               setIsAlreadyPledgedModal(true);
               setPledgedModalVisible(true);
@@ -420,6 +509,28 @@ const RequestDetailScreen: React.FC = () => {
               );
               return;
             }
+
+            if (user?.stats?.is_eligible === false) {
+              const reason = user?.stats?.next_eligible_date
+                ? `You have an active donation cooldown until ${user.stats.next_eligible_date}.`
+                : "You are currently marked as ineligible to donate blood based on your health screening.";
+              Alert.alert(
+                "Donor Eligibility Notice",
+                `${reason}\n\nWould you like to review your screening questionnaire?`,
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Review Questionnaire",
+                    onPress: () =>
+                      (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE, {
+                        isEditing: true,
+                      }),
+                  },
+                ],
+              );
+              return;
+            }
+
             setMatchSheetVisible(true);
           }}
           onManageRequest={handleManageRequest}
@@ -454,6 +565,7 @@ const RequestDetailScreen: React.FC = () => {
           (navigation as any).navigate(ROUTES.CHAT, {
             request,
             threadId: existingThread?.id,
+            participant,
           });
         }}
         onViewMyDonations={() => {

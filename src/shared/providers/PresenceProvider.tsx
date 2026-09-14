@@ -12,11 +12,14 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import { supabase } from "@shared/config/supabase";
 
+import NetInfo from "@react-native-community/netinfo";
+
 interface PresenceContextType {
   onlineUserIds: Set<string>;
   isUserOnline: (userId?: string | null) => boolean;
   formatLastSeen: (timestamp?: string | null, isOnline?: boolean) => string;
   updateMyLastSeen: () => Promise<void>;
+  isNetworkConnected: boolean;
 }
 
 const PresenceContext = createContext<PresenceContextType>({
@@ -24,6 +27,7 @@ const PresenceContext = createContext<PresenceContextType>({
   isUserOnline: () => false,
   formatLastSeen: () => "Offline",
   updateMyLastSeen: async () => {},
+  isNetworkConnected: true,
 });
 
 export const usePresence = () => useContext(PresenceContext);
@@ -35,11 +39,31 @@ interface PresenceProviderProps {
 export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) => {
   const user = useSelector(selectUser) as any;
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
+  const [isNetworkConnected, setIsNetworkConnected] = useState<boolean>(true);
   const channelRef = useRef<any>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Monitor network connectivity in real time
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      const connected = Boolean(
+        state.isConnected && state.isInternetReachable !== false
+      );
+      setIsNetworkConnected(connected);
+
+      if (!connected) {
+        // Immediate disconnect reaction: local user cannot reach any online presence
+        setOnlineUserIds(new Set());
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const updateMyLastSeen = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || !isNetworkConnected) return;
     try {
       const now = new Date().toISOString();
       const { error } = await supabase
@@ -48,16 +72,15 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
         .eq("id", user.id);
 
       if (error) {
-        // Fallback gracefully if last_seen_at column migration is pending
         await supabase
           .from("profiles")
           .update({ updated_at: now })
           .eq("id", user.id);
       }
     } catch {
-      // Fail silently to never block UI
+      // Fail silently
     }
-  }, [user?.id]);
+  }, [user?.id, isNetworkConnected]);
 
   // Sync presence state into our local Set
   const syncPresenceState = useCallback((channel: any) => {
@@ -67,12 +90,12 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
 
     Object.entries(state).forEach(([key, presences]: [string, any]) => {
       if (key && key !== "undefined" && key !== "null") {
-        activeIds.add(String(key).toLowerCase());
+        activeIds.add(String(key).trim().toLowerCase());
       }
       if (Array.isArray(presences)) {
         presences.forEach((p: any) => {
           if (p?.user_id) {
-            activeIds.add(String(p.user_id).toLowerCase());
+            activeIds.add(String(p.user_id).trim().toLowerCase());
           }
         });
       }
@@ -81,19 +104,31 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
     setOnlineUserIds(activeIds);
   }, []);
 
-  // Initialize global presence channel when user is authenticated
-  useEffect(() => {
-    if (!user?.id) {
+  const setupChannel = useCallback(() => {
+    if (!user?.id || !isNetworkConnected) {
       if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
+        try {
+          channelRef.current.untrack?.().catch?.(() => {});
+          supabase.removeChannel(channelRef.current);
+        } catch {}
         channelRef.current = null;
       }
       setOnlineUserIds(new Set());
       return;
     }
 
-    const userIdStr = String(user.id);
-    const channel = supabase.channel("global_presence", {
+    const userIdStr = String(user.id).trim().toLowerCase();
+
+    // Clean up existing channel if any
+    if (channelRef.current) {
+      try {
+        channelRef.current.untrack?.().catch?.(() => {});
+        supabase.removeChannel(channelRef.current);
+      } catch {}
+      channelRef.current = null;
+    }
+
+    const channel = supabase.channel(`global_presence_${Date.now()}`, {
       config: {
         presence: { key: userIdStr },
       },
@@ -106,17 +141,16 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
       .on("presence", { event: "join" }, ({ key, newPresences }) => {
         setOnlineUserIds((prev) => {
           const next = new Set(prev);
-          if (key) next.add(String(key).toLowerCase());
+          if (key) next.add(String(key).trim().toLowerCase());
           if (Array.isArray(newPresences)) {
             newPresences.forEach((p: any) => {
-              if (p?.user_id) next.add(String(p.user_id).toLowerCase());
+              if (p?.user_id) next.add(String(p.user_id).trim().toLowerCase());
             });
           }
           return next;
         });
       })
-      .on("presence", { event: "leave" }, ({ key, leftPresences }) => {
-        // Run full sync on leave to ensure proper reconciliation
+      .on("presence", { event: "leave" }, () => {
         syncPresenceState(channel);
       })
       .subscribe(async (status) => {
@@ -132,41 +166,53 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
       });
 
     channelRef.current = channel;
+  }, [user?.id, isNetworkConnected, syncPresenceState, updateMyLastSeen]);
 
-    // Periodic heartbeat every 2 minutes while app is active
-    heartbeatRef.current = setInterval(() => {
-      if (AppState.currentState === "active") {
-        updateMyLastSeen();
-      }
-    }, 120000);
-
-    return () => {
-      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
-      if (channelRef.current) {
-        channelRef.current.untrack?.().catch?.(() => {});
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
-    };
-  }, [user?.id, syncPresenceState, updateMyLastSeen]);
-
-  // Handle AppState (active = track & mark online, background/inactive = untrack & mark last seen)
+  // Setup presence channel on auth or network connection change
   useEffect(() => {
-    const handleAppStateChange = async (nextState: AppStateStatus) => {
-      if (!user?.id || !channelRef.current) return;
+    setupChannel();
 
-      if (nextState === "active") {
+    // Periodic heartbeat every 30s while app is active
+    heartbeatRef.current = setInterval(() => {
+      if (AppState.currentState === "active" && isNetworkConnected && channelRef.current) {
         try {
-          await channelRef.current.track({
-            user_id: String(user.id),
+          channelRef.current.track({
+            user_id: String(user?.id).trim().toLowerCase(),
             online_at: new Date().toISOString(),
           });
         } catch {}
         updateMyLastSeen();
-      } else if (nextState.match(/inactive|background/)) {
+      }
+    }, 30000);
+
+    return () => {
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      if (channelRef.current) {
         try {
-          await channelRef.current.untrack();
+          channelRef.current.untrack?.().catch?.(() => {});
+          supabase.removeChannel(channelRef.current);
         } catch {}
+        channelRef.current = null;
+      }
+    };
+  }, [setupChannel, isNetworkConnected, user?.id, updateMyLastSeen]);
+
+  // Handle AppState (active = re-establish & mark online, background = untrack & mark last seen)
+  useEffect(() => {
+    const handleAppStateChange = async (nextState: AppStateStatus) => {
+      if (!user?.id) return;
+
+      if (nextState === "active") {
+        if (isNetworkConnected) {
+          setupChannel();
+          updateMyLastSeen();
+        }
+      } else if (nextState.match(/inactive|background/)) {
+        if (channelRef.current) {
+          try {
+            await channelRef.current.untrack();
+          } catch {}
+        }
         updateMyLastSeen();
       }
     };
@@ -175,18 +221,19 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
     return () => {
       subscription.remove();
     };
-  }, [user?.id, updateMyLastSeen]);
+  }, [user?.id, isNetworkConnected, setupChannel, updateMyLastSeen]);
 
   const isUserOnline = useCallback(
     (userId?: string | null): boolean => {
-      if (!userId) return false;
-      return onlineUserIds.has(String(userId).toLowerCase());
+      if (!isNetworkConnected || !userId) return false;
+      return onlineUserIds.has(String(userId).trim().toLowerCase());
     },
-    [onlineUserIds]
+    [isNetworkConnected, onlineUserIds]
   );
 
   const formatLastSeen = useCallback(
     (timestamp?: string | null, isOnline?: boolean): string => {
+      if (!isNetworkConnected) return "Waiting for network...";
       if (isOnline) return "Online";
       if (!timestamp) return "Offline";
 
@@ -210,7 +257,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
         return "Offline";
       }
     },
-    []
+    [isNetworkConnected]
   );
 
   return (
@@ -220,6 +267,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
         isUserOnline,
         formatLastSeen,
         updateMyLastSeen,
+        isNetworkConnected,
       }}
     >
       {children}
