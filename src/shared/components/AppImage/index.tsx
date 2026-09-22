@@ -1,13 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ActivityIndicator, ImageSourcePropType, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  ImageSourcePropType,
+  StyleSheet,
+  View,
+} from "react-native";
 import FastImage, { FastImageProps, Source } from "react-native-fast-image";
 
 export type AppImageProps = Omit<FastImageProps, "source" | "resizeMode"> & {
   source?: FastImageProps["source"] | ImageSourcePropType | string | any;
   placeholder?: React.ReactNode;
-  fallbackSource?: FastImageProps["source"] | ImageSourcePropType | string | any;
+  fallbackSource?:
+    | FastImageProps["source"]
+    | ImageSourcePropType
+    | string
+    | any;
   fallbackComponent?: React.ReactNode;
-  resizeMode?: FastImageProps["resizeMode"] | "cover" | "contain" | "stretch" | "center";
+  resizeMode?:
+    | FastImageProps["resizeMode"]
+    | "cover"
+    | "contain"
+    | "stretch"
+    | "center";
   children?: React.ReactNode;
 };
 
@@ -136,11 +150,20 @@ const AppImage: React.FC<AppImageProps> = ({
   }
 
   let mappedResizeMode: any = FastImage.resizeMode.cover;
-  if (resizeMode === "contain" || (resizeMode as any) === FastImage.resizeMode.contain) {
+  if (
+    resizeMode === "contain" ||
+    (resizeMode as any) === FastImage.resizeMode.contain
+  ) {
     mappedResizeMode = FastImage.resizeMode.contain;
-  } else if (resizeMode === "stretch" || (resizeMode as any) === FastImage.resizeMode.stretch) {
+  } else if (
+    resizeMode === "stretch" ||
+    (resizeMode as any) === FastImage.resizeMode.stretch
+  ) {
     mappedResizeMode = FastImage.resizeMode.stretch;
-  } else if (resizeMode === "center" || (resizeMode as any) === FastImage.resizeMode.center) {
+  } else if (
+    resizeMode === "center" ||
+    (resizeMode as any) === FastImage.resizeMode.center
+  ) {
     mappedResizeMode = FastImage.resizeMode.center;
   } else {
     mappedResizeMode = FastImage.resizeMode.cover;

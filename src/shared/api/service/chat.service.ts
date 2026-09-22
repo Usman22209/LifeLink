@@ -5,7 +5,10 @@ export const CHAT_SERVICE = {
   getThreads: () => {
     return HTTP_CLIENT.get(API_CONFIG.CHAT.threads);
   },
-  getMessages: (threadId: string, params?: { page?: number; limit?: number }) => {
+  getMessages: (
+    threadId: string,
+    params?: { page?: number; limit?: number },
+  ) => {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
@@ -17,7 +20,11 @@ export const CHAT_SERVICE = {
 
     return HTTP_CLIENT.get(url);
   },
-  sendMessage: (data: { thread_id?: string; request_id?: string; text: string }) => {
+  sendMessage: (data: {
+    thread_id?: string;
+    request_id?: string;
+    text: string;
+  }) => {
     return HTTP_CLIENT.post(API_CONFIG.CHAT.messages, data);
   },
 };

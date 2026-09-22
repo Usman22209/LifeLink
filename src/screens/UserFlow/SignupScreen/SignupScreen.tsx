@@ -1,5 +1,11 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet, I18nManager, Platform } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  I18nManager,
+  Platform,
+} from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";

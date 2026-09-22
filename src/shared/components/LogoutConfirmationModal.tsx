@@ -31,7 +31,8 @@ const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
 
-  const titleText = t("profile.logoutTitle") || t("profile.logout") || "Sign Out of LifeLink?";
+  const titleText =
+    t("profile.logoutTitle") || t("profile.logout") || "Sign Out of LifeLink?";
   const descText =
     t("profile.logoutConfirm") ||
     "Are you sure you want to sign out? You will need to log in again to receive emergency blood request notifications.";
@@ -72,10 +73,7 @@ const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({
           <Text
             bold
             FONT_18
-            style={[
-              styles.title,
-              { textAlign: isRtl ? "right" : "center" },
-            ]}
+            style={[styles.title, { textAlign: isRtl ? "right" : "center" }]}
           >
             {titleText}
           </Text>

@@ -99,7 +99,11 @@ export const BLOOD_REQUEST_SERVICE = {
   /**
    * Get urgent blood requests for HomeScreen
    */
-  getUrgentRequests: (params?: { limit?: number; lat?: number; lng?: number }) => {
+  getUrgentRequests: (params?: {
+    limit?: number;
+    lat?: number;
+    lng?: number;
+  }) => {
     const queryParams = new URLSearchParams();
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.lat) queryParams.append("lat", params.lat.toString());

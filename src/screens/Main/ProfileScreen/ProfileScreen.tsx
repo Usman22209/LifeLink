@@ -12,7 +12,11 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
-import { useDeleteAccount, useUpdateSettings, useGetProfile } from "@shared/query/profile/useProfile";
+import {
+  useDeleteAccount,
+  useUpdateSettings,
+  useGetProfile,
+} from "@shared/query/profile/useProfile";
 import { getStoredEligibility } from "@shared/utils/donorEligibilityService";
 import { ROUTES } from "@utils/Routes";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
@@ -29,8 +33,10 @@ const ProfileScreen = () => {
   const dispatch = useDispatch();
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const rawProfileUser = profile?.data || profile?.user || profile?.profile || profile;
-  const profileUser = rawProfileUser?.user || rawProfileUser?.profile || rawProfileUser;
+  const rawProfileUser =
+    profile?.data || profile?.user || profile?.profile || profile;
+  const profileUser =
+    rawProfileUser?.user || rawProfileUser?.profile || rawProfileUser;
 
   const user = useMemo(() => {
     if (!profileUser && !reduxUser) return undefined;
@@ -81,13 +87,15 @@ const ProfileScreen = () => {
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
-  const { mutate: deleteAccountMutate, isPending: deleteAccountPending } = useDeleteAccount();
+  const { mutate: deleteAccountMutate, isPending: deleteAccountPending } =
+    useDeleteAccount();
   const { mutate: updateSettingsMutate } = useUpdateSettings();
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [deleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
+  const [deleteAccountModalVisible, setDeleteAccountModalVisible] =
+    useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
@@ -192,7 +200,9 @@ const ProfileScreen = () => {
             />
             <SettingItem
               iconName="check-circle"
-              label={t("profile.donorEligibilityCheck") || "Donor Eligibility Check"}
+              label={
+                t("profile.donorEligibilityCheck") || "Donor Eligibility Check"
+              }
               onPress={() => {
                 navigation.navigate(ROUTES.DONOR_QUESTIONNAIRE as any, {
                   isEditing: true,
@@ -289,7 +299,8 @@ const ProfileScreen = () => {
         />
 
         <Text regular FONT_10 style={styles.versionText}>
-          {t("profile.appVersion", { version: "1.0.0", build: "12" }) || "Version 1.0.0 (Build 12)"}
+          {t("profile.appVersion", { version: "1.0.0", build: "12" }) ||
+            "Version 1.0.0 (Build 12)"}
         </Text>
       </ScrollView>
 
