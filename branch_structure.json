@@ -1,0 +1,33 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "app-polish",
+    "dev-ui",
+    "feature-blood-request",
+    "ios-fixes",
+    "main",
+    "onboarding-screen",
+    "origin",
+    "performance"
+  ],
+  "parent": {
+    "app-polish": "main",
+    "dev-ui": "main",
+    "feature-blood-request": "main",
+    "ios-fixes": "main",
+    "main": null,
+    "onboarding-screen": "main",
+    "origin": "main",
+    "performance": "main"
+  },
+  "order": [
+    "main",
+    "app-polish",
+    "dev-ui",
+    "feature-blood-request",
+    "ios-fixes",
+    "onboarding-screen",
+    "origin",
+    "performance"
+  ]
+}

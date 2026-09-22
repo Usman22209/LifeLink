@@ -43,22 +43,13 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
   const req = item.request as any;
-  const patientName =
-    req?.patientName ||
-    req?.patient_name ||
-    "Blood Request";
+  const patientName = req?.patientName || req?.patient_name || "Blood Request";
 
   const hospitalName =
-    item.hospitalName ||
-    req?.hospital ||
-    req?.hospital_name ||
-    "Hospital";
+    item.hospitalName || req?.hospital || req?.hospital_name || "Hospital";
 
   const bloodType =
-    item.bloodType ||
-    req?.bloodType ||
-    req?.blood_group ||
-    "O+";
+    item.bloodType || req?.bloodType || req?.blood_group || "O+";
 
   const units = item.units || 1;
 
@@ -88,7 +79,10 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
             <AppText
               semiBold
               FONT_13
-              style={[styles.patientName, { textAlign: isRtl ? "right" : "left" }]}
+              style={[
+                styles.patientName,
+                { textAlign: isRtl ? "right" : "left" },
+              ]}
             >
               {patientName}
             </AppText>
@@ -160,7 +154,10 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
               <AppText
                 regular
                 FONT_10
-                style={[styles.metaText, { marginHorizontal: moderateScale(4) }]}
+                style={[
+                  styles.metaText,
+                  { marginHorizontal: moderateScale(4) },
+                ]}
               >
                 {formattedDate}
               </AppText>
@@ -180,9 +177,15 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
               <AppText
                 regular
                 FONT_10
-                style={[styles.metaText, { marginHorizontal: moderateScale(4) }]}
+                style={[
+                  styles.metaText,
+                  { marginHorizontal: moderateScale(4) },
+                ]}
               >
-                {units} {units === 1 ? (t("feed.unit") || "unit") : (t("feed.units") || "units")}
+                {units}{" "}
+                {units === 1
+                  ? t("feed.unit") || "unit"
+                  : t("feed.units") || "units"}
               </AppText>
             </View>
           </View>

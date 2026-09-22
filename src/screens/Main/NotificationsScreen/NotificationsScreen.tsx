@@ -55,14 +55,11 @@ const NotificationsScreen = () => {
   const navigation = useNavigation<any>();
   const isRtl = useSelector(selectIsRtl);
 
-  const {
-    data: rawNotifications,
-    refetch,
-    isRefetching,
-  } = useNotifications();
+  const { data: rawNotifications, refetch, isRefetching } = useNotifications();
 
   const { mutate: markRead } = useMarkNotificationRead();
-  const { mutate: clearAll, isPending: isClearing } = useClearAllNotifications();
+  const { mutate: clearAll, isPending: isClearing } =
+    useClearAllNotifications();
 
   const alerts: Alert[] = useMemo(() => {
     if (!rawNotifications) return [];
@@ -70,9 +67,9 @@ const NotificationsScreen = () => {
     const rawList = Array.isArray(rawNotifications)
       ? rawNotifications
       : rawNotifications?.data?.notifications ||
-      rawNotifications?.notifications ||
-      rawNotifications?.data ||
-      [];
+        rawNotifications?.notifications ||
+        rawNotifications?.data ||
+        [];
 
     if (!Array.isArray(rawList)) return [];
 
@@ -87,9 +84,7 @@ const NotificationsScreen = () => {
             : "system");
 
       const isRead =
-        item.read === true ||
-        item.is_read === true ||
-        item.status === "read";
+        item.read === true || item.is_read === true || item.status === "read";
 
       return {
         id: String(item.id || item._id || `notif-${index}`),
@@ -113,9 +108,7 @@ const NotificationsScreen = () => {
           item.data?.hospital_name ||
           item.data?.hospital,
         patientName:
-          item.patientName ||
-          item.patient_name ||
-          item.data?.patient_name,
+          item.patientName || item.patient_name || item.data?.patient_name,
         city: item.city || item.data?.city,
         requestId:
           item.requestId ||
@@ -148,9 +141,7 @@ const NotificationsScreen = () => {
         case "urgent_request":
         case "donation_match": {
           const reqId =
-            item.requestId ||
-            item.data?.request_id ||
-            item.data?.request?.id;
+            item.requestId || item.data?.request_id || item.data?.request?.id;
 
           if (reqId) {
             const reqPayload = item.data?.request || {
@@ -162,8 +153,7 @@ const NotificationsScreen = () => {
                 "Blood Patient",
               bloodType:
                 item.bloodType || item.data?.blood_group || "Emergency",
-              hospital:
-                item.hospital || item.data?.hospital_name || "Hospital",
+              hospital: item.hospital || item.data?.hospital_name || "Hospital",
               city: item.city || item.data?.city_id || "",
               units: item.data?.units_required || 1,
               urgency: item.urgency || item.data?.urgency || "urgent",

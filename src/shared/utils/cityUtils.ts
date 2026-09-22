@@ -24,7 +24,8 @@ export const getCityNameById = (
   cityIdOrName?: string,
   lang: string = "en",
 ): string => {
-  if (!cityIdOrName || cityIdOrName === "N/A" || cityIdOrName === "undefined") return "";
+  if (!cityIdOrName || cityIdOrName === "N/A" || cityIdOrName === "undefined")
+    return "";
   const rawStr = String(cityIdOrName).trim();
   if (rawStr === "N/A" || rawStr === "undefined") return "";
 
@@ -51,7 +52,8 @@ export const getCityNameById = (
  * Resolves state/province name from a city ID or city name.
  */
 export const getProvinceByCityId = (cityIdOrName?: string): string => {
-  if (!cityIdOrName || cityIdOrName === "N/A" || cityIdOrName === "undefined") return "";
+  if (!cityIdOrName || cityIdOrName === "N/A" || cityIdOrName === "undefined")
+    return "";
   const rawStr = String(cityIdOrName).trim();
   if (rawStr === "N/A" || rawStr === "undefined") return "";
 
@@ -76,11 +78,17 @@ export const getProvinceByCityId = (cityIdOrName?: string): string => {
 export const findCityRecord = (
   cityName?: string,
   provinceName?: string,
-): { id: string; name: { en: string; ur: string }; province: string } | null => {
+): {
+  id: string;
+  name: { en: string; ur: string };
+  province: string;
+} | null => {
   if (!cityName && !provinceName) return null;
 
   const normCity = cityName ? normalizeCityStr(cityName).toLowerCase() : "";
-  const normProvince = provinceName ? normalizeCityStr(provinceName).toLowerCase() : "";
+  const normProvince = provinceName
+    ? normalizeCityStr(provinceName).toLowerCase()
+    : "";
 
   // 1. Try exact match on city name and province
   if (normCity) {

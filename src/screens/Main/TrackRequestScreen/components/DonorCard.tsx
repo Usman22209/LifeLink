@@ -81,10 +81,14 @@ export const DonorCard: React.FC<DonorCardProps> = ({
             },
           ]}
         >
-          <Text bold FONT_10 style={{ color: isCompleted ? colors.success : colors.warning }}>
+          <Text
+            bold
+            FONT_10
+            style={{ color: isCompleted ? colors.success : colors.warning }}
+          >
             {isCompleted
-              ? (t("trackRequest.received") || "Donated")
-              : (t("trackRequest.pledged") || "Pledged")}
+              ? t("trackRequest.received") || "Donated"
+              : t("trackRequest.pledged") || "Pledged"}
           </Text>
         </View>
       </View>
@@ -104,8 +108,17 @@ export const DonorCard: React.FC<DonorCardProps> = ({
           activeOpacity={0.7}
           onPress={onMessage}
         >
-          <AnyIcon type={Icons.Feather} name="message-circle" size={moderateScale(13)} color={colors.text} />
-          <Text semiBold FONT_11 style={{ color: colors.text, marginHorizontal: scale(5) }}>
+          <AnyIcon
+            type={Icons.Feather}
+            name="message-circle"
+            size={moderateScale(13)}
+            color={colors.text}
+          />
+          <Text
+            semiBold
+            FONT_11
+            style={{ color: colors.text, marginHorizontal: scale(5) }}
+          >
             {t("trackRequest.message") || "Message"}
           </Text>
         </TouchableOpacity>
@@ -120,8 +133,17 @@ export const DonorCard: React.FC<DonorCardProps> = ({
             onPress={() => onConfirmReceived(donation.id, donorName)}
             disabled={isUpdatingDonation}
           >
-            <AnyIcon type={Icons.Feather} name="check" size={moderateScale(13)} color={colors.white} />
-            <Text semiBold FONT_11 style={{ color: colors.white, marginHorizontal: scale(5) }}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="check"
+              size={moderateScale(13)}
+              color={colors.white}
+            />
+            <Text
+              semiBold
+              FONT_11
+              style={{ color: colors.white, marginHorizontal: scale(5) }}
+            >
               {t("trackRequest.confirmReceivedBtn") || "Confirm Received"}
             </Text>
           </TouchableOpacity>

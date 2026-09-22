@@ -26,9 +26,12 @@ export const requireCompleteProfile = (
   if (!isProfileComplete(user)) {
     Toast.show({
       type: "info",
-      text1: t ? t("profile.completeProfileTitle") || "Complete Your Profile" : "Complete Your Profile",
+      text1: t
+        ? t("profile.completeProfileTitle") || "Complete Your Profile"
+        : "Complete Your Profile",
       text2: t
-        ? t("profile.completeProfilePrompt") || "Please complete your profile details first."
+        ? t("profile.completeProfilePrompt") ||
+          "Please complete your profile details first."
         : "Please complete your profile details first.",
     });
     navigation.navigate(ROUTES.EDIT_PROFILE as any, { isEditing: true });
@@ -36,4 +39,3 @@ export const requireCompleteProfile = (
   }
   return true;
 };
-

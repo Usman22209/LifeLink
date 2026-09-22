@@ -28,22 +28,23 @@ export const MyRequestCard: React.FC<MyRequestCardProps> = ({
   const progress = Math.min(100, Math.round((fulfilled / required) * 100));
 
   const isExpired = item.status === "expired" || item.is_expired;
-  const isFulfilled = item.status === "fulfilled" || item.status === "completed";
+  const isFulfilled =
+    item.status === "fulfilled" || item.status === "completed";
   const isCancelled = item.status === "cancelled";
 
   const statusLabel = isFulfilled
-    ? (t("myRequests.fulfilled") || "Fulfilled")
+    ? t("myRequests.fulfilled") || "Fulfilled"
     : isCancelled
-    ? (t("myRequests.cancelled") || "Cancelled")
-    : isExpired
-    ? (t("myRequests.expired") || "Expired")
-    : item.time_left || (t("myRequests.active") || "Active");
+      ? t("myRequests.cancelled") || "Cancelled"
+      : isExpired
+        ? t("myRequests.expired") || "Expired"
+        : item.time_left || t("myRequests.active") || "Active";
 
   const statusColor = isFulfilled
     ? colors.success
     : isCancelled || isExpired
-    ? colors.textSecondary
-    : colors.success;
+      ? colors.textSecondary
+      : colors.success;
 
   return (
     <View style={styles.card}>
@@ -96,7 +97,11 @@ export const MyRequestCard: React.FC<MyRequestCardProps> = ({
           ]}
         >
           <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-          <Text bold FONT_10 style={{ color: statusColor, marginHorizontal: scale(3) }}>
+          <Text
+            bold
+            FONT_10
+            style={{ color: statusColor, marginHorizontal: scale(3) }}
+          >
             {statusLabel}
           </Text>
         </View>
@@ -129,7 +134,8 @@ export const MyRequestCard: React.FC<MyRequestCardProps> = ({
               styles.progressFill,
               {
                 width: `${progress}%`,
-                backgroundColor: progress >= 100 ? colors.success : colors.primary,
+                backgroundColor:
+                  progress >= 100 ? colors.success : colors.primary,
               },
             ]}
           />

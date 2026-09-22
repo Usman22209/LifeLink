@@ -25,11 +25,17 @@ const authSlice = createSlice({
       const incomingUser = action.payload.user;
       const wasOnboarded =
         Boolean(state.user?.is_onboarded) ||
-        Boolean(state.user?.phone && (state.user?.blood_group || (state.user as any)?.blood_type));
+        Boolean(
+          state.user?.phone &&
+          (state.user?.blood_group || (state.user as any)?.blood_type),
+        );
       const isOnboarded =
         wasOnboarded ||
         incomingUser.is_onboarded ||
-        Boolean(incomingUser.phone && (incomingUser.blood_group || (incomingUser as any)?.blood_type));
+        Boolean(
+          incomingUser.phone &&
+          (incomingUser.blood_group || (incomingUser as any)?.blood_type),
+        );
 
       state.user = {
         ...(state.user || {}),
@@ -44,7 +50,9 @@ const authSlice = createSlice({
         const incoming = action.payload as any;
         const isOnboarded =
           Boolean(incoming.is_onboarded) ||
-          Boolean(incoming.phone && (incoming.blood_group || incoming.blood_type));
+          Boolean(
+            incoming.phone && (incoming.blood_group || incoming.blood_type),
+          );
         state.user = {
           ...incoming,
           is_onboarded: isOnboarded,
@@ -54,7 +62,10 @@ const authSlice = createSlice({
 
       const wasOnboarded =
         Boolean(state.user.is_onboarded) ||
-        Boolean(state.user.phone && (state.user.blood_group || (state.user as any).blood_type));
+        Boolean(
+          state.user.phone &&
+          (state.user.blood_group || (state.user as any).blood_type),
+        );
 
       const incomingOnboarded = action.payload.is_onboarded;
 
@@ -63,7 +74,9 @@ const authSlice = createSlice({
         Boolean(incomingOnboarded) ||
         Boolean(
           (action.payload.phone || state.user.phone) &&
-            (action.payload.blood_group || (action.payload as any).blood_type || state.user.blood_group),
+          (action.payload.blood_group ||
+            (action.payload as any).blood_type ||
+            state.user.blood_group),
         );
 
       // Cleanly filter out undefined or null keys so they do not overwrite existing valid persisted data
