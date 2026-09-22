@@ -6,7 +6,10 @@ import AppHeader from "@components/AppHeader";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useChatThreads, useMarkThreadAsRead } from "@shared/query/chat/useChat";
+import {
+  useChatThreads,
+  useMarkThreadAsRead,
+} from "@shared/query/chat/useChat";
 import { styles } from "./ChatsListScreen.styles";
 
 import ChatItem, { ChatThread } from "./components/ChatItem";
@@ -28,8 +31,8 @@ const ChatsListScreen = () => {
   const rawThreads: any[] = Array.isArray(chatThreadsData?.data)
     ? chatThreadsData.data
     : Array.isArray(chatThreadsData)
-    ? chatThreadsData
-    : [];
+      ? chatThreadsData
+      : [];
 
   const threads: ChatThread[] = React.useMemo(() => {
     const seen = new Set<string>();

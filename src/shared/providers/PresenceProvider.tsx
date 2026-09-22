@@ -36,7 +36,9 @@ interface PresenceProviderProps {
   children: ReactNode;
 }
 
-export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) => {
+export const PresenceProvider: React.FC<PresenceProviderProps> = ({
+  children,
+}) => {
   const user = useSelector(selectUser) as any;
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
   const [isNetworkConnected, setIsNetworkConnected] = useState<boolean>(true);
@@ -47,7 +49,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       const connected = Boolean(
-        state.isConnected && state.isInternetReachable !== false
+        state.isConnected && state.isInternetReachable !== false,
       );
       setIsNetworkConnected(connected);
 
@@ -174,7 +176,11 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
 
     // Periodic heartbeat every 30s while app is active
     heartbeatRef.current = setInterval(() => {
-      if (AppState.currentState === "active" && isNetworkConnected && channelRef.current) {
+      if (
+        AppState.currentState === "active" &&
+        isNetworkConnected &&
+        channelRef.current
+      ) {
         try {
           channelRef.current.track({
             user_id: String(user?.id).trim().toLowerCase(),
@@ -217,7 +223,10 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
       }
     };
 
-    const subscription = AppState.addEventListener("change", handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
     return () => {
       subscription.remove();
     };
@@ -228,7 +237,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
       if (!isNetworkConnected || !userId) return false;
       return onlineUserIds.has(String(userId).trim().toLowerCase());
     },
-    [isNetworkConnected, onlineUserIds]
+    [isNetworkConnected, onlineUserIds],
   );
 
   const formatLastSeen = useCallback(
@@ -257,7 +266,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ children }) 
         return "Offline";
       }
     },
-    [isNetworkConnected]
+    [isNetworkConnected],
   );
 
   return (

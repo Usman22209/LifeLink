@@ -99,7 +99,8 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
               {t("requestDetail.navRoute") || "Navigation Route"}
             </AppText>
             <AppText regular style={styles.mapSubtitle}>
-              {t("requestDetail.navDirections") || "Directions to destination hospital"}
+              {t("requestDetail.navDirections") ||
+                "Directions to destination hospital"}
             </AppText>
           </View>
         </View>

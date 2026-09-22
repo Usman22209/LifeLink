@@ -27,7 +27,11 @@ export const BloodCompatibilityCard: React.FC<BloodCompatibilityCardProps> = ({
   const selectedLang = useSelector(selectLanguage);
   const isUrdu = selectedLang === "ur";
 
-  const notice = getCompatibilityNotice(donorBloodGroup, patientBloodGroup, isUrdu);
+  const notice = getCompatibilityNotice(
+    donorBloodGroup,
+    patientBloodGroup,
+    isUrdu,
+  );
   const donor = normalizeBloodGroup(donorBloodGroup) || "Unknown";
   const patient = normalizeBloodGroup(patientBloodGroup) || "Patient";
 
@@ -117,10 +121,7 @@ export const BloodCompatibilityCard: React.FC<BloodCompatibilityCardProps> = ({
       <AppText
         regular
         FONT_11
-        style={[
-          styles.message,
-          { textAlign: isRtl ? "right" : "left" },
-        ]}
+        style={[styles.message, { textAlign: isRtl ? "right" : "left" }]}
       >
         {notice.message}
       </AppText>

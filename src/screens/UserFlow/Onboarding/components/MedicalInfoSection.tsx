@@ -26,10 +26,7 @@ export const MedicalInfoSection: React.FC<MedicalInfoSectionProps> = ({
       <Text
         bold
         FONT_14
-        style={[
-          styles.sectionTitle,
-          { textAlign: isRtl ? "right" : "left" },
-        ]}
+        style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}
       >
         {t("onboarding.medicalInfo")}
       </Text>

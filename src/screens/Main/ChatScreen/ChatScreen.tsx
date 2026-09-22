@@ -1,5 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, View } from "react-native";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  View,
+} from "react-native";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import { verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -11,7 +23,13 @@ import { styles } from "./ChatScreen.styles";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useChatMessages, useSendMessage, useMarkThreadAsRead, useChatThreads, chatKeys } from "@shared/query/chat/useChat";
+import {
+  useChatMessages,
+  useSendMessage,
+  useMarkThreadAsRead,
+  useChatThreads,
+  chatKeys,
+} from "@shared/query/chat/useChat";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@shared/config/supabase";
 import { usePresence } from "@shared/providers/PresenceProvider";
@@ -36,7 +54,9 @@ const ChatScreen = () => {
   const participant = (route.params as any)?.participant;
 
   const initialThreadId = (route.params as any)?.threadId || null;
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(initialThreadId);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(
+    initialThreadId,
+  );
   const [recipientProfile, setRecipientProfile] = useState<{
     name?: string;
     avatar?: string;
@@ -51,24 +71,28 @@ const ChatScreen = () => {
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [isInRoomOnline, setIsInRoomOnline] = useState(false);
   const [otherUserLastSeen, setOtherUserLastSeen] = useState<string | null>(
-    participant?.last_seen_at || participant?.updated_at || null
+    participant?.last_seen_at || participant?.updated_at || null,
   );
   const otherUserIdRef = useRef<string | null>(null);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userTypingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const realtimeChannelRef = useRef<any>(null);
 
   const { data: chatThreadsData } = useChatThreads();
   const { data: remoteMessagesData, isLoading } = useChatMessages(
     activeThreadId || "",
-    Boolean(activeThreadId)
+    Boolean(activeThreadId),
   );
   const { mutate: sendMessageMutate } = useSendMessage();
   const { mutate: markReadMutate } = useMarkThreadAsRead();
 
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
-  const [receivedRealtimeMessages, setReceivedRealtimeMessages] = useState<any[]>([]);
+  const [receivedRealtimeMessages, setReceivedRealtimeMessages] = useState<
+    any[]
+  >([]);
 
   useEffect(() => {
     if (activeThreadId) {
@@ -110,10 +134,13 @@ const ChatScreen = () => {
         const state = channel.presenceState();
         const targetId = otherUserIdRef.current;
         if (!targetId) return;
-        const present = Object.values(state).flat().some(
-          (p: any) =>
-            String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
-        );
+        const present = Object.values(state)
+          .flat()
+          .some(
+            (p: any) =>
+              String(p?.user_id || "").toLowerCase() ===
+              String(targetId).toLowerCase(),
+          );
         setIsInRoomOnline(present);
       };
 
@@ -125,7 +152,8 @@ const ChatScreen = () => {
             targetId &&
             newPresences?.some(
               (p: any) =>
-                String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
+                String(p?.user_id || "").toLowerCase() ===
+                String(targetId).toLowerCase(),
             )
           ) {
             setIsInRoomOnline(true);
@@ -137,7 +165,8 @@ const ChatScreen = () => {
             targetId &&
             leftPresences?.some(
               (p: any) =>
-                String(p?.user_id || "").toLowerCase() === String(targetId).toLowerCase()
+                String(p?.user_id || "").toLowerCase() ===
+                String(targetId).toLowerCase(),
             )
           ) {
             checkInRoomPresence();
@@ -154,7 +183,8 @@ const ChatScreen = () => {
             const newMsg = payload.new;
             if (newMsg) {
               setReceivedRealtimeMessages((prev) => {
-                if (prev.some((m) => String(m.id) === String(newMsg.id))) return prev;
+                if (prev.some((m) => String(m.id) === String(newMsg.id)))
+                  return prev;
                 return [...prev, newMsg];
               });
               channelIds.forEach((targetId) => {
@@ -166,29 +196,42 @@ const ChatScreen = () => {
                       oldData?.messages ||
                       (Array.isArray(oldData) ? oldData : []);
                     if (
-                      rawList.some((m: any) => String(m.id) === String(newMsg.id))
+                      rawList.some(
+                        (m: any) => String(m.id) === String(newMsg.id),
+                      )
                     ) {
                       return oldData;
                     }
                     const updatedList = [...rawList, newMsg];
                     return oldData?.data?.messages
-                      ? { ...oldData, data: { ...oldData.data, messages: updatedList } }
+                      ? {
+                          ...oldData,
+                          data: { ...oldData.data, messages: updatedList },
+                        }
                       : oldData?.messages
-                      ? { ...oldData, messages: updatedList }
-                      : updatedList;
-                  }
+                        ? { ...oldData, messages: updatedList }
+                        : updatedList;
+                  },
                 );
               });
               setTimeout(() => {
                 queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
               }, 1200);
             }
-          }
+          },
         )
         .on("broadcast", { event: "message" }, ({ payload: newMsg }) => {
           if (newMsg) {
             setReceivedRealtimeMessages((prev) => {
-              if (prev.some((m) => String(m.id) === String(newMsg.id) || (m.text === newMsg.text && String(m.sender_id) === String(newMsg.sender_id)))) return prev;
+              if (
+                prev.some(
+                  (m) =>
+                    String(m.id) === String(newMsg.id) ||
+                    (m.text === newMsg.text &&
+                      String(m.sender_id) === String(newMsg.sender_id)),
+                )
+              )
+                return prev;
               return [...prev, newMsg];
             });
             channelIds.forEach((targetId) => {
@@ -206,11 +249,14 @@ const ChatScreen = () => {
                   }
                   const updatedList = [...rawList, newMsg];
                   return oldData?.data?.messages
-                    ? { ...oldData, data: { ...oldData.data, messages: updatedList } }
+                    ? {
+                        ...oldData,
+                        data: { ...oldData.data, messages: updatedList },
+                      }
                     : oldData?.messages
-                    ? { ...oldData, messages: updatedList }
-                    : updatedList;
-                }
+                      ? { ...oldData, messages: updatedList }
+                      : updatedList;
+                },
               );
             });
             setTimeout(() => {
@@ -219,10 +265,14 @@ const ChatScreen = () => {
           }
         })
         .on("broadcast", { event: "typing" }, ({ payload }) => {
-          if (payload?.senderId && String(payload.senderId) !== String(user?.id)) {
+          if (
+            payload?.senderId &&
+            String(payload.senderId) !== String(user?.id)
+          ) {
             setIsOtherUserTyping(Boolean(payload.isTyping));
             if (payload.isTyping) {
-              if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              if (typingTimeoutRef.current)
+                clearTimeout(typingTimeoutRef.current);
               typingTimeoutRef.current = setTimeout(() => {
                 setIsOtherUserTyping(false);
               }, 3500);
@@ -267,23 +317,27 @@ const ChatScreen = () => {
       text: m.text,
       createdAt: new Date(m.sent_at || m.created_at || Date.now()),
       senderId:
-        String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+        String(m.sender_id || m.senderId).toLowerCase() ===
+        String(user?.id).toLowerCase()
           ? "me"
           : "them",
     }));
 
     const serverIds = new Set(serverFormatted.map((m) => m.id));
-    const serverTexts = new Set(serverFormatted.map((m) => `${m.text}_${m.senderId}`));
+    const serverTexts = new Set(
+      serverFormatted.map((m) => `${m.text}_${m.senderId}`),
+    );
 
     const pendingLocal = localMessages.filter(
-      (m) => !serverTexts.has(`${m.text}_me`)
+      (m) => !serverTexts.has(`${m.text}_me`),
     );
 
     const pendingRealtime: Message[] = receivedRealtimeMessages
       .filter((m) => {
         if (serverIds.has(String(m.id))) return false;
         const sender =
-          String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+          String(m.sender_id || m.senderId).toLowerCase() ===
+          String(user?.id).toLowerCase()
             ? "me"
             : "them";
         return !serverTexts.has(`${m.text}_${sender}`);
@@ -293,13 +347,14 @@ const ChatScreen = () => {
         text: m.text,
         createdAt: new Date(m.sent_at || m.created_at || Date.now()),
         senderId:
-          String(m.sender_id || m.senderId).toLowerCase() === String(user?.id).toLowerCase()
+          String(m.sender_id || m.senderId).toLowerCase() ===
+          String(user?.id).toLowerCase()
             ? "me"
             : "them",
       }));
 
     return [...serverFormatted, ...pendingLocal, ...pendingRealtime].sort(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     );
   }, [remoteMessagesData, localMessages, receivedRealtimeMessages, user?.id]);
 
@@ -307,27 +362,36 @@ const ChatScreen = () => {
     return Array.isArray(chatThreadsData?.data)
       ? chatThreadsData.data
       : Array.isArray(chatThreadsData)
-      ? chatThreadsData
-      : [];
+        ? chatThreadsData
+        : [];
   }, [chatThreadsData]);
 
   const isValidUserId = (id?: string | null): id is string =>
     Boolean(
       id &&
-        typeof id === "string" &&
-        id.trim().length > 0 &&
-        id !== "usr_unknown" &&
-        id !== "null" &&
-        id !== "undefined"
+      typeof id === "string" &&
+      id.trim().length > 0 &&
+      id !== "usr_unknown" &&
+      id !== "null" &&
+      id !== "undefined",
     );
 
   const initialOtherUserId = useMemo<string | null>(() => {
-    if (isValidUserId(participant?.id) && String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      isValidUserId(participant?.id) &&
+      String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(participant.id);
     }
 
-    const reqRequesterId = (request as any)?.requester_id || (request as any)?.requester?.id || (request as any)?.user?.id;
-    if (isValidUserId(reqRequesterId) && String(reqRequesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    const reqRequesterId =
+      (request as any)?.requester_id ||
+      (request as any)?.requester?.id ||
+      (request as any)?.user?.id;
+    if (
+      isValidUserId(reqRequesterId) &&
+      String(reqRequesterId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(reqRequesterId);
     }
 
@@ -338,7 +402,9 @@ const ChatScreen = () => {
 
     const otherMsg = rawMsgs.find(
       (m: any) =>
-        isValidUserId(m.sender_id) && user?.id && String(m.sender_id).toLowerCase() !== String(user.id).toLowerCase()
+        isValidUserId(m.sender_id) &&
+        user?.id &&
+        String(m.sender_id).toLowerCase() !== String(user.id).toLowerCase(),
     );
     if (otherMsg?.sender_id) return String(otherMsg.sender_id);
 
@@ -347,7 +413,9 @@ const ChatScreen = () => {
 
   const matchedThread = useMemo<any>(() => {
     if (activeThreadId) {
-      const byId = rawThreads.find((t: any) => String(t.id) === String(activeThreadId));
+      const byId = rawThreads.find(
+        (t: any) => String(t.id) === String(activeThreadId),
+      );
       if (byId) return byId;
     }
     if (request?.id) {
@@ -356,7 +424,7 @@ const ChatScreen = () => {
           String(t.request_id || t.request?.id) === String(request.id) &&
           (!initialOtherUserId ||
             String(t.participant?.id || t.recipient?.id).toLowerCase() ===
-              String(initialOtherUserId).toLowerCase())
+              String(initialOtherUserId).toLowerCase()),
       );
       if (byReq) return byReq;
     }
@@ -366,15 +434,24 @@ const ChatScreen = () => {
   const otherUserId = useMemo<string | null>(() => {
     if (isValidUserId(initialOtherUserId)) return initialOtherUserId;
     const threadPId = matchedThread?.participant?.id;
-    if (isValidUserId(threadPId) && String(threadPId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      isValidUserId(threadPId) &&
+      String(threadPId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(threadPId);
     }
     const donorId = (matchedThread as any)?.donor_id;
-    if (isValidUserId(donorId) && String(donorId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      isValidUserId(donorId) &&
+      String(donorId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(donorId);
     }
     const requesterId = (matchedThread as any)?.requester_id;
-    if (isValidUserId(requesterId) && String(requesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      isValidUserId(requesterId) &&
+      String(requesterId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(requesterId);
     }
     return null;
@@ -420,11 +497,18 @@ const ChatScreen = () => {
 
           if (isMounted && data) {
             setRecipientProfile((prev) => ({
-              name: (data as any)?.full_name || (data as any)?.name || prev?.name,
+              name:
+                (data as any)?.full_name || (data as any)?.name || prev?.name,
               avatar: (data as any)?.profile_image || prev?.avatar,
-              lastSeen: (data as any)?.last_seen_at || data.updated_at || prev?.lastSeen || null,
+              lastSeen:
+                (data as any)?.last_seen_at ||
+                data.updated_at ||
+                prev?.lastSeen ||
+                null,
             }));
-            setOtherUserLastSeen((data as any)?.last_seen_at || data.updated_at || null);
+            setOtherUserLastSeen(
+              (data as any)?.last_seen_at || data.updated_at || null,
+            );
           }
         } catch {}
       }
@@ -451,10 +535,12 @@ const ChatScreen = () => {
     const remotePName = remoteParticipant?.name || remoteParticipant?.full_name;
     if (!isGeneric(remotePName)) return remotePName;
 
-    const threadPName = matchedThread?.participant?.name || matchedThread?.participant?.full_name;
+    const threadPName =
+      matchedThread?.participant?.name || matchedThread?.participant?.full_name;
     if (!isGeneric(threadPName)) return threadPName;
 
-    const recName = recipientProfile?.name || (recipientProfile as any)?.full_name;
+    const recName =
+      recipientProfile?.name || (recipientProfile as any)?.full_name;
     if (!isGeneric(recName)) return recName;
 
     const reqFullName =
@@ -468,15 +554,21 @@ const ChatScreen = () => {
     if (!isGeneric(patName)) return patName;
 
     return "User";
-  }, [participant, remoteParticipant, matchedThread, recipientProfile, request]);
+  }, [
+    participant,
+    remoteParticipant,
+    matchedThread,
+    recipientProfile,
+    request,
+  ]);
 
   const isValidAvatar = (url?: string | null) =>
     Boolean(
       url &&
-        typeof url === "string" &&
-        url.trim().length > 0 &&
-        !url.includes("cdn.lifelink.org") &&
-        (url.startsWith("http://") || url.startsWith("https://"))
+      typeof url === "string" &&
+      url.trim().length > 0 &&
+      !url.includes("cdn.lifelink.org") &&
+      (url.startsWith("http://") || url.startsWith("https://")),
     );
 
   const displayAvatar = useMemo(() => {
@@ -496,11 +588,17 @@ const ChatScreen = () => {
       if (isValidAvatar(c)) return c;
     }
     return undefined;
-  }, [recipientProfile, remoteParticipant, matchedThread, participant, request]);
+  }, [
+    recipientProfile,
+    remoteParticipant,
+    matchedThread,
+    participant,
+    request,
+  ]);
 
   const isRecipientOnline = Boolean(
     isNetworkConnected &&
-      (isInRoomOnline || (otherUserId && isUserOnline(otherUserId)))
+    (isInRoomOnline || (otherUserId && isUserOnline(otherUserId))),
   );
 
   const headerStatusText = useMemo(() => {
@@ -508,7 +606,13 @@ const ChatScreen = () => {
     if (isOtherUserTyping) return "Typing...";
     if (isRecipientOnline) return "Online";
     return formatLastSeen(otherUserLastSeen, false);
-  }, [isNetworkConnected, isOtherUserTyping, isRecipientOnline, otherUserLastSeen, formatLastSeen]);
+  }, [
+    isNetworkConnected,
+    isOtherUserTyping,
+    isRecipientOnline,
+    otherUserLastSeen,
+    formatLastSeen,
+  ]);
 
   const scrollToBottom = useCallback((animated = true) => {
     setTimeout(() => {
@@ -537,7 +641,8 @@ const ChatScreen = () => {
       if (text.trim().length > 0) {
         broadcastToChannels("typing", { senderId: user.id, isTyping: true });
 
-        if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
+        if (userTypingDebounceRef.current)
+          clearTimeout(userTypingDebounceRef.current);
         userTypingDebounceRef.current = setTimeout(() => {
           broadcastToChannels("typing", { senderId: user.id, isTyping: false });
         }, 2000);
@@ -553,7 +658,8 @@ const ChatScreen = () => {
     const textToSend = inputText.trim();
     setInputText("");
 
-    if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
+    if (userTypingDebounceRef.current)
+      clearTimeout(userTypingDebounceRef.current);
     broadcastToChannels("typing", { senderId: user?.id, isTyping: false });
 
     const optimisticMessage: Message = {
@@ -619,7 +725,9 @@ const ChatScreen = () => {
           statusText={headerStatusText}
           phoneNumber={contactPhone}
           onBackPress={() => navigation.goBack()}
-          onReportPress={otherUserId ? () => setReportModalVisible(true) : undefined}
+          onReportPress={
+            otherUserId ? () => setReportModalVisible(true) : undefined
+          }
         />
       }
     >
@@ -628,10 +736,7 @@ const ChatScreen = () => {
         style={styles.keyboardAvoidingView}
         keyboardVerticalOffset={Platform.OS === "ios" ? verticalScale(40) : 0}
       >
-        <ChatContextBanner
-          bloodType={bloodType}
-          hospital={hospital}
-        />
+        <ChatContextBanner bloodType={bloodType} hospital={hospital} />
 
         {isLoading && messages.length === 0 ? (
           <View
