@@ -47,10 +47,11 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
     profileImage &&
     typeof profileImage === "string" &&
     profileImage.trim().length > 0 &&
-    !imageError
+    !imageError,
   );
 
-  const initial = firstName && firstName !== "User" ? firstName.charAt(0).toUpperCase() : "";
+  const initial =
+    firstName && firstName !== "User" ? firstName.charAt(0).toUpperCase() : "";
 
   return (
     <View

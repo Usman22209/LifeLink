@@ -39,16 +39,14 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
   onViewMyDonations,
 }) => {
   const { t } = useTranslation();
-  const safeBottomPadding = Math.max(verticalScale(18), insetsBottom + verticalScale(8));
+  const safeBottomPadding = Math.max(
+    verticalScale(18),
+    insetsBottom + verticalScale(8),
+  );
 
   if (isOwner) {
     return (
-      <View
-        style={[
-          styles.footer,
-          { paddingBottom: safeBottomPadding },
-        ]}
-      >
+      <View style={[styles.footer, { paddingBottom: safeBottomPadding }]}>
         <TouchableOpacity
           style={styles.manageBtn}
           onPress={onManageRequest}
@@ -69,12 +67,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
   }
 
   return (
-    <View
-      style={[
-        styles.footer,
-        { paddingBottom: safeBottomPadding },
-      ]}
-    >
+    <View style={[styles.footer, { paddingBottom: safeBottomPadding }]}>
       {canCall && (
         <TouchableOpacity
           style={styles.callBtn}
@@ -171,12 +164,11 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
           />
           <AppText bold FONT_13 style={styles.donateText} numberOfLines={1}>
             {isUrgent
-              ? (t("requestDetail.respondNow") || "Respond Now")
-              : (t("requestDetail.donateNow") || "Donate Now")}
+              ? t("requestDetail.respondNow") || "Respond Now"
+              : t("requestDetail.donateNow") || "Donate Now"}
           </AppText>
         </TouchableOpacity>
       )}
     </View>
   );
 };
-

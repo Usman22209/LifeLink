@@ -27,7 +27,9 @@ HTTP_CLIENT_UPLOAD.interceptors.request.use(
         `🔑 [HTTP_CLIENT_UPLOAD Auth] Attached Token (ends with ...${accessToken.slice(-10)})`,
       );
     } else {
-      console.warn("⚠️ [HTTP_CLIENT_UPLOAD Auth] No accessToken found in Redux store");
+      console.warn(
+        "⚠️ [HTTP_CLIENT_UPLOAD Auth] No accessToken found in Redux store",
+      );
     }
     return config;
   },

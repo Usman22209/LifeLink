@@ -26,18 +26,16 @@ export interface FilterState {
   bloodType: string;
 }
 
-export const URGENCY_CONFIG: Record<
-  string,
-  { color: string; label: string }
-> = {
-  critical: { color: colors.danger, label: "Critical" },
-  emergency: { color: colors.danger, label: "Critical" },
-  urgent: { color: colors.warning, label: "High" },
-  high: { color: colors.warning, label: "High" },
-  medium: { color: colors.info, label: "Normal" },
-  normal: { color: colors.info, label: "Normal" },
-  low: { color: colors.info, label: "Normal" },
-};
+export const URGENCY_CONFIG: Record<string, { color: string; label: string }> =
+  {
+    critical: { color: colors.danger, label: "Critical" },
+    emergency: { color: colors.danger, label: "Critical" },
+    urgent: { color: colors.warning, label: "High" },
+    high: { color: colors.warning, label: "High" },
+    medium: { color: colors.info, label: "Normal" },
+    normal: { color: colors.info, label: "Normal" },
+    low: { color: colors.info, label: "Normal" },
+  };
 
 export const SORT_OPTIONS = ["Newest First", "Nearest First", "Most Units"];
 export const URGENCY_OPTIONS = ["All", "Critical", "High", "Normal"];

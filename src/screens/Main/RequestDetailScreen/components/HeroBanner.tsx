@@ -45,11 +45,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </View>
         )}
         <LinearGradient
-          colors={
-            isCritical
-              ? ["#E53935", "#FF8A80"]
-              : ["#F57C00", "#FFB74D"]
-          }
+          colors={isCritical ? ["#E53935", "#FF8A80"] : ["#F57C00", "#FFB74D"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.overlappingBadge}

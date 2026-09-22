@@ -23,7 +23,9 @@ export const useUnreadNotificationCount = (enabled = true) => {
     queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
       const response = await NOTIFICATION_SERVICE.getUnreadCount();
-      return response.data?.data?.unreadCount ?? response.data?.unreadCount ?? 0;
+      return (
+        response.data?.data?.unreadCount ?? response.data?.unreadCount ?? 0
+      );
     },
     enabled,
     refetchInterval: 30000,

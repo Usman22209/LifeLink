@@ -51,18 +51,23 @@ const HomeScreen = () => {
   const rawUrgent = Array.isArray(urgentRequestsData?.data)
     ? urgentRequestsData.data
     : Array.isArray(urgentRequestsData)
-    ? urgentRequestsData
-    : [];
+      ? urgentRequestsData
+      : [];
 
   const urgentRequests: UrgentRequest[] = rawUrgent;
 
   const stats = user?.stats || {};
   const bloodType = user?.blood_group || "O+";
   const donationsCount = stats.donations_count ?? 0;
-  const livesSaved = stats.lives_saved ?? (donationsCount * 3);
-  
+  const livesSaved = stats.lives_saved ?? donationsCount * 3;
+
   const formatLastDonated = (dateStr?: string) => {
-    if (!dateStr || dateStr === "N/A" || dateStr === "null" || dateStr === "undefined") {
+    if (
+      !dateStr ||
+      dateStr === "N/A" ||
+      dateStr === "null" ||
+      dateStr === "undefined"
+    ) {
       return "—";
     }
     const d = new Date(dateStr);
@@ -170,8 +175,13 @@ const HomeScreen = () => {
             <AppText semiBold FONT_13 style={{ color: colors.text }}>
               {t("home.noCriticalNearby") || "No critical emergencies nearby"}
             </AppText>
-            <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 2 }}>
-              {t("home.checkLiveFeed") || "Check the live blood feed to view all active requests."}
+            <AppText
+              regular
+              FONT_11
+              style={{ color: colors.textSecondary, marginTop: 2 }}
+            >
+              {t("home.checkLiveFeed") ||
+                "Check the live blood feed to view all active requests."}
             </AppText>
           </View>
           <TouchableOpacity

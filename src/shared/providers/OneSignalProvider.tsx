@@ -28,7 +28,7 @@ export const checkAndPromptNotificationPermission = async () => {
 
     if (Platform.OS === "android" && Platform.Version >= 33) {
       hasPerm = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
       );
     } else {
       hasPerm = await OneSignal.Notifications.hasPermission();
@@ -68,7 +68,7 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     try {
       if (Platform.OS === "android" && Platform.Version >= 33) {
         const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         );
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
           Linking.openSettings();
@@ -122,7 +122,7 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
           checkAndPromptNotificationPermission();
         }
         appState.current = nextAppState;
-      }
+      },
     );
 
     return () => {
@@ -139,7 +139,10 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
       try {
         const bloodGroup = user.blood_group || (user as any).blood_type;
         if (bloodGroup) {
-          OneSignal.User.addTag("blood_group", String(bloodGroup).toUpperCase());
+          OneSignal.User.addTag(
+            "blood_group",
+            String(bloodGroup).toUpperCase(),
+          );
         }
         const city = user.city_id || (user as any).city;
         if (city) {

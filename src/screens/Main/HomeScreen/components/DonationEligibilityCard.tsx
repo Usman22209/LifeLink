@@ -59,8 +59,8 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
         >
           <Text semiBold FONT_14 style={{ color: colors.text }}>
             {isEligible
-              ? (t("home.eligibleToDonate") || "You're Eligible to Donate!")
-              : (t("home.nextDonation") || "Next Donation")}
+              ? t("home.eligibleToDonate") || "You're Eligible to Donate!"
+              : t("home.nextDonation") || "Next Donation"}
           </Text>
           <Text
             medium
@@ -68,9 +68,10 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
             style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}
           >
             {isEligible
-              ? (t("home.readyForDonation") || "Your body is ready for the next donation")
-              : (t("home.daysUntilDonation", { days: daysUntilEligible }) ||
-                 `${daysUntilEligible} days until you can donate again`)}
+              ? t("home.readyForDonation") ||
+                "Your body is ready for the next donation"
+              : t("home.daysUntilDonation", { days: daysUntilEligible }) ||
+                `${daysUntilEligible} days until you can donate again`}
           </Text>
         </View>
       </View>

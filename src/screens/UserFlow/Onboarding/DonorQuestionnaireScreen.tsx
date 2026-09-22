@@ -20,7 +20,10 @@ import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useQueryClient } from "@tanstack/react-query";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useUpdateProfile, useGetProfile } from "@shared/query/profile/useProfile";
+import {
+  useUpdateProfile,
+  useGetProfile,
+} from "@shared/query/profile/useProfile";
 import {
   DONOR_QUESTIONS,
   evaluateDonorEligibility,
@@ -49,7 +52,9 @@ const DonorQuestionnaireScreen: React.FC = () => {
   const user = rawUser?.user || rawUser?.profile || rawUser;
 
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
-  const [originalAnswers, setOriginalAnswers] = useState<Record<string, boolean>>({});
+  const [originalAnswers, setOriginalAnswers] = useState<
+    Record<string, boolean>
+  >({});
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [evalResult, setEvalResult] = useState<EligibilityResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,8 +68,7 @@ const DonorQuestionnaireScreen: React.FC = () => {
   }, [answers, originalAnswers, isInitializing]);
 
   const verifiedLastDonation =
-    user?.stats?.last_donated_at ||
-    user?.last_donated_at;
+    user?.stats?.last_donated_at || user?.last_donated_at;
 
   const isVerifiedDonationActive = useMemo(() => {
     if (!verifiedLastDonation) return false;
@@ -77,7 +81,8 @@ const DonorQuestionnaireScreen: React.FC = () => {
 
   const liveEvaluation = useMemo(() => {
     const dob = user?.dob || user?.date_of_birth;
-    const lastDonated = answers.recent_donation === false ? null : verifiedLastDonation;
+    const lastDonated =
+      answers.recent_donation === false ? null : verifiedLastDonation;
     return evaluateDonorEligibility(answers, dob, lastDonated);
   }, [answers, user?.dob, user?.date_of_birth, verifiedLastDonation]);
 
@@ -147,7 +152,9 @@ const DonorQuestionnaireScreen: React.FC = () => {
     );
     if (unanswered.length > 0) {
       Alert.alert(
-        currentLang === "ur" ? "تمام سوالات کا جواب دیں" : "Incomplete Questionnaire",
+        currentLang === "ur"
+          ? "تمام سوالات کا جواب دیں"
+          : "Incomplete Questionnaire",
         currentLang === "ur"
           ? "براہ کرم آگے بڑھنے سے پہلے تمام سوالات کا جواب دیں۔"
           : "Please answer all health screening questions to continue.",
@@ -158,7 +165,8 @@ const DonorQuestionnaireScreen: React.FC = () => {
     setIsSubmitting(true);
     try {
       const dob = user?.dob || user?.date_of_birth;
-      const lastDonated = answers.recent_donation === false ? null : verifiedLastDonation;
+      const lastDonated =
+        answers.recent_donation === false ? null : verifiedLastDonation;
 
       const evaluation = evaluateDonorEligibility(answers, dob, lastDonated);
       setEvalResult(evaluation);
@@ -215,7 +223,9 @@ const DonorQuestionnaireScreen: React.FC = () => {
     if (isEditing || returnTo) {
       navigation.goBack();
     } else {
-      dispatch(updateUser({ is_onboarded: true, has_completed_screening: true }));
+      dispatch(
+        updateUser({ is_onboarded: true, has_completed_screening: true }),
+      );
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.MAIN_FLOW }],
@@ -228,9 +238,15 @@ const DonorQuestionnaireScreen: React.FC = () => {
       navigation.goBack();
     } else {
       const dob = user?.dob || user?.date_of_birth;
-      const defaultEval = evaluateDonorEligibility({}, dob, verifiedLastDonation);
+      const defaultEval = evaluateDonorEligibility(
+        {},
+        dob,
+        verifiedLastDonation,
+      );
       await saveStoredEligibility(defaultEval, user?.id);
-      dispatch(updateUser({ is_onboarded: true, has_completed_screening: true }));
+      dispatch(
+        updateUser({ is_onboarded: true, has_completed_screening: true }),
+      );
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.MAIN_FLOW }],
@@ -275,7 +291,9 @@ const DonorQuestionnaireScreen: React.FC = () => {
       }
     >
       {isInitializing ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
@@ -283,207 +301,228 @@ const DonorQuestionnaireScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        <View style={styles.headerRow}>
-          <AppText bold FONT_20 style={styles.title}>
-            {currentLang === "ur" ? "ڈونر سوالنامہ" : "Questionnaires"}
-          </AppText>
-        </View>
-
-        <AppText regular FONT_12 style={styles.subtitle}>
-          {currentLang === "ur"
-            ? "خون کا عطیہ دینے کے لیے درج ذیل سوالنامے کو پُر کریں اور ڈونر بنیں۔"
-            : "Fill up the following Questionnaires and become a donor"}
-        </AppText>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: scale(14),
-            paddingVertical: verticalScale(10),
-            borderRadius: moderateScale(12),
-            backgroundColor: liveEvaluation.isEligible
-              ? "rgba(46, 204, 113, 0.08)"
-              : "rgba(245, 166, 35, 0.09)",
-            borderWidth: 1.2,
-            borderColor: liveEvaluation.isEligible
-              ? "rgba(46, 204, 113, 0.35)"
-              : "rgba(245, 166, 35, 0.4)",
-            marginBottom: verticalScale(16),
-            gap: scale(10),
-          }}
-        >
-          <AnyIcon
-            type={Icons.Feather}
-            name={liveEvaluation.isEligible ? "check-circle" : "alert-circle"}
-            size={moderateScale(20)}
-            color={liveEvaluation.isEligible ? colors.success : colors.warning}
-          />
-          <View style={{ flex: 1 }}>
-            <AppText
-              bold
-              FONT_12
-              style={{
-                color: liveEvaluation.isEligible ? colors.success : "#D97706",
-              }}
-            >
-              {liveEvaluation.isEligible
-                ? currentLang === "ur"
-                  ? "اسٹیٹس: خون دینے کے اہل ✓ (تمام شرائط پوری ہیں)"
-                  : "Live Status: Eligible to Donate ✓"
-                : currentLang === "ur"
-                ? `اسٹیٹس: فی الحال نااہل (${liveEvaluation.reasons.length} رکاوٹ)`
-                : `Live Status: Deferred (${liveEvaluation.reasons.length} requirement not met)`}
+          <View style={styles.headerRow}>
+            <AppText bold FONT_20 style={styles.title}>
+              {currentLang === "ur" ? "ڈونر سوالنامہ" : "Questionnaires"}
             </AppText>
-            {!liveEvaluation.isEligible && liveEvaluation.reasons.length > 0 && (
+          </View>
+
+          <AppText regular FONT_12 style={styles.subtitle}>
+            {currentLang === "ur"
+              ? "خون کا عطیہ دینے کے لیے درج ذیل سوالنامے کو پُر کریں اور ڈونر بنیں۔"
+              : "Fill up the following Questionnaires and become a donor"}
+          </AppText>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: scale(14),
+              paddingVertical: verticalScale(10),
+              borderRadius: moderateScale(12),
+              backgroundColor: liveEvaluation.isEligible
+                ? "rgba(46, 204, 113, 0.08)"
+                : "rgba(245, 166, 35, 0.09)",
+              borderWidth: 1.2,
+              borderColor: liveEvaluation.isEligible
+                ? "rgba(46, 204, 113, 0.35)"
+                : "rgba(245, 166, 35, 0.4)",
+              marginBottom: verticalScale(16),
+              gap: scale(10),
+            }}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name={liveEvaluation.isEligible ? "check-circle" : "alert-circle"}
+              size={moderateScale(20)}
+              color={
+                liveEvaluation.isEligible ? colors.success : colors.warning
+              }
+            />
+            <View style={{ flex: 1 }}>
               <AppText
-                regular
-                FONT_10
-                style={{ color: colors.textSecondary, marginTop: 2 }}
-                numberOfLines={1}
+                bold
+                FONT_12
+                style={{
+                  color: liveEvaluation.isEligible ? colors.success : "#D97706",
+                }}
               >
-                {currentLang === "ur"
-                  ? (liveEvaluation.reasonsUr?.[0] || liveEvaluation.reasons[0])
-                  : liveEvaluation.reasons[0]}
+                {liveEvaluation.isEligible
+                  ? currentLang === "ur"
+                    ? "اسٹیٹس: خون دینے کے اہل ✓ (تمام شرائط پوری ہیں)"
+                    : "Live Status: Eligible to Donate ✓"
+                  : currentLang === "ur"
+                    ? `اسٹیٹس: فی الحال نااہل (${liveEvaluation.reasons.length} رکاوٹ)`
+                    : `Live Status: Deferred (${liveEvaluation.reasons.length} requirement not met)`}
+              </AppText>
+              {!liveEvaluation.isEligible &&
+                liveEvaluation.reasons.length > 0 && (
+                  <AppText
+                    regular
+                    FONT_10
+                    style={{ color: colors.textSecondary, marginTop: 2 }}
+                    numberOfLines={1}
+                  >
+                    {currentLang === "ur"
+                      ? liveEvaluation.reasonsUr?.[0] ||
+                        liveEvaluation.reasons[0]
+                      : liveEvaluation.reasons[0]}
+                  </AppText>
+                )}
+            </View>
+          </View>
+
+          {DONOR_QUESTIONS.map((q) => {
+            const selected = answers[q.id];
+            const questionText =
+              currentLang === "ur" ? q.questionUr : q.questionEn;
+
+            return (
+              <View key={q.id} style={styles.questionCard}>
+                <AppText semiBold FONT_13 style={styles.questionText}>
+                  {questionText}
+                </AppText>
+
+                {q.id === "recent_donation" && isVerifiedDonationActive && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: scale(6),
+                      marginTop: verticalScale(6),
+                      marginBottom: verticalScale(4),
+                      paddingHorizontal: scale(10),
+                      paddingVertical: verticalScale(6),
+                      backgroundColor: "rgba(245, 158, 11, 0.1)",
+                      borderRadius: moderateScale(8),
+                      borderWidth: 1,
+                      borderColor: "rgba(245, 158, 11, 0.25)",
+                    }}
+                  >
+                    <AnyIcon
+                      type={Icons.Feather}
+                      name="clock"
+                      size={moderateScale(13)}
+                      color="#D97706"
+                    />
+                    <AppText
+                      semiBold
+                      FONT_11
+                      style={{ color: "#D97706", flex: 1 }}
+                    >
+                      {currentLang === "ur"
+                        ? `تصدیق شدہ عطیہ: ${verifiedLastDonation}۔ 90 دن کا بحالی کا وقفہ جاری ہے۔`
+                        : `Verified donation on ${verifiedLastDonation}. 90-day recovery cooldown is active.`}
+                    </AppText>
+                  </View>
+                )}
+
+                <View style={styles.radioRow}>
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    activeOpacity={0.7}
+                    onPress={() => handleSelectAnswer(q.id, true)}
+                  >
+                    <View
+                      style={[
+                        styles.radioCircle,
+                        selected === true && styles.radioCircleSelected,
+                      ]}
+                    >
+                      {selected === true && (
+                        <View style={styles.radioInnerDot} />
+                      )}
+                    </View>
+                    <AppText
+                      medium
+                      FONT_13
+                      style={[
+                        styles.radioLabel,
+                        selected === true && {
+                          color: colors.primary,
+                          fontWeight: "700",
+                        },
+                      ]}
+                    >
+                      {currentLang === "ur" ? "ہاں (Yes)" : "Yes"}
+                    </AppText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.radioOption}
+                    activeOpacity={0.7}
+                    onPress={() => handleSelectAnswer(q.id, false)}
+                  >
+                    <View
+                      style={[
+                        styles.radioCircle,
+                        selected === false && styles.radioCircleSelected,
+                      ]}
+                    >
+                      {selected === false && (
+                        <View style={styles.radioInnerDot} />
+                      )}
+                    </View>
+                    <AppText
+                      medium
+                      FONT_13
+                      style={[
+                        styles.radioLabel,
+                        selected === false && {
+                          color: colors.primary,
+                          fontWeight: "700",
+                        },
+                      ]}
+                    >
+                      {currentLang === "ur" ? "نہیں (No)" : "No"}
+                    </AppText>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })}
+
+          <AppText regular FONT_10 style={styles.disclaimer}>
+            {currentLang === "ur"
+              ? "جاری رکھ کر، آپ تصدیق کرتے ہیں کہ آپ نے تمام معلومات ایمانداری سے فراہم کی ہیں۔ آپ کی صحت سے متعلق ڈیٹا آپ کے آلے پر محفوظ اور پرائیویٹ رہتا ہے۔"
+              : "By continuing, you certify that all health information is accurate to the best of your knowledge. Your private health answers remain confidential on your device."}
+          </AppText>
+
+          <TouchableOpacity
+            style={[styles.submitButton, isSubmitting && { opacity: 0.75 }]}
+            onPress={handleContinue}
+            disabled={isSubmitting}
+            activeOpacity={0.8}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              <AppText bold FONT_14 style={styles.submitButtonText}>
+                {isEditing
+                  ? currentLang === "ur"
+                    ? "اسکریننگ اپ ڈیٹ کریں (Update)"
+                    : "Update Screening"
+                  : currentLang === "ur"
+                    ? "جاری رکھیں (Continue)"
+                    : "Continue"}
               </AppText>
             )}
-          </View>
-        </View>
-
-        {DONOR_QUESTIONS.map((q) => {
-          const selected = answers[q.id];
-          const questionText = currentLang === "ur" ? q.questionUr : q.questionEn;
-
-          return (
-            <View key={q.id} style={styles.questionCard}>
-              <AppText semiBold FONT_13 style={styles.questionText}>
-                {questionText}
-              </AppText>
-
-              {q.id === "recent_donation" && isVerifiedDonationActive && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: scale(6),
-                    marginTop: verticalScale(6),
-                    marginBottom: verticalScale(4),
-                    paddingHorizontal: scale(10),
-                    paddingVertical: verticalScale(6),
-                    backgroundColor: "rgba(245, 158, 11, 0.1)",
-                    borderRadius: moderateScale(8),
-                    borderWidth: 1,
-                    borderColor: "rgba(245, 158, 11, 0.25)",
-                  }}
-                >
-                  <AnyIcon
-                    type={Icons.Feather}
-                    name="clock"
-                    size={moderateScale(13)}
-                    color="#D97706"
-                  />
-                  <AppText semiBold FONT_11 style={{ color: "#D97706", flex: 1 }}>
-                    {currentLang === "ur"
-                      ? `تصدیق شدہ عطیہ: ${verifiedLastDonation}۔ 90 دن کا بحالی کا وقفہ جاری ہے۔`
-                      : `Verified donation on ${verifiedLastDonation}. 90-day recovery cooldown is active.`}
-                  </AppText>
-                </View>
-              )}
-
-              <View style={styles.radioRow}>
-                <TouchableOpacity
-                  style={styles.radioOption}
-                  activeOpacity={0.7}
-                  onPress={() => handleSelectAnswer(q.id, true)}
-                >
-                  <View
-                    style={[
-                      styles.radioCircle,
-                      selected === true && styles.radioCircleSelected,
-                    ]}
-                  >
-                    {selected === true && <View style={styles.radioInnerDot} />}
-                  </View>
-                  <AppText
-                    medium
-                    FONT_13
-                    style={[
-                      styles.radioLabel,
-                      selected === true && { color: colors.primary, fontWeight: "700" },
-                    ]}
-                  >
-                    {currentLang === "ur" ? "ہاں (Yes)" : "Yes"}
-                  </AppText>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.radioOption}
-                  activeOpacity={0.7}
-                  onPress={() => handleSelectAnswer(q.id, false)}
-                >
-                  <View
-                    style={[
-                      styles.radioCircle,
-                      selected === false && styles.radioCircleSelected,
-                    ]}
-                  >
-                    {selected === false && <View style={styles.radioInnerDot} />}
-                  </View>
-                  <AppText
-                    medium
-                    FONT_13
-                    style={[
-                      styles.radioLabel,
-                      selected === false && { color: colors.primary, fontWeight: "700" },
-                    ]}
-                  >
-                    {currentLang === "ur" ? "نہیں (No)" : "No"}
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })}
-
-        <AppText regular FONT_10 style={styles.disclaimer}>
-          {currentLang === "ur"
-            ? "جاری رکھ کر، آپ تصدیق کرتے ہیں کہ آپ نے تمام معلومات ایمانداری سے فراہم کی ہیں۔ آپ کی صحت سے متعلق ڈیٹا آپ کے آلے پر محفوظ اور پرائیویٹ رہتا ہے۔"
-            : "By continuing, you certify that all health information is accurate to the best of your knowledge. Your private health answers remain confidential on your device."}
-        </AppText>
-
-        <TouchableOpacity
-          style={[styles.submitButton, isSubmitting && { opacity: 0.75 }]}
-          onPress={handleContinue}
-          disabled={isSubmitting}
-          activeOpacity={0.8}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator size="small" color={colors.white} />
-          ) : (
-            <AppText bold FONT_14 style={styles.submitButtonText}>
-              {isEditing
-                ? currentLang === "ur"
-                  ? "اسکریننگ اپ ڈیٹ کریں (Update)"
-                  : "Update Screening"
-                : currentLang === "ur"
-                ? "جاری رکھیں (Continue)"
-                : "Continue"}
-            </AppText>
-          )}
-        </TouchableOpacity>
-
-        {!isEditing && (
-          <TouchableOpacity
-            style={styles.skipButton}
-            onPress={handleSkip}
-            activeOpacity={0.7}
-          >
-            <AppText regular FONT_12 style={styles.skipButtonText}>
-              {currentLang === "ur" ? "بعد میں کریں (Skip for now)" : "Skip for now"}
-            </AppText>
           </TouchableOpacity>
-        )}
-      </ScrollView>
+
+          {!isEditing && (
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={handleSkip}
+              activeOpacity={0.7}
+            >
+              <AppText regular FONT_12 style={styles.skipButtonText}>
+                {currentLang === "ur"
+                  ? "بعد میں کریں (Skip for now)"
+                  : "Skip for now"}
+              </AppText>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
       )}
 
       <Modal
@@ -562,7 +601,11 @@ const DonorQuestionnaireScreen: React.FC = () => {
                   ))}
                 </View>
 
-                <AppText regular FONT_11 style={[styles.modalSubtitle, { marginBottom: 16 }]}>
+                <AppText
+                  regular
+                  FONT_11
+                  style={[styles.modalSubtitle, { marginBottom: 16 }]}
+                >
                   {currentLang === "ur"
                     ? "آپ بدستور مریضوں کے لیے بلڈ ریکوئسٹ پوسٹ کر سکتے ہیں اور کمیونٹی ریکوئسٹس شیئر کر سکتے ہیں۔"
                     : "You can still request blood for family and friends, share emergency requests, and manage requests."}
@@ -581,8 +624,8 @@ const DonorQuestionnaireScreen: React.FC = () => {
                     ? "شروع کریں (Get Started)"
                     : "Go to Dashboard"
                   : currentLang === "ur"
-                  ? "سمجھ گیا (Acknowledge & Continue)"
-                  : "Acknowledge & Continue"}
+                    ? "سمجھ گیا (Acknowledge & Continue)"
+                    : "Acknowledge & Continue"}
               </AppText>
             </TouchableOpacity>
           </View>

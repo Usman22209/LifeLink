@@ -8,7 +8,11 @@ export type UserStackParamList = {
   [ROUTES.DONOR_QUESTIONNAIRE]?: { isEditing?: boolean; returnTo?: string };
   [ROUTES.REQUEST_DETAIL]: { request: BloodRequest };
   [ROUTES.EDIT_PROFILE]: { isEditing?: boolean };
-  [ROUTES.CHAT]: { request: BloodRequest; threadId?: string; participant?: any };
+  [ROUTES.CHAT]: {
+    request: BloodRequest;
+    threadId?: string;
+    participant?: any;
+  };
   [ROUTES.NOTIFICATIONS]: undefined;
   [ROUTES.MY_DONATIONS]: undefined;
   [ROUTES.MY_REQUESTS]: undefined;
