@@ -23,7 +23,10 @@ import { useBloodRequestForm } from "@shared/forms/hooks/useBloodRequestForm";
 import { useCreateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { Coords } from "@shared/utils/locationService";
 import { formatPhoneNumber, toE164Phone } from "@shared/utils/phoneUtils";
-import { requireCompleteProfile, isProfileComplete } from "@shared/utils/profileUtils";
+import {
+  requireCompleteProfile,
+  isProfileComplete,
+} from "@shared/utils/profileUtils";
 import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 import CitiesData from "@shared/data/cities.json";
 

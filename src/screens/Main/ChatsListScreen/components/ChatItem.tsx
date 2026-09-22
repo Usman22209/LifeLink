@@ -55,10 +55,10 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, onPress }) => {
   const isValidAvatar = (url?: string | null) =>
     Boolean(
       url &&
-        typeof url === "string" &&
-        url.trim().length > 0 &&
-        !url.includes("cdn.lifelink.org") &&
-        (url.startsWith("http://") || url.startsWith("https://"))
+      typeof url === "string" &&
+      url.trim().length > 0 &&
+      !url.includes("cdn.lifelink.org") &&
+      (url.startsWith("http://") || url.startsWith("https://")),
     );
 
   const rawImage =
@@ -74,27 +74,52 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, onPress }) => {
   const patientName =
     (!isGeneric(participant?.name) && participant?.name) ||
     (!isGeneric(request?.patientName) && request?.patientName) ||
-    (!isGeneric((request as any)?.requester?.full_name) && (request as any)?.requester?.full_name) ||
+    (!isGeneric((request as any)?.requester?.full_name) &&
+      (request as any)?.requester?.full_name) ||
     "User";
   const bloodType = request?.bloodType || "";
 
   const participantId = useMemo(() => {
-    if (participant?.id && participant.id !== "usr_unknown" && String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      participant?.id &&
+      participant.id !== "usr_unknown" &&
+      String(participant.id).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(participant.id);
     }
     const donorId = (item as any)?.donor_id;
-    if (donorId && donorId !== "usr_unknown" && String(donorId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    if (
+      donorId &&
+      donorId !== "usr_unknown" &&
+      String(donorId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(donorId);
     }
-    const requesterId = (item as any)?.requester_id || (request as any)?.requester_id || (request as any)?.user?.id;
-    if (requesterId && requesterId !== "usr_unknown" && String(requesterId).toLowerCase() !== String(user?.id).toLowerCase()) {
+    const requesterId =
+      (item as any)?.requester_id ||
+      (request as any)?.requester_id ||
+      (request as any)?.user?.id;
+    if (
+      requesterId &&
+      requesterId !== "usr_unknown" &&
+      String(requesterId).toLowerCase() !== String(user?.id).toLowerCase()
+    ) {
       return String(requesterId);
     }
-    return participant?.id && participant.id !== "usr_unknown" ? participant.id : null;
-  }, [participant?.id, (item as any)?.donor_id, (item as any)?.requester_id, (request as any)?.requester_id, (request as any)?.user?.id, user?.id]);
+    return participant?.id && participant.id !== "usr_unknown"
+      ? participant.id
+      : null;
+  }, [
+    participant?.id,
+    (item as any)?.donor_id,
+    (item as any)?.requester_id,
+    (request as any)?.requester_id,
+    (request as any)?.user?.id,
+    user?.id,
+  ]);
 
   const isOnline = Boolean(
-    participantId ? isUserOnline(participantId) : item?.isOnline
+    participantId ? isUserOnline(participantId) : item?.isOnline,
   );
 
   const defaultAvatarNode = (

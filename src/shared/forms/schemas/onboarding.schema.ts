@@ -22,7 +22,8 @@ export const getOnboardingSchema = (t: any) =>
           return age >= 18;
         },
         {
-          message: t("errors.underageError") || "You must be at least 18 years old",
+          message:
+            t("errors.underageError") || "You must be at least 18 years old",
         },
       ),
     city: z.string().min(2, t("errors.cityRequired")),

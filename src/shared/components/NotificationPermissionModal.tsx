@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
@@ -17,11 +12,9 @@ interface NotificationPermissionModalProps {
   onEnable: () => void;
 }
 
-const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = ({
-  isVisible,
-  onClose,
-  onEnable,
-}) => {
+const NotificationPermissionModal: React.FC<
+  NotificationPermissionModalProps
+> = ({ isVisible, onClose, onEnable }) => {
   const { t } = useTranslation();
 
   return (
@@ -92,7 +85,8 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
               </View>
               <View style={styles.benefitTextWrap}>
                 <Text bold FONT_12 style={{ color: colors.text }}>
-                  {t("notificationModal.chatMessages") || "Donation Chat Messages"}
+                  {t("notificationModal.chatMessages") ||
+                    "Donation Chat Messages"}
                 </Text>
                 <Text regular FONT_11 style={{ color: colors.textSecondary }}>
                   {t("notificationModal.chatMessagesDesc") ||
@@ -115,7 +109,8 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
               color={colors.white}
             />
             <Text bold FONT_13 style={styles.primaryBtnText}>
-              {t("notificationModal.enableNotifications") || "Enable Notifications"}
+              {t("notificationModal.enableNotifications") ||
+                "Enable Notifications"}
             </Text>
           </TouchableOpacity>
 

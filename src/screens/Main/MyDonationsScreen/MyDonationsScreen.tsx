@@ -55,9 +55,15 @@ const MyDonationsScreen = () => {
       : [];
 
   const stats = useMemo(() => {
-    const totalDonations = myDonationsData?.stats?.totalDonations ?? donations.length;
-    const totalUnits = donations.reduce((sum, item) => sum + (item.units || 1), 0);
-    const livesSaved = myDonationsData?.stats?.livesSaved ?? (totalUnits > 0 ? totalUnits * 3 : 0);
+    const totalDonations =
+      myDonationsData?.stats?.totalDonations ?? donations.length;
+    const totalUnits = donations.reduce(
+      (sum, item) => sum + (item.units || 1),
+      0,
+    );
+    const livesSaved =
+      myDonationsData?.stats?.livesSaved ??
+      (totalUnits > 0 ? totalUnits * 3 : 0);
 
     let isEligible = true;
     let nextEligibleDateStr = "";
@@ -164,7 +170,14 @@ const MyDonationsScreen = () => {
                   color={colors.primary}
                 />
               </View>
-              <AppText bold FONT_14 style={[styles.sectionTitle, { marginHorizontal: moderateScale(6) }]}>
+              <AppText
+                bold
+                FONT_14
+                style={[
+                  styles.sectionTitle,
+                  { marginHorizontal: moderateScale(6) },
+                ]}
+              >
                 {t("myDonations.donationHistory") || "Donation History"}
               </AppText>
             </View>

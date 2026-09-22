@@ -3,7 +3,15 @@
  * Implements standard international medical ABO and Rh (D) blood transfusion compatibility rules.
  */
 
-export type BloodGroup = "O-" | "O+" | "A-" | "A+" | "B-" | "B+" | "AB-" | "AB+";
+export type BloodGroup =
+  | "O-"
+  | "O+"
+  | "A-"
+  | "A+"
+  | "B-"
+  | "B+"
+  | "AB-"
+  | "AB+";
 
 export const ALL_BLOOD_GROUPS: BloodGroup[] = [
   "O-",
@@ -65,7 +73,9 @@ export const DONOR_COMPATIBILITY_MAP: Record<BloodGroup, BloodGroup[]> = {
 /**
  * Normalizes blood group string input (e.g., "o+", " B + ", "ab-") to standard format.
  */
-export const normalizeBloodGroup = (group?: string | null): BloodGroup | null => {
+export const normalizeBloodGroup = (
+  group?: string | null,
+): BloodGroup | null => {
   if (!group) return null;
   const clean = group.toUpperCase().replace(/\s+/g, "").trim();
   if (ALL_BLOOD_GROUPS.includes(clean as BloodGroup)) {
@@ -96,7 +106,9 @@ export const isBloodCompatible = (
 /**
  * Returns list of compatible donor groups for a given patient/recipient.
  */
-export const getCompatibleDonors = (recipientGroup?: string | null): BloodGroup[] => {
+export const getCompatibleDonors = (
+  recipientGroup?: string | null,
+): BloodGroup[] => {
   const recipient = normalizeBloodGroup(recipientGroup);
   if (!recipient) return ALL_BLOOD_GROUPS;
   return RECIPIENT_COMPATIBILITY_MAP[recipient] || [];
@@ -105,7 +117,9 @@ export const getCompatibleDonors = (recipientGroup?: string | null): BloodGroup[
 /**
  * Returns list of recipient groups a donor can safely donate to.
  */
-export const getCompatibleRecipients = (donorGroup?: string | null): BloodGroup[] => {
+export const getCompatibleRecipients = (
+  donorGroup?: string | null,
+): BloodGroup[] => {
   const donor = normalizeBloodGroup(donorGroup);
   if (!donor) return ALL_BLOOD_GROUPS;
   return DONOR_COMPATIBILITY_MAP[donor] || [];
@@ -150,8 +164,8 @@ export const getCompatibilityNotice = (
           ? `آپ کا بلڈ گروپ (${donor}) مریض کے بلڈ گروپ (${recipient}) سے بالکل مطابقت رکھتا ہے۔ آپ محفوظ طریقے سے خون کا عطیہ دے سکتے ہیں۔`
           : `طبی اصولوں کے مطابق آپ کا بلڈ گروپ (${donor}) مریض (${recipient}) کے لیے محفوظ اور موزوں ہے۔`
         : isExact
-        ? `Your blood group (${donor}) is an exact match for this patient (${recipient}). You can safely donate!`
-        : `Your blood group (${donor}) is medically compatible for whole red cell transfusion to this patient (${recipient}).`,
+          ? `Your blood group (${donor}) is an exact match for this patient (${recipient}). You can safely donate!`
+          : `Your blood group (${donor}) is medically compatible for whole red cell transfusion to this patient (${recipient}).`,
       badgeLabel: isUrdu ? "موزوں ڈونر" : "Compatible Match",
     };
   }
@@ -159,7 +173,9 @@ export const getCompatibilityNotice = (
   const allowedDonors = getCompatibleDonors(recipient).join(", ");
   return {
     isCompatible: false,
-    title: isUrdu ? "بلڈ گروپ غیر مطابقت پذیر ہے ⚠️" : "Incompatible Blood Type ⚠️",
+    title: isUrdu
+      ? "بلڈ گروپ غیر مطابقت پذیر ہے ⚠️"
+      : "Incompatible Blood Type ⚠️",
     message: isUrdu
       ? `آپ کا بلڈ گروپ (${donor}) اس مریض (${recipient}) کے ساتھ طبی لحاظ سے مطابقت نہیں رکھتا۔ اس مریض کو درج ذیل بلڈ گروپس درکار ہیں: ${allowedDonors}۔ تاہم، آپ اس ایمرجنسی کو اپنے دوستوں اور خاندان کے ساتھ شیئر کر کے جان بچانے میں مدد کر سکتے ہیں!`
       : `Your blood group (${donor}) cannot be safely transfused to this patient (${recipient}). This patient can only receive blood from: ${allowedDonors}. You can still save this patient's life by sharing this request with your network!`,

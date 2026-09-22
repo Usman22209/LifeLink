@@ -22,12 +22,9 @@ interface DeleteAccountConfirmationModalProps {
   isLoading?: boolean;
 }
 
-const DeleteAccountConfirmationModal: React.FC<DeleteAccountConfirmationModalProps> = ({
-  visible,
-  onClose,
-  onConfirm,
-  isLoading = false,
-}) => {
+const DeleteAccountConfirmationModal: React.FC<
+  DeleteAccountConfirmationModalProps
+> = ({ visible, onClose, onConfirm, isLoading = false }) => {
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
 
@@ -36,7 +33,8 @@ const DeleteAccountConfirmationModal: React.FC<DeleteAccountConfirmationModalPro
     t("profile.deleteAccountConfirm") ||
     "Are you sure you want to delete your account? All your donation records, blood requests, and profile data will be permanently removed. This action cannot be undone.";
   const cancelText = t("common.cancel") || "Keep Account";
-  const confirmText = t("profile.deleteAccountConfirmButton") || "Permanently Delete";
+  const confirmText =
+    t("profile.deleteAccountConfirmButton") || "Permanently Delete";
 
   return (
     <Modal
@@ -46,7 +44,10 @@ const DeleteAccountConfirmationModal: React.FC<DeleteAccountConfirmationModalPro
       statusBarTranslucent
       onRequestClose={isLoading ? undefined : onClose}
     >
-      <Pressable style={styles.backdrop} onPress={isLoading ? undefined : onClose}>
+      <Pressable
+        style={styles.backdrop}
+        onPress={isLoading ? undefined : onClose}
+      >
         <Pressable style={styles.sheetContainer} onPress={() => {}}>
           {/* Top Interactive Handle Bar */}
           <TouchableOpacity
@@ -72,10 +73,7 @@ const DeleteAccountConfirmationModal: React.FC<DeleteAccountConfirmationModalPro
           <Text
             bold
             FONT_18
-            style={[
-              styles.title,
-              { textAlign: isRtl ? "right" : "center" },
-            ]}
+            style={[styles.title, { textAlign: isRtl ? "right" : "center" }]}
           >
             {titleText}
           </Text>

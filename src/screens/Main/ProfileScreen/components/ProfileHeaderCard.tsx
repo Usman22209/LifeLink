@@ -24,7 +24,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
     actualUser?.profile_image ||
     actualUser?.avatar ||
     actualUser?.profileImage;
-  const userBloodType = actualUser?.blood_type || actualUser?.blood_group || "O+";
+  const userBloodType =
+    actualUser?.blood_type || actualUser?.blood_group || "O+";
 
   const userName =
     actualUser?.full_name ||
@@ -34,10 +35,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
     t("profile.guestDonor");
 
   const userSubtext =
-    actualUser?.email ||
-    actualUser?.phone ||
-    actualUser?.contact_number ||
-    "";
+    actualUser?.email || actualUser?.phone || actualUser?.contact_number || "";
 
   const defaultAvatarNode = (
     <View style={[styles.avatar, styles.defaultAvatar]}>

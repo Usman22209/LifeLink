@@ -36,7 +36,8 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
     titleKey: "eligibilityModal.weightTitle",
     descKey: "eligibilityModal.weightDesc",
     defaultTitle: "Weight & Current Health",
-    defaultDesc: "I weigh at least 50 kg and feel healthy today with no active fever, flu, or infection.",
+    defaultDesc:
+      "I weigh at least 50 kg and feel healthy today with no active fever, flu, or infection.",
     icon: "activity",
     iconType: Icons.Feather,
   },
@@ -45,7 +46,8 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
     titleKey: "eligibilityModal.cooldownTitle",
     descKey: "eligibilityModal.cooldownDesc",
     defaultTitle: "90-Day Donation Interval",
-    defaultDesc: "I have not donated whole blood in the last 90 days to ensure safe red cell recovery.",
+    defaultDesc:
+      "I have not donated whole blood in the last 90 days to ensure safe red cell recovery.",
     icon: "calendar",
     iconType: Icons.Feather,
   },
@@ -54,7 +56,8 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
     titleKey: "eligibilityModal.medicalTitle",
     descKey: "eligibilityModal.medicalDesc",
     defaultTitle: "Medical Safety & Screening",
-    defaultDesc: "No major surgery, hepatitis, chronic illness, or new tattoos/piercings in the last 6 months.",
+    defaultDesc:
+      "No major surgery, hepatitis, chronic illness, or new tattoos/piercings in the last 6 months.",
     icon: "shield",
     iconType: Icons.Feather,
   },
@@ -82,7 +85,9 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
     }));
   };
 
-  const checkedCount = CHECKLIST_ITEMS.filter((item) => checkedItems[item.id]).length;
+  const checkedCount = CHECKLIST_ITEMS.filter(
+    (item) => checkedItems[item.id],
+  ).length;
   const totalCount = CHECKLIST_ITEMS.length;
   const allChecked = checkedCount === totalCount;
 
@@ -126,8 +131,16 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
                 <Text bold FONT_15 style={{ color: colors.text }}>
                   {t("eligibilityModal.title") || "Donor Health & Safety Check"}
                 </Text>
-                <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(1) }}>
-                  {t("eligibilityModal.subtitle") || "Confirm all 3 requirements to safely respond"}
+                <Text
+                  regular
+                  FONT_11
+                  style={{
+                    color: colors.textSecondary,
+                    marginTop: verticalScale(1),
+                  }}
+                >
+                  {t("eligibilityModal.subtitle") ||
+                    "Confirm all 3 requirements to safely respond"}
                 </Text>
               </View>
             </View>
@@ -147,7 +160,13 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
 
           {/* Simple Clean Counter Pill */}
           <View style={styles.counterRow}>
-            <Text bold FONT_11 style={{ color: allChecked ? colors.success : colors.textSecondary }}>
+            <Text
+              bold
+              FONT_11
+              style={{
+                color: allChecked ? colors.success : colors.textSecondary,
+              }}
+            >
               {allChecked
                 ? "✓ All 3 requirements confirmed"
                 : `Please confirm all requirements (${checkedCount} of ${totalCount})`}
@@ -234,7 +253,9 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
             <TouchableOpacity
               style={[
                 styles.confirmButton,
-                allChecked ? styles.confirmButtonActive : styles.confirmButtonDisabled,
+                allChecked
+                  ? styles.confirmButtonActive
+                  : styles.confirmButtonDisabled,
               ]}
               onPress={handleConfirm}
               disabled={!allChecked || isLoading}
@@ -256,13 +277,15 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
                     color={colors.white}
                   />
                   <Text bold FONT_13 style={styles.btnTextActive}>
-                    {t("eligibilityModal.confirmAndRespond") || "Confirm & Respond to Emergency"}
+                    {t("eligibilityModal.confirmAndRespond") ||
+                      "Confirm & Respond to Emergency"}
                   </Text>
                 </View>
               ) : (
                 <Text bold FONT_12 style={styles.btnTextDisabled}>
-                  {t("eligibilityModal.confirmAllToProceed", { count: checkedCount }) ||
-                    `Confirm All 3 Items to Proceed (${checkedCount}/3)`}
+                  {t("eligibilityModal.confirmAllToProceed", {
+                    count: checkedCount,
+                  }) || `Confirm All 3 Items to Proceed (${checkedCount}/3)`}
                 </Text>
               )}
             </TouchableOpacity>

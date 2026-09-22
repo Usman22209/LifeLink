@@ -37,7 +37,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     if (!phoneNumber) {
       Alert.alert(
         "Phone Call",
-        "No direct contact phone number is available for this recipient. Please message them directly in chat."
+        "No direct contact phone number is available for this recipient. Please message them directly in chat.",
       );
       return;
     }
@@ -50,8 +50,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const dotColor = isTyping
     ? colors.primary
     : isOnline
-    ? colors.success
-    : colors.gray300;
+      ? colors.success
+      : colors.gray300;
 
   const displayStatus = isTyping
     ? "Typing..."
@@ -60,10 +60,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const isValidAvatar = (url?: string | null) =>
     Boolean(
       url &&
-        typeof url === "string" &&
-        url.trim().length > 0 &&
-        !url.includes("cdn.lifelink.org") &&
-        (url.startsWith("http://") || url.startsWith("https://"))
+      typeof url === "string" &&
+      url.trim().length > 0 &&
+      !url.includes("cdn.lifelink.org") &&
+      (url.startsWith("http://") || url.startsWith("https://")),
     );
 
   const cleanPatientImage = isValidAvatar(patientImage) ? patientImage : null;
@@ -116,16 +116,14 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             </AppText>
             <View style={styles.headerStatus}>
               <View
-                style={[
-                  styles.headerStatusDot,
-                  { backgroundColor: dotColor },
-                ]}
+                style={[styles.headerStatusDot, { backgroundColor: dotColor }]}
               />
               <AppText
                 style={[
                   styles.headerStatusText,
                   isTyping && { color: colors.primary, fontWeight: "600" },
-                  isOnline && !isTyping && { color: colors.success, fontWeight: "500" },
+                  isOnline &&
+                    !isTyping && { color: colors.success, fontWeight: "500" },
                 ]}
               >
                 {displayStatus}

@@ -21,12 +21,18 @@ import { selectLanguage } from "@store/slices/appSlice";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import { useGetProfile } from "@shared/query/profile/useProfile";
-import { requireCompleteProfile, isProfileComplete } from "@shared/utils/profileUtils";
+import {
+  requireCompleteProfile,
+  isProfileComplete,
+} from "@shared/utils/profileUtils";
 import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { URGENCY_CONFIG } from "@screens/Main/FeedScreen/types";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
-import { useAcceptBloodRequest, useMyDonations } from "@shared/query/donations/useDonations";
+import {
+  useAcceptBloodRequest,
+  useMyDonations,
+} from "@shared/query/donations/useDonations";
 import { useBloodRequestDetails } from "@shared/query/blood-requests/useBloodRequests";
 import { useChatThreads } from "@shared/query/chat/useChat";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
@@ -58,31 +64,35 @@ const RequestDetailScreen: React.FC = () => {
 
   const rawRequest: any = route.params?.request || {};
 
-  const { data: requestDetails } = useBloodRequestDetails(rawRequest.id, !!rawRequest.id);
+  const { data: requestDetails } = useBloodRequestDetails(
+    rawRequest.id,
+    !!rawRequest.id,
+  );
   const detailData: any = requestDetails?.data || requestDetails || {};
 
   const { data: chatThreadsData } = useChatThreads();
   const threadsList = Array.isArray(chatThreadsData?.data)
     ? chatThreadsData.data
     : Array.isArray(chatThreadsData)
-    ? chatThreadsData
-    : [];
+      ? chatThreadsData
+      : [];
 
   const { data: myDonationsData } = useMyDonations();
   const myDonationsList: any[] = Array.isArray(myDonationsData?.history)
     ? myDonationsData.history
     : Array.isArray(myDonationsData?.data)
-    ? myDonationsData.data
-    : Array.isArray(myDonationsData)
-    ? myDonationsData
-    : [];
+      ? myDonationsData.data
+      : Array.isArray(myDonationsData)
+        ? myDonationsData
+        : [];
 
   const request = useMemo(() => {
     const combined = { ...rawRequest, ...detailData };
     return {
       ...combined,
       id: combined.id || "",
-      patientName: combined.patientName || combined.patient_name || "Anonymous Patient",
+      patientName:
+        combined.patientName || combined.patient_name || "Anonymous Patient",
       bloodType: combined.bloodType || combined.blood_group || "O+",
       hospital: combined.hospital || combined.hospital_name || "Hospital",
       city: combined.city || combined.city_id || "",
@@ -90,17 +100,24 @@ const RequestDetailScreen: React.FC = () => {
       urgency: (combined.urgency || "normal").toLowerCase(),
       time: combined.time || "Recently",
       time_left: combined.time_left || "",
-      patientImage: combined.patientImage || combined.patient_image || combined.requester?.profile_image,
+      patientImage:
+        combined.patientImage ||
+        combined.patient_image ||
+        combined.requester?.profile_image,
       latitude: combined.latitude ? Number(combined.latitude) : undefined,
       longitude: combined.longitude ? Number(combined.longitude) : undefined,
       distance: combined.distance || "",
-      requester_id: combined.requester_id || combined.requesterId || combined.requester?.id,
-      contact_number: combined.contact_number || combined.contactNumber || combined.requester?.phone,
+      requester_id:
+        combined.requester_id || combined.requesterId || combined.requester?.id,
+      contact_number:
+        combined.contact_number ||
+        combined.contactNumber ||
+        combined.requester?.phone,
       hide_phone_number: Boolean(
         combined.hide_phone_number ||
         combined.requester?.hide_phone_number ||
         detailData.hide_phone_number ||
-        detailData.requester?.hide_phone_number
+        detailData.requester?.hide_phone_number,
       ),
     };
   }, [rawRequest, detailData]);
@@ -108,8 +125,7 @@ const RequestDetailScreen: React.FC = () => {
   const existingThread = useMemo(() => {
     if (!request.id) return null;
     return threadsList.find(
-      (t: any) =>
-        String(t.request_id || t.request?.id) === String(request.id)
+      (t: any) => String(t.request_id || t.request?.id) === String(request.id),
     );
   }, [threadsList, request.id]);
 
@@ -119,7 +135,7 @@ const RequestDetailScreen: React.FC = () => {
       (d: any) =>
         (String(d.request?.id || d.request_id) === String(request.id) ||
           String(d.requestId) === String(request.id)) &&
-        d.status !== "cancelled"
+        d.status !== "cancelled",
     );
   }, [myDonationsList, request.id]);
 
@@ -129,7 +145,7 @@ const RequestDetailScreen: React.FC = () => {
     justPledged ||
     Boolean(existingDonation && existingDonation.status === "intent");
   const donationCompleted = Boolean(
-    existingDonation && existingDonation.status === "completed"
+    existingDonation && existingDonation.status === "completed",
   );
 
   const cityName = useMemo(
@@ -149,11 +165,15 @@ const RequestDetailScreen: React.FC = () => {
 
   const displayDistance = computedDist
     ? `${computedDist} away`
-    : request.distance && request.distance !== "N/A" && request.distance !== "0 km"
-    ? `${request.distance} away`
-    : "";
+    : request.distance &&
+        request.distance !== "N/A" &&
+        request.distance !== "0 km"
+      ? `${request.distance} away`
+      : "";
 
-  const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
+  const mapOverlayText = [cityName, displayDistance]
+    .filter(Boolean)
+    .join(" · ");
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
@@ -162,13 +182,15 @@ const RequestDetailScreen: React.FC = () => {
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
 
-  const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const urgencyKey = (request?.urgency?.toLowerCase() ||
+    "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
   const isUrgent = urgencyKey === "urgent" || urgencyKey === "critical";
 
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const rawUser = profile?.data || profile?.user || profile?.profile || profile || reduxUser;
+  const rawUser =
+    profile?.data || profile?.user || profile?.profile || profile || reduxUser;
   const user = rawUser?.user || rawUser?.profile || rawUser;
   const currentUserId = user?.id || reduxUser?.id;
 
@@ -188,15 +210,17 @@ const RequestDetailScreen: React.FC = () => {
 
   const isOwner = Boolean(
     currentUserId &&
-      requesterId &&
-      String(currentUserId).trim().toLowerCase() === String(requesterId).trim().toLowerCase()
+    requesterId &&
+    String(currentUserId).trim().toLowerCase() ===
+      String(requesterId).trim().toLowerCase(),
   );
 
-  const donorBloodGroup = user?.blood_group || (user as any)?.bloodType || reduxUser?.blood_group;
+  const donorBloodGroup =
+    user?.blood_group || (user as any)?.bloodType || reduxUser?.blood_group;
   const patientBloodGroup = request.bloodType || (request as any)?.blood_group;
   const isCompatible = useMemo(
     () => isBloodCompatible(donorBloodGroup, patientBloodGroup),
-    [donorBloodGroup, patientBloodGroup]
+    [donorBloodGroup, patientBloodGroup],
   );
 
   const handleShare = useCallback(async () => {
@@ -211,7 +235,8 @@ const RequestDetailScreen: React.FC = () => {
 
   const participant = useMemo(() => {
     const rawPId = existingThread?.participant?.id;
-    const pId = (rawPId && rawPId !== "usr_unknown" ? rawPId : requesterId) || null;
+    const pId =
+      (rawPId && rawPId !== "usr_unknown" ? rawPId : requesterId) || null;
     const pName =
       existingThread?.participant?.name ||
       detailData?.requester?.full_name ||
@@ -225,10 +250,10 @@ const RequestDetailScreen: React.FC = () => {
     const isValidAvatar = (url?: string | null) =>
       Boolean(
         url &&
-          typeof url === "string" &&
-          url.trim().length > 0 &&
-          !url.includes("cdn.lifelink.org") &&
-          (url.startsWith("http://") || url.startsWith("https://"))
+        typeof url === "string" &&
+        url.trim().length > 0 &&
+        !url.includes("cdn.lifelink.org") &&
+        (url.startsWith("http://") || url.startsWith("https://")),
       );
 
     const candidates = [
@@ -259,7 +284,8 @@ const RequestDetailScreen: React.FC = () => {
       (navigation as any).navigate(ROUTES.MY_REQUESTS);
       return;
     }
-    const isUserOnboarded = user?.is_onboarded === true || isProfileComplete(user);
+    const isUserOnboarded =
+      user?.is_onboarded === true || isProfileComplete(user);
     if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
@@ -276,10 +302,14 @@ const RequestDetailScreen: React.FC = () => {
 
   const handleConfirmMatch = useCallback(async () => {
     if (isOwner) {
-      Alert.alert("Action Not Allowed", "You cannot donate blood to your own request.");
+      Alert.alert(
+        "Action Not Allowed",
+        "You cannot donate blood to your own request.",
+      );
       return;
     }
-    const isUserOnboarded = user?.is_onboarded === true || isProfileComplete(user);
+    const isUserOnboarded =
+      user?.is_onboarded === true || isProfileComplete(user);
     if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
@@ -298,8 +328,8 @@ const RequestDetailScreen: React.FC = () => {
 
   const canCall = Boolean(
     !isOwner &&
-      !request.hide_phone_number &&
-      (request.contact_number || request.contactNumber)
+    !request.hide_phone_number &&
+    (request.contact_number || request.contactNumber),
   );
 
   const handleCall = useCallback(() => {
@@ -330,7 +360,9 @@ const RequestDetailScreen: React.FC = () => {
   }, [request]);
 
   const handleNavigate = useCallback(() => {
-    const query = encodeURIComponent(`${request.hospital}, ${cityName || request.city}`);
+    const query = encodeURIComponent(
+      `${request.hospital}, ${cityName || request.city}`,
+    );
     const url = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
     Linking.openURL(url).catch((err) => {
       console.log("Error launching native maps:", err.message);
@@ -353,7 +385,9 @@ const RequestDetailScreen: React.FC = () => {
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+              >
                 <TouchableOpacity
                   style={styles.headerShareBtn}
                   onPress={handleShare}
@@ -444,9 +478,14 @@ const RequestDetailScreen: React.FC = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText bold FONT_12 style={{ color: colors.text }}>
-                    {t("requestDetail.suspiciousTitle") || "Notice something suspicious?"}
+                    {t("requestDetail.suspiciousTitle") ||
+                      "Notice something suspicious?"}
                   </AppText>
-                  <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }}>
+                  <AppText
+                    regular
+                    FONT_11
+                    style={{ color: colors.textSecondary, marginTop: 1 }}
+                  >
                     {t("requestDetail.suspiciousDesc") ||
                       "Report fake or fraudulent blood requests to protect our community."}
                   </AppText>
@@ -496,7 +535,8 @@ const RequestDetailScreen: React.FC = () => {
                 [
                   {
                     text: "View My Donations",
-                    onPress: () => (navigation as any).navigate(ROUTES.MY_DONATIONS),
+                    onPress: () =>
+                      (navigation as any).navigate(ROUTES.MY_DONATIONS),
                   },
                   { text: "OK", style: "cancel" },
                 ],
@@ -528,7 +568,9 @@ const RequestDetailScreen: React.FC = () => {
             setMatchSheetVisible(true);
           }}
           onManageRequest={handleManageRequest}
-          onViewMyDonations={() => (navigation as any).navigate(ROUTES.MY_DONATIONS)}
+          onViewMyDonations={() =>
+            (navigation as any).navigate(ROUTES.MY_DONATIONS)
+          }
         />
       </ScreenWrapper>
 

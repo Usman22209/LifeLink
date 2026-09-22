@@ -21,7 +21,10 @@ interface StatsSectionProps {
   onEligibilityPress?: () => void;
 }
 
-const StatsSection: React.FC<StatsSectionProps> = ({ stats, onEligibilityPress }) => {
+const StatsSection: React.FC<StatsSectionProps> = ({
+  stats,
+  onEligibilityPress,
+}) => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const isRtl = useSelector(selectIsRtl);

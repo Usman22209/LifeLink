@@ -132,7 +132,10 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   useEffect(() => {
     if (visible) {
-      console.log("[LocationPickerModal] Modal opened | initialCoords:", initialCoords);
+      console.log(
+        "[LocationPickerModal] Modal opened | initialCoords:",
+        initialCoords,
+      );
       const coords = {
         latitude: initialCoords?.latitude ?? DEFAULT_COORDS.latitude,
         longitude: initialCoords?.longitude ?? DEFAULT_COORDS.longitude,
@@ -171,7 +174,12 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       )}&components=country:pk&key=${ENV.MAP_API_KEY}`;
       const res = await fetch(url);
       const data: any = await res.json();
-      console.log("[LocationPickerModal] Predictions response status:", data.status, "Count:", data.predictions?.length || 0);
+      console.log(
+        "[LocationPickerModal] Predictions response status:",
+        data.status,
+        "Count:",
+        data.predictions?.length || 0,
+      );
       if (data.status === "OK" && data.predictions) {
         setPredictions(data.predictions);
         setShowResults(true);
@@ -201,7 +209,11 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   const handleSelectPlace = useCallback(
     async (placeId: string, description: string) => {
-      console.log("[LocationPickerModal] Selecting place:", placeId, description);
+      console.log(
+        "[LocationPickerModal] Selecting place:",
+        placeId,
+        description,
+      );
       if (searchTimer.current) clearTimeout(searchTimer.current);
       isProgrammaticChangeRef.current = true;
       Keyboard.dismiss();
@@ -221,12 +233,16 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         console.log("[LocationPickerModal] Place details status:", data.status);
         if (data.status === "OK" && data.result?.geometry?.location) {
           const { lat, lng } = data.result.geometry.location;
-          console.log("[LocationPickerModal] Navigating map to coords:", lat, lng);
+          console.log(
+            "[LocationPickerModal] Navigating map to coords:",
+            lat,
+            lng,
+          );
           regionRef.current = { latitude: lat, longitude: lng };
-          
+
           if (Platform.OS === "ios") {
             webViewRef.current?.injectJavaScript(
-              `if(window.setMapCenter) window.setMapCenter(${lat}, ${lng}); true;`
+              `if(window.setMapCenter) window.setMapCenter(${lat}, ${lng}); true;`,
             );
           } else {
             mapRef.current?.animateToRegion(
@@ -236,7 +252,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               },
-              600
+              600,
             );
           }
 
@@ -276,14 +292,22 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             }
           }
 
-          const matchedRecord = findCityRecord(extractedCity, extractedProvince);
-          console.log("[LocationPickerModal] Place matched city record:", matchedRecord?.name?.en, matchedRecord?.id);
+          const matchedRecord = findCityRecord(
+            extractedCity,
+            extractedProvince,
+          );
+          console.log(
+            "[LocationPickerModal] Place matched city record:",
+            matchedRecord?.name?.en,
+            matchedRecord?.id,
+          );
 
           setSelectedPlaceInfo({
             name: data.result.name || undefined,
             address: data.result.formatted_address || undefined,
             cityName: matchedRecord?.name.en || extractedCity || undefined,
-            provinceName: matchedRecord?.province || extractedProvince || undefined,
+            provinceName:
+              matchedRecord?.province || extractedProvince || undefined,
             cityId: matchedRecord?.id || undefined,
           });
         }
@@ -301,10 +325,13 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       const coords = await getCurrentLocation();
       console.log("[LocationPickerModal] User location result:", coords);
       if (coords) {
-        regionRef.current = { latitude: coords.latitude, longitude: coords.longitude };
+        regionRef.current = {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
         if (Platform.OS === "ios") {
           webViewRef.current?.injectJavaScript(
-            `if(window.setMapCenter) window.setMapCenter(${coords.latitude}, ${coords.longitude}); true;`
+            `if(window.setMapCenter) window.setMapCenter(${coords.latitude}, ${coords.longitude}); true;`,
           );
         } else {
           mapRef.current?.animateToRegion(
@@ -314,7 +341,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             },
-            600
+            600,
           );
         }
       }
@@ -328,7 +355,12 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const handleConfirm = async () => {
     let info = selectedPlaceInfo;
     const currentRegion = regionRef.current;
-    console.log("[LocationPickerModal] Confirm pressed | region:", currentRegion, "info:", info);
+    console.log(
+      "[LocationPickerModal] Confirm pressed | region:",
+      currentRegion,
+      "info:",
+      info,
+    );
 
     if (!info?.cityId && ENV.MAP_API_KEY) {
       try {
@@ -336,7 +368,10 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentRegion.latitude},${currentRegion.longitude}&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(geoUrl);
         const geoData: any = await res.json();
-        console.log("[LocationPickerModal] Reverse geocode status:", geoData.status);
+        console.log(
+          "[LocationPickerModal] Reverse geocode status:",
+          geoData.status,
+        );
         if (geoData.status === "OK" && geoData.results?.[0]) {
           const topResult = geoData.results[0];
           let city = "";
@@ -389,8 +424,15 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.type === "REGION_CHANGE") {
-        console.log("[LocationPickerModal] Region change complete:", data.latitude, data.longitude);
-        regionRef.current = { latitude: data.latitude, longitude: data.longitude };
+        console.log(
+          "[LocationPickerModal] Region change complete:",
+          data.latitude,
+          data.longitude,
+        );
+        regionRef.current = {
+          latitude: data.latitude,
+          longitude: data.longitude,
+        };
       }
     } catch {
       // ignore
@@ -509,7 +551,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                 source={{
                   html: getLeafletHtml(
                     regionRef.current.latitude,
-                    regionRef.current.longitude
+                    regionRef.current.longitude,
                   ),
                 }}
                 onMessage={handleWebViewMessage}
@@ -534,7 +576,10 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                   longitudeDelta: 0.03,
                 }}
                 onRegionChangeComplete={(r) => {
-                  regionRef.current = { latitude: r.latitude, longitude: r.longitude };
+                  regionRef.current = {
+                    latitude: r.latitude,
+                    longitude: r.longitude,
+                  };
                 }}
                 showsUserLocation
                 showsMyLocationButton={false}
@@ -545,9 +590,25 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
               />
             )
           ) : (
-            <View style={[styles.map, { justifyContent: "center", alignItems: "center", backgroundColor: colors.gray100 }]}>
+            <View
+              style={[
+                styles.map,
+                {
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.gray100,
+                },
+              ]}
+            >
               <ActivityIndicator size="large" color={colors.primary} />
-              <AppText regular FONT_12 style={{ marginTop: verticalScale(8), color: colors.textSecondary }}>
+              <AppText
+                regular
+                FONT_12
+                style={{
+                  marginTop: verticalScale(8),
+                  color: colors.textSecondary,
+                }}
+              >
                 {t("requestForm.loadingMap") || "Loading map..."}
               </AppText>
             </View>

@@ -55,7 +55,8 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 const HelpSupportScreen = () => {
   const { t } = useTranslation();
 
-  const { mutate: submitContact, isPending: isSubmitting } = useContactSupport();
+  const { mutate: submitContact, isPending: isSubmitting } =
+    useContactSupport();
 
   const handleContactEmail = () => {
     submitContact({

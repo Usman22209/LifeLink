@@ -18,10 +18,16 @@ export const useGetProfile = (enabled = true) => {
     queryFn: async () => {
       console.log("🔍 [useGetProfile] Fetching profile from API...");
       const response = await PROFILE_SERVICE.getProfile();
-      console.log("🔍 [useGetProfile] Raw API Response:", JSON.stringify(response.data));
+      console.log(
+        "🔍 [useGetProfile] Raw API Response:",
+        JSON.stringify(response.data),
+      );
       const rawData = response.data?.data || response.data;
       const profileData = rawData?.user || rawData?.profile || rawData;
-      console.log("🔍 [useGetProfile] Resolved profileData:", JSON.stringify(profileData));
+      console.log(
+        "🔍 [useGetProfile] Resolved profileData:",
+        JSON.stringify(profileData),
+      );
       if (profileData) {
         store.dispatch(updateUser(profileData));
       }
@@ -60,9 +66,7 @@ export const useDeleteAccount = () => {
     },
     onSuccess: async () => {
       try {
-        await Promise.allSettled([
-          tokenStorage.clearToken(),
-        ]);
+        await Promise.allSettled([tokenStorage.clearToken()]);
       } catch (e) {
         console.error("Token clear error:", e);
       }
@@ -79,7 +83,9 @@ export const useDeleteAccount = () => {
       Toast.show({
         type: "error",
         text1: "Deletion Failed",
-        text2: error?.response?.data?.message || "Could not delete account. Please try again.",
+        text2:
+          error?.response?.data?.message ||
+          "Could not delete account. Please try again.",
       });
     },
   });
