@@ -6,6 +6,7 @@ import { moderateScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../RequestDetailScreen.styles";
 
 interface MapPreviewCardProps {
@@ -79,6 +80,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
   mapOverlayText,
   onNavigate,
 }) => {
+  const { t } = useTranslation();
   const lat = Number(request?.latitude) || 31.5723;
   const lng = Number(request?.longitude) || 74.3213;
 
@@ -94,10 +96,10 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
           />
           <View>
             <AppText bold FONT_13 style={styles.mapTitle}>
-              Navigation Route
+              {t("requestDetail.navRoute") || "Navigation Route"}
             </AppText>
             <AppText regular style={styles.mapSubtitle}>
-              Directions to destination hospital
+              {t("requestDetail.navDirections") || "Directions to destination hospital"}
             </AppText>
           </View>
         </View>
@@ -165,7 +167,6 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
           </MapView>
         )}
 
-        {/* Floating Action Overlay on Map Canvas */}
         <View style={styles.mapOverlay}>
           <View style={styles.mapOverlayLeft}>
             <AppText
@@ -192,7 +193,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({
               color={colors.white}
             />
             <AppText bold FONT_10 style={styles.navigateBtnText}>
-              Navigate
+              {t("requestDetail.navigate") || "Navigate"}
             </AppText>
           </TouchableOpacity>
         </View>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, FlatList } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { moderateScale } from "react-native-size-matters";
@@ -9,8 +9,10 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { ROUTES } from "@utils/Routes";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectIsRtl } from "@store/slices/appSlice";
+import { selectUser, updateUser } from "@store/slices/authSlice";
+import { getStoredEligibility } from "@shared/utils/donorEligibilityService";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useMyDonations } from "@shared/query/donations/useDonations";
 import { styles } from "./MyDonationsScreen.styles";
@@ -21,10 +23,31 @@ import { MOCK_DONATIONS } from "@shared/constants/mockData";
 
 const MyDonationsScreen = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const isRtl = useSelector(selectIsRtl);
+  const user = useSelector(selectUser);
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const { data: myDonationsData } = useMyDonations();
+
+  useEffect(() => {
+    (async () => {
+      if (user?.stats?.is_eligible === undefined) {
+        const stored = await getStoredEligibility(user?.id);
+        if (stored) {
+          dispatch(
+            updateUser({
+              stats: {
+                ...(user?.stats || {}),
+                is_eligible: stored.isEligible,
+                next_eligible_date: stored.nextEligibleDate || undefined,
+              },
+            }),
+          );
+        }
+      }
+    })();
+  }, [user?.stats?.is_eligible, dispatch]);
 
   const donations: DonationLog[] =
     myDonationsData?.history && Array.isArray(myDonationsData.history)
@@ -32,22 +55,22 @@ const MyDonationsScreen = () => {
       : [];
 
   const stats = useMemo(() => {
-    if (myDonationsData?.stats) {
-      return {
-        totalDonations: myDonationsData.stats.totalDonations ?? donations.length,
-        livesSaved: myDonationsData.stats.livesSaved ?? (donations.length * 3),
-        isEligible: myDonationsData.stats.isEligible ?? true,
-        nextEligibleDateStr: myDonationsData.stats.nextEligibleDateStr || "",
-      };
-    }
-
-    const totalDonations = donations.length;
+    const totalDonations = myDonationsData?.stats?.totalDonations ?? donations.length;
     const totalUnits = donations.reduce((sum, item) => sum + (item.units || 1), 0);
-    const livesSaved = totalUnits * 3;
+    const livesSaved = myDonationsData?.stats?.livesSaved ?? (totalUnits > 0 ? totalUnits * 3 : 0);
 
     let isEligible = true;
     let nextEligibleDateStr = "";
 
+    // 1. Health screening eligibility check (CRITICAL: if user is deferred by health questionnaire)
+    if (user?.stats?.is_eligible === false) {
+      isEligible = false;
+      if (user?.stats?.next_eligible_date) {
+        nextEligibleDateStr = user.stats.next_eligible_date;
+      }
+    }
+
+    // 2. Cooldown check from donation history
     if (totalDonations > 0) {
       const validDates = donations
         .map((d) => (d.date ? new Date(d.date) : null))
@@ -60,9 +83,8 @@ const MyDonationsScreen = () => {
         nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
 
         const today = new Date();
-        isEligible = today.getTime() >= nextEligibleDate.getTime();
-
-        if (!isEligible) {
+        if (today.getTime() < nextEligibleDate.getTime()) {
+          isEligible = false;
           nextEligibleDateStr = nextEligibleDate.toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
@@ -73,7 +95,7 @@ const MyDonationsScreen = () => {
     }
 
     return { totalDonations, livesSaved, isEligible, nextEligibleDateStr };
-  }, [myDonationsData, donations]);
+  }, [myDonationsData, donations, user?.stats]);
 
   const handleItemPress = (item: DonationLog) => {
     if (item.request) {

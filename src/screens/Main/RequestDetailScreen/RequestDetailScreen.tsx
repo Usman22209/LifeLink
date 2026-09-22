@@ -21,7 +21,7 @@ import { selectLanguage } from "@store/slices/appSlice";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import { useGetProfile } from "@shared/query/profile/useProfile";
-import { requireCompleteProfile } from "@shared/utils/profileUtils";
+import { requireCompleteProfile, isProfileComplete } from "@shared/utils/profileUtils";
 import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { URGENCY_CONFIG } from "@screens/Main/FeedScreen/types";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
@@ -61,7 +61,6 @@ const RequestDetailScreen: React.FC = () => {
   const { data: requestDetails } = useBloodRequestDetails(rawRequest.id, !!rawRequest.id);
   const detailData: any = requestDetails?.data || requestDetails || {};
 
-  // Fetch existing chat threads to avoid duplicate thread creation
   const { data: chatThreadsData } = useChatThreads();
   const threadsList = Array.isArray(chatThreadsData?.data)
     ? chatThreadsData.data
@@ -69,7 +68,6 @@ const RequestDetailScreen: React.FC = () => {
     ? chatThreadsData
     : [];
 
-  // Fetch user donations to check if already pledged for this request
   const { data: myDonationsData } = useMyDonations();
   const myDonationsList: any[] = Array.isArray(myDonationsData?.history)
     ? myDonationsData.history
@@ -79,7 +77,6 @@ const RequestDetailScreen: React.FC = () => {
     ? myDonationsData
     : [];
 
-  // Normalize request schema to handle both camelCase and backend snake_case properties
   const request = useMemo(() => {
     const combined = { ...rawRequest, ...detailData };
     return {
@@ -238,7 +235,9 @@ const RequestDetailScreen: React.FC = () => {
       detailData?.requester?.profile_image,
       (request as any)?.requester?.profile_image,
       existingThread?.participant?.avatar,
+      (existingThread as any)?.participant?.profile_image,
       request?.patientImage,
+      (request as any)?.patient_image,
     ];
     let pAvatar: string | undefined = undefined;
     for (const c of candidates) {
@@ -260,7 +259,8 @@ const RequestDetailScreen: React.FC = () => {
       (navigation as any).navigate(ROUTES.MY_REQUESTS);
       return;
     }
-    if (user && !requireCompleteProfile(user, navigation, t)) {
+    const isUserOnboarded = user?.is_onboarded === true || isProfileComplete(user);
+    if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
     (navigation as any).navigate(ROUTES.CHAT, {
@@ -279,7 +279,8 @@ const RequestDetailScreen: React.FC = () => {
       Alert.alert("Action Not Allowed", "You cannot donate blood to your own request.");
       return;
     }
-    if (user && !requireCompleteProfile(user, navigation, t)) {
+    const isUserOnboarded = user?.is_onboarded === true || isProfileComplete(user);
+    if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
     if (!request.id) return;
@@ -380,7 +381,7 @@ const RequestDetailScreen: React.FC = () => {
                       color={colors.error}
                     />
                     <AppText bold FONT_11 style={styles.headerReportText}>
-                      Report
+                      {t("requestDetail.report") || "Report"}
                     </AppText>
                   </TouchableOpacity>
                 )}
@@ -396,14 +397,12 @@ const RequestDetailScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Cardless Hero Banner */}
           <HeroBanner
             request={request}
             cfg={cfg}
             displayDistance={displayDistance}
           />
 
-          {/* Blood Compatibility Card */}
           {!isOwner && (
             <BloodCompatibilityCard
               donorBloodGroup={donorBloodGroup}
@@ -412,27 +411,22 @@ const RequestDetailScreen: React.FC = () => {
             />
           )}
 
-          {/* Medical Case Notes */}
           <MedicalCaseNotesCard bloodType={request.bloodType} />
 
-          {/* Donation Step Timeline */}
           <TimelineCard request={request} cityName={cityName} />
 
-          {/* Unified Details Sheet */}
           <DetailsSheet
             request={request}
             cityName={cityName}
             provinceName={provinceName}
           />
 
-          {/* Vector Map Preview Card (Android only) */}
           <MapPreviewCard
             request={request}
             mapOverlayText={mapOverlayText}
             onNavigate={handleNavigate}
           />
 
-          {/* In-Page Safety Concern & Report Card */}
           {!isOwner && (
             <TouchableOpacity
               style={styles.safetyReportCard}
@@ -450,16 +444,17 @@ const RequestDetailScreen: React.FC = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText bold FONT_12 style={{ color: colors.text }}>
-                    Notice something suspicious?
+                    {t("requestDetail.suspiciousTitle") || "Notice something suspicious?"}
                   </AppText>
                   <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }}>
-                    Report fake or fraudulent blood requests to protect our community.
+                    {t("requestDetail.suspiciousDesc") ||
+                      "Report fake or fraudulent blood requests to protect our community."}
                   </AppText>
                 </View>
               </View>
               <View style={styles.reportBadge}>
                 <AppText bold FONT_11 style={{ color: colors.error }}>
-                  Report
+                  {t("requestDetail.report") || "Report"}
                 </AppText>
                 <AnyIcon
                   type={Icons.Feather}
@@ -472,7 +467,6 @@ const RequestDetailScreen: React.FC = () => {
           )}
         </ScrollView>
 
-        {/* Sticky Actions Footer */}
         <StickyFooterActions
           insetsBottom={insets.bottom}
           isOwner={isOwner}

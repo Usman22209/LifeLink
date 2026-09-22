@@ -168,10 +168,10 @@ const HomeScreen = () => {
           </View>
           <View style={{ flex: 1, marginHorizontal: scale(10) }}>
             <AppText semiBold FONT_13 style={{ color: colors.text }}>
-              No critical emergencies nearby
+              {t("home.noCriticalNearby") || "No critical emergencies nearby"}
             </AppText>
             <AppText regular FONT_11 style={{ color: colors.textSecondary, marginTop: 2 }}>
-              Check the live blood feed to view all active requests.
+              {t("home.checkLiveFeed") || "Check the live blood feed to view all active requests."}
             </AppText>
           </View>
           <TouchableOpacity
@@ -180,7 +180,7 @@ const HomeScreen = () => {
             activeOpacity={0.7}
           >
             <AppText bold FONT_11 style={{ color: colors.primary }}>
-              View Feed
+              {t("home.viewFeed") || "View Feed"}
             </AppText>
           </TouchableOpacity>
         </View>

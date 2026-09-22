@@ -42,21 +42,22 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
   ).toLowerCase() as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
+  const req = item.request as any;
   const patientName =
-    item.request?.patientName ||
-    item.request?.patient_name ||
+    req?.patientName ||
+    req?.patient_name ||
     "Blood Request";
 
   const hospitalName =
     item.hospitalName ||
-    item.request?.hospital ||
-    item.request?.hospital_name ||
+    req?.hospital ||
+    req?.hospital_name ||
     "Hospital";
 
   const bloodType =
     item.bloodType ||
-    item.request?.bloodType ||
-    item.request?.blood_group ||
+    req?.bloodType ||
+    req?.blood_group ||
     "O+";
 
   const units = item.units || 1;

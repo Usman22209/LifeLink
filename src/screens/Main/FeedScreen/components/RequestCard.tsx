@@ -66,7 +66,6 @@ const RequestCard: React.FC<RequestCardProps> = ({
         message: `🚨 ${t("feed.title")}: ${bloodType} ${t("requestForm.bloodGroup")} required for ${patientName} at ${hospital}, ${city}. Please help save a life!`,
       });
     } catch (e) {
-      // ignore share error
     }
   };
 

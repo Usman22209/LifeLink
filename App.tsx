@@ -58,13 +58,23 @@ const linking: LinkingOptions<any> = {
   },
 };
 
+import { initNetworkSentryTracking } from "@shared/utils/sentryLogger";
+
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay: true,
+});
+
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
   sendDefaultPii: true,
   enableLogs: true,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+  integrations: [
+    navigationIntegration,
+    Sentry.mobileReplayIntegration(),
+    Sentry.feedbackIntegration(),
+  ],
 });
 
 const AppToast = () => {
@@ -79,6 +89,12 @@ const AppToast = () => {
 };
 
 const App = (): React.JSX.Element => {
+  const navigationRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    initNetworkSentryTracking();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <Provider store={store}>
@@ -86,7 +102,13 @@ const App = (): React.JSX.Element => {
           <QueryClientProvider client={queryClient}>
             <PresenceProvider>
               <OneSignalProvider>
-                <NavigationContainer linking={linking}>
+                <NavigationContainer
+                  ref={navigationRef}
+                  linking={linking}
+                  onReady={() => {
+                    navigationIntegration.registerNavigationContainer(navigationRef);
+                  }}
+                >
                   <AppNavigation />
                   <AppToast />
                 </NavigationContainer>

@@ -6,6 +6,7 @@ import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../ChatScreen.styles";
 
 interface ChatHeaderProps {
@@ -29,6 +30,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   onBackPress,
   onReportPress,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const handleCall = () => {
@@ -159,7 +161,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               color={colors.error}
             />
             <AppText bold FONT_10 style={{ color: colors.error }}>
-              Report
+              {t("common.report") || "Report"}
             </AppText>
           </TouchableOpacity>
         )}

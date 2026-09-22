@@ -37,7 +37,7 @@ const AdditionalInfoSection: React.FC<AdditionalInfoSectionProps> = ({
           />
         </View>
         <AppText bold FONT_14 style={styles.sectionTitle}>
-          Additional Info
+          {t("requestForm.additionalInfo") || "Additional Info"}
         </AppText>
       </View>
 

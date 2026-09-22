@@ -107,7 +107,7 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
       >
         <AnyIcon
           type={Icons.Feather}
-          name={isEligible ? "check-circle" : "clock"}
+          name={isEligible ? "check-circle" : nextEligibleDateStr ? "clock" : "alert-circle"}
           size={moderateScale(18)}
           color={statusColor}
         />
@@ -128,7 +128,9 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           >
             {isEligible
               ? t("myDonations.eligibleToDonate") || "Eligible to Donate"
-              : t("myDonations.cooldownPeriod") || "Cooldown Period"}
+              : nextEligibleDateStr
+              ? t("myDonations.cooldownPeriod") || "Cooldown Period"
+              : t("myDonations.deferred") || "Currently Deferred"}
           </AppText>
           <AppText
             regular
@@ -137,8 +139,11 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           >
             {isEligible
               ? t("myDonations.eligibleDesc") || "You are eligible to donate blood. Tap to review questionnaire."
-              : t("myDonations.nextEligibleOn", { date: nextEligibleDateStr }) ||
-                `Next eligible on ${nextEligibleDateStr}. Tap to review status.`}
+              : nextEligibleDateStr
+              ? t("myDonations.nextEligibleOn", { date: nextEligibleDateStr }) ||
+                `Next eligible on ${nextEligibleDateStr}. Tap to review status.`
+              : t("myDonations.deferredDesc") ||
+                "Based on your health screening, you are currently deferred from donating."}
           </AppText>
         </View>
         <AnyIcon

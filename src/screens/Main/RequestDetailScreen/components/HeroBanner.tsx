@@ -6,6 +6,7 @@ import AppText from "@components/AppText";
 import AppImage from "@components/AppImage";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../RequestDetailScreen.styles";
 
 interface HeroBannerProps {
@@ -19,6 +20,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   cfg,
   displayDistance,
 }) => {
+  const { t } = useTranslation();
   const isCritical =
     request?.urgency === "critical" || request?.urgency === "emergency";
   const cfgColor = cfg?.color || (isCritical ? colors.danger : colors.info);
@@ -61,7 +63,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {request?.patientName || "Anonymous Patient"}
       </AppText>
       <AppText regular style={styles.subtitleText}>
-        Needs emergency blood donation
+        {t("requestDetail.needsBlood") || "Needs emergency blood donation"}
       </AppText>
 
       <View style={styles.urgencyRow}>
@@ -87,7 +89,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
             color={colors.textSecondary}
           />
           <AppText semiBold FONT_10 style={styles.distanceText}>
-            {displayDistance || "Nearby"}
+            {displayDistance || t("requestDetail.nearby") || "Nearby"}
           </AppText>
         </View>
       </View>

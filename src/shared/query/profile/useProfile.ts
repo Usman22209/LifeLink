@@ -22,9 +22,13 @@ export const useGetProfile = (enabled = true) => {
       const rawData = response.data?.data || response.data;
       const profileData = rawData?.user || rawData?.profile || rawData;
       console.log("🔍 [useGetProfile] Resolved profileData:", JSON.stringify(profileData));
+      if (profileData) {
+        store.dispatch(updateUser(profileData));
+      }
       return profileData;
     },
     enabled,
+    staleTime: 1000 * 60 * 5, // Cache profile for 5 minutes
   });
 };
 

@@ -11,6 +11,7 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface EligibilityChecklistModalProps {
   isVisible: boolean;
@@ -21,8 +22,10 @@ interface EligibilityChecklistModalProps {
 
 interface ChecklistItem {
   id: string;
-  title: string;
-  desc: string;
+  titleKey: string;
+  descKey: string;
+  defaultTitle: string;
+  defaultDesc: string;
   icon: string;
   iconType: any;
 }
@@ -30,22 +33,28 @@ interface ChecklistItem {
 const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: "weight_health",
-    title: "Weight & Current Health",
-    desc: "I weigh at least 50 kg and feel healthy today with no active fever, flu, or infection.",
+    titleKey: "eligibilityModal.weightTitle",
+    descKey: "eligibilityModal.weightDesc",
+    defaultTitle: "Weight & Current Health",
+    defaultDesc: "I weigh at least 50 kg and feel healthy today with no active fever, flu, or infection.",
     icon: "activity",
     iconType: Icons.Feather,
   },
   {
     id: "cooldown",
-    title: "90-Day Donation Interval",
-    desc: "I have not donated whole blood in the last 90 days to ensure safe red cell recovery.",
+    titleKey: "eligibilityModal.cooldownTitle",
+    descKey: "eligibilityModal.cooldownDesc",
+    defaultTitle: "90-Day Donation Interval",
+    defaultDesc: "I have not donated whole blood in the last 90 days to ensure safe red cell recovery.",
     icon: "calendar",
     iconType: Icons.Feather,
   },
   {
     id: "medical_safety",
-    title: "Medical Safety & Screening",
-    desc: "No major surgery, hepatitis, chronic illness, or new tattoos/piercings in the last 6 months.",
+    titleKey: "eligibilityModal.medicalTitle",
+    descKey: "eligibilityModal.medicalDesc",
+    defaultTitle: "Medical Safety & Screening",
+    defaultDesc: "No major surgery, hepatitis, chronic illness, or new tattoos/piercings in the last 6 months.",
     icon: "shield",
     iconType: Icons.Feather,
   },
@@ -57,6 +66,7 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
   onConfirm,
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -114,10 +124,10 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
               </View>
               <View style={styles.headerTextWrap}>
                 <Text bold FONT_15 style={{ color: colors.text }}>
-                  Donor Health & Safety Check
+                  {t("eligibilityModal.title") || "Donor Health & Safety Check"}
                 </Text>
                 <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(1) }}>
-                  Confirm all 3 requirements to safely respond
+                  {t("eligibilityModal.subtitle") || "Confirm all 3 requirements to safely respond"}
                 </Text>
               </View>
             </View>
@@ -178,10 +188,10 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
 
                   <View style={styles.checkTextContent}>
                     <Text bold FONT_13 style={{ color: colors.text }}>
-                      {item.title}
+                      {t(item.titleKey) || item.defaultTitle}
                     </Text>
                     <Text regular FONT_11 style={styles.checkDesc}>
-                      {item.desc}
+                      {t(item.descKey) || item.defaultDesc}
                     </Text>
                   </View>
 
@@ -213,7 +223,8 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
                 color={colors.textSecondary}
               />
               <Text regular FONT_10 style={styles.safetyNoteText}>
-                Requirements are verified with medical staff prior to blood donation.
+                {t("eligibilityModal.verifiedNotice") ||
+                  "Requirements are verified with medical staff prior to blood donation."}
               </Text>
             </View>
           </ScrollView>
@@ -233,7 +244,7 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
                 <View style={styles.btnInner}>
                   <ActivityIndicator color={colors.white} size="small" />
                   <Text bold FONT_13 style={styles.btnTextActive}>
-                    Pledging Donation...
+                    {t("eligibilityModal.pledging") || "Pledging Donation..."}
                   </Text>
                 </View>
               ) : allChecked ? (
@@ -245,12 +256,13 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
                     color={colors.white}
                   />
                   <Text bold FONT_13 style={styles.btnTextActive}>
-                    Confirm & Respond to Emergency
+                    {t("eligibilityModal.confirmAndRespond") || "Confirm & Respond to Emergency"}
                   </Text>
                 </View>
               ) : (
                 <Text bold FONT_12 style={styles.btnTextDisabled}>
-                  Confirm All 3 Items to Proceed ({checkedCount}/3)
+                  {t("eligibilityModal.confirmAllToProceed", { count: checkedCount }) ||
+                    `Confirm All 3 Items to Proceed (${checkedCount}/3)`}
                 </Text>
               )}
             </TouchableOpacity>
@@ -261,7 +273,7 @@ const EligibilityChecklistModal: React.FC<EligibilityChecklistModalProps> = ({
               activeOpacity={0.7}
             >
               <Text bold FONT_12 style={{ color: colors.textSecondary }}>
-                Cancel
+                {t("common.cancel") || "Cancel"}
               </Text>
             </TouchableOpacity>
           </View>

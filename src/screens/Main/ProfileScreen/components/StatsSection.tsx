@@ -28,7 +28,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ stats, onEligibilityPress }
 
   const donationsCount = stats?.donations_count ?? 0;
   const livesSaved = stats?.lives_saved ?? 0;
-  const isEligible = stats?.is_eligible ?? true;
+  const isEligible = stats?.is_eligible !== false;
 
   const handleEligibilityPress = () => {
     if (onEligibilityPress) {

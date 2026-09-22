@@ -64,7 +64,6 @@ const NotificationsScreen = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: clearAll, isPending: isClearing } = useClearAllNotifications();
 
-  // Normalize notifications dynamically from backend API
   const alerts: Alert[] = useMemo(() => {
     if (!rawNotifications) return [];
 
@@ -138,14 +137,12 @@ const NotificationsScreen = () => {
     [alerts],
   );
 
-  // Smart Navigation Handler
   const handlePress = useCallback(
     (item: Alert) => {
       if (!item.read) {
         markRead(item.id);
       }
 
-      // Smart Route Navigation based on payload
       switch (item.type) {
         case "blood_request":
         case "urgent_request":
@@ -181,7 +178,6 @@ const NotificationsScreen = () => {
               request: reqPayload,
             });
           } else {
-            // General announcement or broadcast without a specific request ID
             navigation.navigate(ROUTES.MAIN_FLOW, {
               screen: ROUTES.FEED,
             });

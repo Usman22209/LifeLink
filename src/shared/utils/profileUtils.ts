@@ -3,12 +3,19 @@ import { ROUTES } from "./Routes";
 
 export const isProfileComplete = (user: any): boolean => {
   if (!user) return false;
-  const hasName = Boolean(user.full_name?.trim() || user.name?.trim());
+
+  if (user.is_onboarded === true || String(user.is_onboarded) === "true") {
+    return true;
+  }
+
   const hasPhone = Boolean(user.phone?.trim() || user.contact_number?.trim());
   const hasBlood = Boolean(user.blood_group?.trim() || user.blood_type?.trim());
-  const hasState = Boolean(user.state?.trim() || user.province?.trim());
-  const hasCity = Boolean(user.city_id?.trim() || user.city?.trim());
-  return hasName && hasPhone && hasBlood && hasState && hasCity;
+  if (hasPhone && hasBlood) {
+    return true;
+  }
+
+  const hasName = Boolean(user.full_name?.trim() || user.name?.trim());
+  return hasName && hasPhone && hasBlood;
 };
 
 export const requireCompleteProfile = (
@@ -29,3 +36,4 @@ export const requireCompleteProfile = (
   }
   return true;
 };
+

@@ -171,7 +171,6 @@ const TrackRequestScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Patient Summary Card */}
         <PatientSummaryCard
           request={request}
           unitsRequired={unitsRequired}
@@ -179,7 +178,6 @@ const TrackRequestScreen: React.FC = () => {
           isFulfilled={isFulfilled}
         />
 
-        {/* Progress Card */}
         <DonationProgressCard
           progressPercent={progressPercent}
           fulfilledUnits={fulfilledUnits}
@@ -188,7 +186,6 @@ const TrackRequestScreen: React.FC = () => {
           donationsCount={donationsList.length}
         />
 
-        {/* Donors Section Header */}
         <View
           style={[
             styles.sectionHeader,
@@ -249,7 +246,6 @@ const TrackRequestScreen: React.FC = () => {
           ))
         )}
 
-        {/* Action Buttons */}
         {!isFulfilled && !isExpired && request.status !== "cancelled" ? (
           <View style={{ marginTop: verticalScale(10) }}>
             <TouchableOpacity

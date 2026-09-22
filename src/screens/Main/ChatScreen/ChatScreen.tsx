@@ -70,14 +70,12 @@ const ChatScreen = () => {
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [receivedRealtimeMessages, setReceivedRealtimeMessages] = useState<any[]>([]);
 
-  // Mark thread as read on mount / when activeThreadId is available
   useEffect(() => {
     if (activeThreadId) {
       markReadMutate(activeThreadId);
     }
   }, [activeThreadId, markReadMutate]);
 
-  // Clear in-room presence immediately when local network drops
   useEffect(() => {
     if (!isNetworkConnected) {
       setIsInRoomOnline(false);
@@ -97,7 +95,6 @@ const ChatScreen = () => {
     return Array.from(ids);
   }, [activeThreadId, request?.id, remoteMessagesData]);
 
-  // Realtime Broadcast Channel for 0ms typing indicators and instant message delivery
   useEffect(() => {
     if (channelIds.length === 0) return;
 
@@ -278,12 +275,10 @@ const ChatScreen = () => {
     const serverIds = new Set(serverFormatted.map((m) => m.id));
     const serverTexts = new Set(serverFormatted.map((m) => `${m.text}_${m.senderId}`));
 
-    // Pending local optimistic messages
     const pendingLocal = localMessages.filter(
       (m) => !serverTexts.has(`${m.text}_me`)
     );
 
-    // Realtime broadcast messages from others that aren't in server list yet
     const pendingRealtime: Message[] = receivedRealtimeMessages
       .filter((m) => {
         if (serverIds.has(String(m.id))) return false;
@@ -389,14 +384,12 @@ const ChatScreen = () => {
     otherUserIdRef.current = otherUserId;
   }, [otherUserId]);
 
-  // Match existing thread from threadsList if activeThreadId is not set yet
   useEffect(() => {
     if (!activeThreadId && matchedThread?.id) {
       setActiveThreadId(matchedThread.id);
     }
   }, [activeThreadId, matchedThread]);
 
-  // Fetch latest last seen and full profile for recipient via backend service (bypasses RLS)
   useEffect(() => {
     const targetUserId = otherUserId;
     if (!isValidUserId(targetUserId)) return;
@@ -407,18 +400,17 @@ const ChatScreen = () => {
         const res = await PROFILE_SERVICE.getPublicProfile(targetUserId);
         const data = res?.data?.data || res?.data;
         if (isMounted && data) {
-          setRecipientProfile({
-            name: data.full_name || data.name,
-            avatar: data.profile_image,
-            lastSeen: data.last_seen_at || null,
-          });
+          setRecipientProfile((prev) => ({
+            name: data.full_name || data.name || prev?.name,
+            avatar: data.profile_image || prev?.avatar,
+            lastSeen: data.last_seen_at || prev?.lastSeen || null,
+          }));
           if (data.last_seen_at) {
             setOtherUserLastSeen(data.last_seen_at);
           }
           return;
         }
       } catch {
-        // Fallback to direct supabase query
         try {
           const { data } = await supabase
             .from("profiles")
@@ -427,11 +419,11 @@ const ChatScreen = () => {
             .maybeSingle();
 
           if (isMounted && data) {
-            setRecipientProfile({
-              name: (data as any)?.full_name || (data as any)?.name,
-              avatar: (data as any)?.profile_image,
-              lastSeen: (data as any)?.last_seen_at || data.updated_at || null,
-            });
+            setRecipientProfile((prev) => ({
+              name: (data as any)?.full_name || (data as any)?.name || prev?.name,
+              avatar: (data as any)?.profile_image || prev?.avatar,
+              lastSeen: (data as any)?.last_seen_at || data.updated_at || prev?.lastSeen || null,
+            }));
             setOtherUserLastSeen((data as any)?.last_seen_at || data.updated_at || null);
           }
         } catch {}
@@ -453,23 +445,18 @@ const ChatScreen = () => {
     !name || !name.trim() || name.trim().toLowerCase() === "user";
 
   const displayName = useMemo(() => {
-    // 1. Participant name from route params if valid and not "User"
     const pName = participant?.name || (participant as any)?.full_name;
     if (!isGeneric(pName)) return pName;
 
-    // 2. Remote messages participant returned from backend
     const remotePName = remoteParticipant?.name || remoteParticipant?.full_name;
     if (!isGeneric(remotePName)) return remotePName;
 
-    // 3. Matched thread participant name from chatThreads
     const threadPName = matchedThread?.participant?.name || matchedThread?.participant?.full_name;
     if (!isGeneric(threadPName)) return threadPName;
 
-    // 4. Recipient profile fetched via backend API
     const recName = recipientProfile?.name || (recipientProfile as any)?.full_name;
     if (!isGeneric(recName)) return recName;
 
-    // 5. Requester full name from request details
     const reqFullName =
       (request as any)?.requester?.full_name ||
       (request as any)?.requester?.name ||
@@ -477,7 +464,6 @@ const ChatScreen = () => {
       (request as any)?.user?.name;
     if (!isGeneric(reqFullName)) return reqFullName;
 
-    // 6. Patient Name
     const patName = request?.patientName || matchedThread?.request?.patientName;
     if (!isGeneric(patName)) return patName;
 
@@ -567,11 +553,9 @@ const ChatScreen = () => {
     const textToSend = inputText.trim();
     setInputText("");
 
-    // Cancel typing broadcast immediately
     if (userTypingDebounceRef.current) clearTimeout(userTypingDebounceRef.current);
     broadcastToChannels("typing", { senderId: user?.id, isTyping: false });
 
-    // 1. Optimistic Message (0ms latency UI update)
     const optimisticMessage: Message = {
       id: `temp_${Date.now()}`,
       text: textToSend,
@@ -581,7 +565,6 @@ const ChatScreen = () => {
 
     setLocalMessages((prev) => [...prev, optimisticMessage]);
 
-    // 2. Broadcast for 0ms delivery to recipient
     broadcastToChannels("message", {
       id: `bc_${Date.now()}`,
       text: textToSend,
@@ -591,7 +574,6 @@ const ChatScreen = () => {
       request_id: request?.id,
     });
 
-    // 3. Background API Call
     const payload = {
       ...(activeThreadId ? { thread_id: activeThreadId } : {}),
       ...(request?.id ? { request_id: request.id } : {}),

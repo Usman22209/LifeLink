@@ -20,6 +20,7 @@ import { useLogin } from "@shared/query/auth/useLogin";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
+import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -35,6 +36,11 @@ const LoginScreen = () => {
   const { mutate: googleLoginMutate, isPending: googleLoginPending } =
     useGoogleLogin();
   const { signIn } = useGoogleSignIn();
+
+  useScreenHangWatchdog("LoginScreen", loginPending || googleLoginPending, {
+    actionName: loginPending ? "email_login" : "google_login",
+    timeoutMs: 12000,
+  });
 
 
   const handleLogin = () => {

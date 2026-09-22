@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import Toast from "react-native-toast-message";
 import {
   View,
   TouchableOpacity,
@@ -27,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useUploadImage } from "@shared/query/file/useUploadImage";
+import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 import { getCurrentLocation, Coords } from "@shared/utils/locationService";
 
 import AppHeader from "@components/AppHeader";
@@ -147,6 +149,12 @@ const CompleteProfileScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [location, setLocation] = useState<Coords | null>(null);
 
+  useScreenHangWatchdog("CompleteProfileScreen", loading || isUploading, {
+    actionName: loading ? "save_profile" : "upload_image",
+    timeoutMs: 12000,
+    context: { isEditing, userId: user?.id },
+  });
+
   const maxDate = useMemo(() => {
     const date = new Date();
     date.setFullYear(date.getFullYear() - 18);
@@ -228,7 +236,11 @@ const CompleteProfileScreen = () => {
       let finalLocation = location;
       if (!finalLocation) {
         try {
-          finalLocation = await getCurrentLocation(true);
+          const locationPromise = getCurrentLocation(true);
+          const timeoutPromise = new Promise<null>((resolve) =>
+            setTimeout(() => resolve(null), 3500)
+          );
+          finalLocation = await Promise.race([locationPromise, timeoutPromise]);
         } catch {
           finalLocation = null;
         }
@@ -252,8 +264,24 @@ const CompleteProfileScreen = () => {
       } else {
         (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("[CompleteProfile] Update error:", error);
+      let errorMsg = "Could not update profile. Please try again.";
+      if (error?.code === "ECONNABORTED" || error?.message?.includes("timeout")) {
+        errorMsg = "Connection timed out. Please check your internet connection.";
+      } else if (!error?.response || error?.message === "Network Error") {
+        errorMsg = "Network error. Please check your internet connection and try again.";
+      } else if (error?.response?.data?.message) {
+        errorMsg = Array.isArray(error.response.data.message)
+          ? error.response.data.message.join(", ")
+          : String(error.response.data.message);
+      }
+
+      Toast.show({
+        type: "error",
+        text1: "Update Failed",
+        text2: errorMsg,
+      });
     } finally {
       setLoading(false);
     }
@@ -284,8 +312,16 @@ const CompleteProfileScreen = () => {
             });
             setLocalImage(null);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("[CompleteProfile] Upload error:", error);
+          setLocalImage(null);
+          Toast.show({
+            type: "error",
+            text1: "Upload Failed",
+            text2:
+              error?.response?.data?.message ||
+              "Could not upload image. Please check your connection.",
+          });
         } finally {
           setImageModalVisible(false);
         }
@@ -397,7 +433,6 @@ const CompleteProfileScreen = () => {
         extraScrollHeight={verticalScale(150)}
         extraHeight={verticalScale(100)}
       >
-        {/* Profile Avatar Section */}
         <ProfileAvatarSection
           profileImage={profileImage}
           localImage={localImage}
@@ -405,7 +440,6 @@ const CompleteProfileScreen = () => {
           onOpenModal={() => setImageModalVisible(true)}
         />
 
-        {/* Basic Info Inputs */}
         <BasicInfoSection
           control={control}
           errors={errors}
@@ -413,7 +447,6 @@ const CompleteProfileScreen = () => {
           isRtl={isRtl}
         />
 
-        {/* Gender & DOB Selection */}
         <GenderAndDobSection
           watch={watch}
           setValue={setValue}
@@ -425,7 +458,6 @@ const CompleteProfileScreen = () => {
           maxDate={maxDate}
         />
 
-        {/* Location Dropdowns */}
         <LocationSelectionSection
           isRtl={isRtl}
           currentFlag={currentFlag}
@@ -439,7 +471,6 @@ const CompleteProfileScreen = () => {
           errors={errors}
         />
 
-        {/* Medical / Blood Group Grid */}
         <MedicalInfoSection
           isRtl={isRtl}
           watch={watch}
@@ -447,7 +478,6 @@ const CompleteProfileScreen = () => {
           errors={errors}
         />
 
-        {/* Submit Button */}
         <AppButton
           title={
             isEditing
@@ -460,7 +490,6 @@ const CompleteProfileScreen = () => {
         />
       </KeyboardAwareScrollView>
 
-      {/* Image Picker Modal */}
       <ImagePickerModal
         isVisible={isImageModalVisible}
         onClose={() => setImageModalVisible(false)}
@@ -472,7 +501,6 @@ const CompleteProfileScreen = () => {
         }}
       />
 
-      {/* Country Picker Modal */}
       <CountryPickerModal
         isVisible={isCountryModalVisible}
         onClose={() => setCountryModalVisible(false)}
@@ -485,7 +513,6 @@ const CompleteProfileScreen = () => {
         onSearch={setCountrySearch}
       />
 
-      {/* Province Selection Modal */}
       <SelectionModal
         isVisible={isProvinceModalVisible}
         onClose={() => setProvinceModalVisible(false)}
@@ -498,7 +525,6 @@ const CompleteProfileScreen = () => {
         }}
       />
 
-      {/* City Selection Modal */}
       <SelectionModal
         isVisible={isCityModalVisible}
         onClose={() => setCityModalVisible(false)}

@@ -16,6 +16,7 @@ import AppButton from "@components/AppButton";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import { useSubmitReport } from "@shared/query/support/useSupport";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface ReportModalProps {
   visible: boolean;
@@ -27,6 +28,8 @@ interface ReportModalProps {
 
 interface CategoryOption {
   key: string;
+  labelKey: string;
+  descKey: string;
   label: string;
   desc: string;
   icon: string;
@@ -35,24 +38,32 @@ interface CategoryOption {
 const REQUEST_CATEGORIES: CategoryOption[] = [
   {
     key: "fake_request",
+    labelKey: "reportModal.fakeRequest",
+    descKey: "reportModal.fakeRequestDesc",
     label: "Fake or Invalid Request",
     desc: "Hospital or patient details appear fabricated",
     icon: "alert-triangle",
   },
   {
     key: "fraud",
+    labelKey: "reportModal.fraud",
+    descKey: "reportModal.fraudDesc",
     label: "Demanding Money / Commercial Selling",
     desc: "Money or fees demanded for blood donation",
     icon: "dollar-sign",
   },
   {
     key: "spam",
+    labelKey: "reportModal.spam",
+    descKey: "reportModal.spamDesc",
     label: "Duplicate or Spam Request",
     desc: "Repeated, outdated, or irrelevant posting",
     icon: "copy",
   },
   {
     key: "other",
+    labelKey: "reportModal.otherSafety",
+    descKey: "reportModal.otherSafetyDesc",
     label: "Other Safety Concern",
     desc: "Any other issue violating community guidelines",
     icon: "shield",
@@ -62,24 +73,32 @@ const REQUEST_CATEGORIES: CategoryOption[] = [
 const USER_CATEGORIES: CategoryOption[] = [
   {
     key: "harassment",
+    labelKey: "reportModal.harassment",
+    descKey: "reportModal.harassmentDesc",
     label: "Harassment or Inappropriate Behavior",
     desc: "Abusive messages, offensive conduct, or threats",
     icon: "user-x",
   },
   {
     key: "fraud",
+    labelKey: "reportModal.fraudUser",
+    descKey: "reportModal.fraudUserDesc",
     label: "Fraudulent User or Impersonation",
     desc: "Scam attempts or false donor/patient identity",
     icon: "alert-octagon",
   },
   {
     key: "spam",
+    labelKey: "reportModal.spamUser",
+    descKey: "reportModal.spamUserDesc",
     label: "Spam or Promotional Activity",
     desc: "Sending unsolicited advertisements or repetitive messages",
     icon: "mail",
   },
   {
     key: "other",
+    labelKey: "reportModal.otherUser",
+    descKey: "reportModal.otherUserDesc",
     label: "Other Concern",
     desc: "Other behavior violating community safety",
     icon: "flag",
@@ -93,6 +112,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
   targetId,
   targetTitle,
 }) => {
+  const { t } = useTranslation();
   const categories =
     targetType === "request" ? REQUEST_CATEGORIES : USER_CATEGORIES;
 
@@ -164,8 +184,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 <View style={styles.headerText}>
                   <Text bold FONT_16 style={{ color: colors.text }}>
                     {targetType === "request"
-                      ? "Report Blood Request"
-                      : "Report User"}
+                      ? (t("reportModal.reportRequest") || "Report Blood Request")
+                      : (t("reportModal.reportUser") || "Report User")}
                   </Text>
                   <Text
                     regular
@@ -175,15 +195,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                     {targetTitle
                       ? targetTitle
                       : targetType === "request"
-                      ? "Help maintain genuine, verified requests"
-                      : "Help keep our community safe and respectful"}
+                      ? (t("reportModal.requestHelp") || "Help maintain genuine, verified requests")
+                      : (t("reportModal.userHelp") || "Help keep our community safe and respectful")}
                   </Text>
                 </View>
               </View>
 
               {/* Category Selector */}
               <Text bold FONT_12 style={styles.sectionLabel}>
-                Select the reason for reporting:
+                {t("reportModal.reasonSelect") || "Select the reason for reporting:"}
               </Text>
 
               <View style={styles.categoriesList}>
@@ -221,10 +241,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                             isSelected && styles.categoryLabelSelected,
                           ]}
                         >
-                          {cat.label}
+                          {t(cat.labelKey) || cat.label}
                         </Text>
                         <Text regular FONT_10 style={styles.categoryDesc}>
-                          {cat.desc}
+                          {t(cat.descKey) || cat.desc}
                         </Text>
                       </View>
                       <View
@@ -242,12 +262,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({
 
               {/* Additional Details Input */}
               <Text bold FONT_12 style={[styles.sectionLabel, { marginTop: verticalScale(14) }]}>
-                Additional details (optional):
+                {t("reportModal.additionalDetails") || "Additional details (optional):"}
               </Text>
               <TextInput
                 value={description}
                 onChangeText={setDescription}
-                placeholder="Explain what happened so our moderation team can verify..."
+                placeholder={
+                  t("reportModal.detailsPlaceholder") ||
+                  "Explain what happened so our moderation team can verify..."
+                }
                 placeholderTextColor={colors.placeholder}
                 multiline
                 numberOfLines={3}
@@ -258,7 +281,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               {/* Action Buttons */}
               <View style={styles.buttonContainer}>
                 <AppButton
-                  title="Submit Incident Report"
+                  title={t("reportModal.submitReport") || "Submit Incident Report"}
                   onPress={handleSubmit}
                   loading={isPending}
                   style={styles.submitBtn}
@@ -272,7 +295,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                   disabled={isPending}
                 >
                   <Text semiBold FONT_12 style={{ color: colors.textSecondary }}>
-                    Cancel
+                    {t("common.cancel") || "Cancel"}
                   </Text>
                 </TouchableOpacity>
               </View>

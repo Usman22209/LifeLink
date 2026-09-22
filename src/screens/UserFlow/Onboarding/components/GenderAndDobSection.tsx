@@ -33,7 +33,6 @@ export const GenderAndDobSection: React.FC<GenderAndDobSectionProps> = ({
 
   return (
     <>
-      {/* Gender Selection */}
       <View style={styles.section}>
         <Text
           semiBold
@@ -99,7 +98,6 @@ export const GenderAndDobSection: React.FC<GenderAndDobSectionProps> = ({
         )}
       </View>
 
-      {/* Date of Birth Picker */}
       <View style={styles.section}>
         <Text
           semiBold

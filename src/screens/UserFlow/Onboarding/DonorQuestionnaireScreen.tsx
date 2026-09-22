@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -16,7 +17,7 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 import { selectUser, updateUser } from "@store/slices/authSlice";
-import { selectLanguage, setLanguage } from "@store/slices/appSlice";
+import { selectLanguage } from "@store/slices/appSlice";
 import { useQueryClient } from "@tanstack/react-query";
 import useTranslation from "@shared/hooks/useTranslation";
 import { useUpdateProfile, useGetProfile } from "@shared/query/profile/useProfile";
@@ -37,6 +38,7 @@ const DonorQuestionnaireScreen: React.FC = () => {
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
   const selectedLang = useSelector(selectLanguage);
+  const currentLang = selectedLang === "ur" ? "ur" : "en";
   const { mutateAsync: updateProfileMutate } = useUpdateProfile();
 
   const isEditing = Boolean(route.params?.isEditing);
@@ -46,12 +48,19 @@ const DonorQuestionnaireScreen: React.FC = () => {
   const rawUser = profile?.data || profile?.user || profile || reduxUser;
   const user = rawUser?.user || rawUser?.profile || rawUser;
 
-  const [currentLang, setCurrentLang] = useState<"en" | "ur">(
-    selectedLang === "ur" ? "ur" : "en",
-  );
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
+  const [originalAnswers, setOriginalAnswers] = useState<Record<string, boolean>>({});
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [evalResult, setEvalResult] = useState<EligibilityResult | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  const isDirty = useMemo(() => {
+    if (isInitializing) return false;
+    const keys = Object.keys(answers);
+    if (keys.length === 0) return false;
+    return keys.some((k) => answers[k] !== originalAnswers[k]);
+  }, [answers, originalAnswers, isInitializing]);
 
   const verifiedLastDonation =
     user?.stats?.last_donated_at ||
@@ -72,26 +81,29 @@ const DonorQuestionnaireScreen: React.FC = () => {
     return evaluateDonorEligibility(answers, dob, lastDonated);
   }, [answers, user?.dob, user?.date_of_birth, verifiedLastDonation]);
 
-  // Load existing saved answers on mount
   useEffect(() => {
     (async () => {
-      const stored = await getStoredEligibility();
-      if (stored && stored.answers) {
-        const loadedAnswers = { ...stored.answers };
-        if (isVerifiedDonationActive) {
-          loadedAnswers.recent_donation = true;
+      try {
+        const stored = await getStoredEligibility(user?.id);
+        let loaded: Record<string, boolean>;
+        if (stored && stored.answers) {
+          loaded = { ...stored.answers };
+          if (isVerifiedDonationActive) {
+            loaded.recent_donation = true;
+          }
+        } else {
+          loaded = {};
+          DONOR_QUESTIONS.forEach((q) => {
+            loaded[q.id] = q.expectedAnswer;
+          });
+          if (isVerifiedDonationActive) {
+            loaded.recent_donation = true;
+          }
         }
-        setAnswers(loadedAnswers);
-      } else {
-        // Default answers: all set to the safe answer so user can quickly confirm
-        const initialAnswers: Record<string, boolean> = {};
-        DONOR_QUESTIONS.forEach((q) => {
-          initialAnswers[q.id] = q.expectedAnswer;
-        });
-        if (isVerifiedDonationActive) {
-          initialAnswers.recent_donation = true;
-        }
-        setAnswers(initialAnswers);
+        setAnswers(loaded);
+        setOriginalAnswers(loaded);
+      } finally {
+        setIsInitializing(false);
       }
     })();
   }, [isVerifiedDonationActive]);
@@ -103,14 +115,33 @@ const DonorQuestionnaireScreen: React.FC = () => {
     }));
   };
 
-  const toggleLanguage = () => {
-    const nextLang = currentLang === "en" ? "ur" : "en";
-    setCurrentLang(nextLang);
-    dispatch(setLanguage(nextLang));
+  const handleBack = () => {
+    if (isDirty && isEditing) {
+      Alert.alert(
+        currentLang === "ur" ? "غیر محفوظ شدہ تبدیلیاں" : "Unsaved Changes",
+        currentLang === "ur"
+          ? "آپ نے سوالنامے میں تبدیلیاں کی ہیں۔ کیا آپ واپس جانے سے پہلے محفوظ کرنا چاہتے ہیں؟"
+          : "You have modified your health screening answers. Do you want to save before leaving?",
+        [
+          {
+            text: currentLang === "ur" ? "رد کریں" : "Discard",
+            style: "destructive",
+            onPress: () => navigation.goBack(),
+          },
+          {
+            text: currentLang === "ur" ? "محفوظ کریں" : "Save & Exit",
+            onPress: () => handleContinue(),
+          },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
   };
 
   const handleContinue = async () => {
-    // Check that all questions are answered
+    if (isSubmitting) return;
+
     const unanswered = DONOR_QUESTIONS.filter(
       (q) => answers[q.id] === undefined,
     );
@@ -124,47 +155,58 @@ const DonorQuestionnaireScreen: React.FC = () => {
       return;
     }
 
-    const dob = user?.dob || user?.date_of_birth;
-    const lastDonated = answers.recent_donation === false ? null : verifiedLastDonation;
-
-    const evaluation = evaluateDonorEligibility(answers, dob, lastDonated);
-    setEvalResult(evaluation);
-
-    // 1. Save locally in AsyncStorage
-    await saveStoredEligibility(evaluation);
-
-    // 2. Update Redux user stats
-    dispatch(
-      updateUser({
-        stats: {
-          ...(user?.stats || {}),
-          is_eligible: evaluation.isEligible,
-          next_eligible_date: evaluation.nextEligibleDate || null,
-        },
-      }),
-    );
-
-    // 3. Sync to backend: if recent donation reported, preserve active date or set today; if not, clear it!
+    setIsSubmitting(true);
     try {
-      if (answers.recent_donation === true) {
-        const targetDate = isVerifiedDonationActive && verifiedLastDonation
-          ? verifiedLastDonation
-          : new Date().toISOString().split("T")[0];
-        await updateProfileMutate({
-          last_donated_at: targetDate,
-        } as any);
-      } else if (!isVerifiedDonationActive) {
-        await updateProfileMutate({
-          last_donated_at: null,
-        } as any);
-      }
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-    } catch (err) {
-      console.log("Could not sync last_donated_at to backend:", err);
-    }
+      const dob = user?.dob || user?.date_of_birth;
+      const lastDonated = answers.recent_donation === false ? null : verifiedLastDonation;
 
-    // 4. Show result modal
-    setResultModalVisible(true);
+      const evaluation = evaluateDonorEligibility(answers, dob, lastDonated);
+      setEvalResult(evaluation);
+
+      await saveStoredEligibility(evaluation, user?.id);
+
+      dispatch(
+        updateUser({
+          stats: {
+            ...(user?.stats || {}),
+            is_eligible: evaluation.isEligible,
+            next_eligible_date: evaluation.nextEligibleDate || undefined,
+          },
+        }),
+      );
+
+      try {
+        if (answers.recent_donation === true) {
+          const targetDate =
+            isVerifiedDonationActive && verifiedLastDonation
+              ? verifiedLastDonation
+              : new Date().toISOString().split("T")[0];
+          await updateProfileMutate({
+            last_donated_at: targetDate,
+          } as any);
+        } else if (!isVerifiedDonationActive) {
+          await updateProfileMutate({
+            last_donated_at: null,
+          } as any);
+        }
+      } catch (err) {
+        console.log("Could not sync last_donated_at to backend:", err);
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      setOriginalAnswers(answers);
+      setResultModalVisible(true);
+    } catch (err) {
+      console.error("Error saving questionnaire:", err);
+      Alert.alert(
+        currentLang === "ur" ? "خرابی" : "Error",
+        currentLang === "ur"
+          ? "اسکریننگ محفوظ کرنے میں مسئلہ پیش آیا۔ دوبارہ کوشش کریں۔"
+          : "Failed to update screening. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFinish = () => {
@@ -173,8 +215,7 @@ const DonorQuestionnaireScreen: React.FC = () => {
     if (isEditing || returnTo) {
       navigation.goBack();
     } else {
-      // Mark onboarded and proceed to main app
-      dispatch(updateUser({ is_onboarded: true }));
+      dispatch(updateUser({ is_onboarded: true, has_completed_screening: true }));
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.MAIN_FLOW }],
@@ -182,11 +223,14 @@ const DonorQuestionnaireScreen: React.FC = () => {
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     if (isEditing) {
       navigation.goBack();
     } else {
-      dispatch(updateUser({ is_onboarded: true }));
+      const dob = user?.dob || user?.date_of_birth;
+      const defaultEval = evaluateDonorEligibility({}, dob, verifiedLastDonation);
+      await saveStoredEligibility(defaultEval, user?.id);
+      dispatch(updateUser({ is_onboarded: true, has_completed_screening: true }));
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.MAIN_FLOW }],
@@ -205,31 +249,44 @@ const DonorQuestionnaireScreen: React.FC = () => {
           <AppHeader
             title={currentLang === "ur" ? "ڈونر اسکریننگ" : "Donor Screening"}
             showBackButton
-            onBackPress={() => navigation.goBack()}
+            onBackPress={handleBack}
             hasBorder
+            rightComponent={
+              <TouchableOpacity
+                onPress={handleContinue}
+                disabled={isSubmitting}
+                activeOpacity={0.7}
+                style={{
+                  paddingHorizontal: scale(10),
+                  paddingVertical: verticalScale(6),
+                }}
+              >
+                {isSubmitting ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <AppText bold FONT_13 style={{ color: colors.primary }}>
+                    {currentLang === "ur" ? "محفوظ کریں" : "Save"}
+                  </AppText>
+                )}
+              </TouchableOpacity>
+            }
           />
         ) : undefined
       }
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header with Title & Language Switcher */}
+      {isInitializing ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
         <View style={styles.headerRow}>
           <AppText bold FONT_20 style={styles.title}>
             {currentLang === "ur" ? "ڈونر سوالنامہ" : "Questionnaires"}
           </AppText>
-
-          <TouchableOpacity
-            style={styles.langButton}
-            onPress={toggleLanguage}
-            activeOpacity={0.8}
-          >
-            <AppText bold FONT_11 style={styles.langButtonText}>
-              {currentLang === "ur" ? "Switch to English" : "Switch to Urdu"}
-            </AppText>
-          </TouchableOpacity>
         </View>
 
         <AppText regular FONT_12 style={styles.subtitle}>
@@ -238,7 +295,6 @@ const DonorQuestionnaireScreen: React.FC = () => {
             : "Fill up the following Questionnaires and become a donor"}
         </AppText>
 
-        {/* Live Real-Time Eligibility Bar */}
         <View
           style={{
             flexDirection: "row",
@@ -294,7 +350,6 @@ const DonorQuestionnaireScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Questions Cards List */}
         {DONOR_QUESTIONS.map((q) => {
           const selected = answers[q.id];
           const questionText = currentLang === "ur" ? q.questionUr : q.questionEn;
@@ -336,7 +391,6 @@ const DonorQuestionnaireScreen: React.FC = () => {
               )}
 
               <View style={styles.radioRow}>
-                {/* Yes Option */}
                 <TouchableOpacity
                   style={styles.radioOption}
                   activeOpacity={0.7}
@@ -362,7 +416,6 @@ const DonorQuestionnaireScreen: React.FC = () => {
                   </AppText>
                 </TouchableOpacity>
 
-                {/* No Option */}
                 <TouchableOpacity
                   style={styles.radioOption}
                   activeOpacity={0.7}
@@ -399,13 +452,24 @@ const DonorQuestionnaireScreen: React.FC = () => {
         </AppText>
 
         <TouchableOpacity
-          style={styles.submitButton}
+          style={[styles.submitButton, isSubmitting && { opacity: 0.75 }]}
           onPress={handleContinue}
+          disabled={isSubmitting}
           activeOpacity={0.8}
         >
-          <AppText bold FONT_14 style={styles.submitButtonText}>
-            {currentLang === "ur" ? "جاری رکھیں (Continue)" : "Continue"}
-          </AppText>
+          {isSubmitting ? (
+            <ActivityIndicator size="small" color={colors.white} />
+          ) : (
+            <AppText bold FONT_14 style={styles.submitButtonText}>
+              {isEditing
+                ? currentLang === "ur"
+                  ? "اسکریننگ اپ ڈیٹ کریں (Update)"
+                  : "Update Screening"
+                : currentLang === "ur"
+                ? "جاری رکھیں (Continue)"
+                : "Continue"}
+            </AppText>
+          )}
         </TouchableOpacity>
 
         {!isEditing && (
@@ -420,8 +484,8 @@ const DonorQuestionnaireScreen: React.FC = () => {
           </TouchableOpacity>
         )}
       </ScrollView>
+      )}
 
-      {/* Result Evaluation Modal */}
       <Modal
         visible={resultModalVisible}
         transparent

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { View, ActivityIndicator } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import AuthFlow from "./Auth";
 import MainFlow from "./Main";
@@ -16,6 +17,8 @@ import { ROUTES } from "@utils/Routes";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useSelector } from "react-redux";
 import { selectToken, selectUser } from "@store/slices/authSlice";
+import { colors } from "@theme/colors";
+import { hasUserCompletedScreeningOnDevice } from "@shared/utils/donorEligibilityService";
 
 const Stack = createStackNavigator<UserStackParamList>();
 
@@ -23,9 +26,55 @@ export default function UserNavigation() {
   const token = useSelector(selectToken);
   const user = useSelector(selectUser);
 
+  const [screeningChecked, setScreeningChecked] = useState(false);
+  const [hasScreeningOnDevice, setHasScreeningOnDevice] = useState(false);
+
   const isOnboarded =
     Boolean(user?.is_onboarded) ||
     Boolean(user?.phone && user?.blood_group);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      if (token && user?.id) {
+        if (user.has_completed_screening) {
+          if (isMounted) {
+            setHasScreeningOnDevice(true);
+            setScreeningChecked(true);
+          }
+          return;
+        }
+        const completed = await hasUserCompletedScreeningOnDevice(user.id);
+        if (isMounted) {
+          setHasScreeningOnDevice(completed);
+          setScreeningChecked(true);
+        }
+      } else {
+        if (isMounted) {
+          setHasScreeningOnDevice(false);
+          setScreeningChecked(true);
+        }
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [token, user?.id, user?.has_completed_screening]);
+
+  if (token && !screeningChecked) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -38,8 +87,22 @@ export default function UserNavigation() {
               name={ROUTES.ONBOARDING}
               component={CompleteProfileScreen}
             />
+          ) : !hasScreeningOnDevice ? (
+            <>
+              <Stack.Screen
+                name={ROUTES.DONOR_QUESTIONNAIRE}
+                component={DonorQuestionnaireScreen}
+              />
+              <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+            </>
           ) : (
-            <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+            <>
+              <Stack.Screen name={ROUTES.MAIN_FLOW} component={MainFlow} />
+              <Stack.Screen
+                name={ROUTES.DONOR_QUESTIONNAIRE}
+                component={DonorQuestionnaireScreen}
+              />
+            </>
           )}
           <Stack.Screen
             name={ROUTES.REQUEST_DETAIL}
@@ -49,10 +112,6 @@ export default function UserNavigation() {
             name={ROUTES.EDIT_PROFILE}
             component={CompleteProfileScreen}
             initialParams={{ isEditing: true }}
-          />
-          <Stack.Screen
-            name={ROUTES.DONOR_QUESTIONNAIRE}
-            component={DonorQuestionnaireScreen}
           />
           <Stack.Screen name={ROUTES.CHAT} component={ChatScreen} />
           <Stack.Screen

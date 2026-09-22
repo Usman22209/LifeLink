@@ -13,6 +13,7 @@ import Text from "@components/AppText";
 import AppInput from "@components/AppInput";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface Country {
   name: string;
@@ -45,6 +46,7 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
   onSearchChange,
   searchValue = "",
 }) => {
+  const { t } = useTranslation();
   const isRtl = I18nManager.isRTL;
   const showModal = isVisible ?? visible ?? false;
 
@@ -77,7 +79,7 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
             />
           </TouchableOpacity>
           <Text bold FONT_16 style={styles.headerTitle}>
-            Select Country
+            {t("onboarding.selectCountry") || "Select Country"}
           </Text>
           <View style={{ width: 28 }} />
         </View>
@@ -85,7 +87,7 @@ const CountryPickerModal: React.FC<CountryPickerModalProps> = ({
         <View style={styles.searchContainer}>
           <AppInput
             name="search_country"
-            placeholder="Search..."
+            placeholder={t("common.search") || "Search..."}
             value={searchValue}
             iconType={Icons.Ionicons}
             iconName="search-outline"

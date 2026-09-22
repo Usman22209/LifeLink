@@ -23,6 +23,7 @@ export interface User {
     is_eligible?: boolean;
     next_eligible_date?: string;
   };
+  has_completed_screening?: boolean;
 }
 
 export interface Profile {

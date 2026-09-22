@@ -60,26 +60,51 @@ export const captureBackendError = (
       status === 404 || // Endpoint missing or misconfigured
       status === 408; // Timeout
 
-    const errorToCapture =
-      error instanceof Error
-        ? error
-        : new Error(`Backend Error [${status || "NETWORK"}]: ${errorMessage}`);
+    // Clean endpoint for Sentry grouping (e.g., "blood-requests/feed")
+    const cleanEndpoint = endpoint
+      ? String(endpoint)
+          .replace(/^https?:\/\/[^\/]+\/?/, "")
+          .split("?")[0]
+      : "unknown";
+
+    const titleMessage = status
+      ? `[${method} ${cleanEndpoint}] HTTP ${status}: ${errorMessage}`
+      : `[${method} ${cleanEndpoint}] Network Error: ${
+          error?.code === "ECONNABORTED" ? "Request Timeout (10s)" : errorMessage
+        }`;
+
+    const errorToCapture = new Error(titleMessage);
+    errorToCapture.name = status
+      ? `ApiError_${status}`
+      : error?.code === "ECONNABORTED"
+      ? "ApiTimeoutError"
+      : "NetworkConnectionError";
+
+    // Preserve original stack trace if available
+    if (error instanceof Error && error.stack) {
+      errorToCapture.stack = error.stack;
+    }
 
     Sentry.captureException(errorToCapture, {
+      fingerprint: [method, cleanEndpoint, String(status || "NETWORK_ERROR")],
       tags: {
         feature: context.feature || "api",
         action: context.action || "request",
+        endpoint: cleanEndpoint,
+        http_method: method,
         status_code: String(status || "NETWORK_ERROR"),
         is_server_issue: String(isServerIssue),
         platform: Platform.OS,
       },
       extra: {
         method,
-        endpoint,
+        fullUrl: endpoint,
+        endpoint: cleanEndpoint,
         status,
         statusText,
         responseBody: responseData,
         errorMessage,
+        errorCode: error?.code,
         ...context.additionalData,
       },
     });
@@ -152,3 +177,129 @@ export const captureLoginFailure = (
     console.error("Failed to log login failure to Sentry:", sentryErr);
   }
 };
+
+export const logScreenBreadcrumb = (
+  screenName: string,
+  action: string,
+  data?: Record<string, any>
+) => {
+  try {
+    Sentry.addBreadcrumb({
+      category: "screen.action",
+      message: `[${screenName}] ${action}`,
+      level: "info",
+      data,
+    });
+  } catch (err) {
+    console.warn("Failed to add Sentry breadcrumb:", err);
+  }
+};
+
+export const captureScreenStuck = (
+  screenName: string,
+  action: string,
+  durationMs: number,
+  context?: Record<string, any>
+) => {
+  try {
+    const seconds = Math.round(durationMs / 1000);
+    const title = `[ScreenHang] ${screenName} remained stuck in "${action}" for > ${seconds}s`;
+    const err = new Error(title);
+    err.name = "ScreenStuckTimeoutError";
+
+    Sentry.captureException(err, {
+      level: "warning",
+      fingerprint: ["ScreenStuck", screenName, action],
+      tags: {
+        feature: "screen_watchdog",
+        stuck_screen: screenName,
+        stuck_action: action,
+        hang_detected: "true",
+        platform: Platform.OS,
+      },
+      extra: {
+        screenName,
+        action,
+        durationMs,
+        durationSeconds: seconds,
+        ...context,
+      },
+    });
+
+    console.warn(`⏳ [Sentry] Logged screen hang alert: ${title}`);
+  } catch (err) {
+    console.error("Failed to capture screen stuck error in Sentry:", err);
+  }
+};
+
+import { useEffect, useRef } from "react";
+import NetInfo from "@react-native-community/netinfo";
+
+export const useScreenHangWatchdog = (
+  screenName: string,
+  isBusy: boolean,
+  options?: {
+    timeoutMs?: number;
+    actionName?: string;
+    context?: Record<string, any>;
+  }
+) => {
+  const actionName = options?.actionName || "loading";
+  const timeoutMs = options?.timeoutMs ?? 12000;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const hasFiredRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isBusy) {
+      startTimeRef.current = Date.now();
+      hasFiredRef.current = false;
+      logScreenBreadcrumb(screenName, `Started ${actionName}`, options?.context);
+
+      timerRef.current = setTimeout(() => {
+        hasFiredRef.current = true;
+        const elapsed = Date.now() - startTimeRef.current;
+        captureScreenStuck(screenName, actionName, elapsed, options?.context);
+      }, timeoutMs);
+    } else {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (startTimeRef.current > 0) {
+        const elapsed = Date.now() - startTimeRef.current;
+        if (!hasFiredRef.current) {
+          logScreenBreadcrumb(screenName, `Finished ${actionName} in ${elapsed}ms`);
+        }
+        startTimeRef.current = 0;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isBusy, screenName, actionName, timeoutMs]);
+};
+
+export const initNetworkSentryTracking = () => {
+  try {
+    NetInfo.addEventListener((state) => {
+      Sentry.addBreadcrumb({
+        category: "network.connectivity",
+        message: `Network ${state.isConnected ? "Connected" : "Disconnected"} (${state.type}, internetReachable: ${state.isInternetReachable ?? "unknown"})`,
+        level: state.isConnected ? "info" : "warning",
+        data: {
+          isConnected: state.isConnected,
+          isInternetReachable: state.isInternetReachable,
+          type: state.type,
+        },
+      });
+    });
+  } catch (err) {
+    console.warn("Failed to initialize network tracking for Sentry:", err);
+  }
+};
+

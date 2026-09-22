@@ -47,7 +47,6 @@ export const LocationSelectionSection: React.FC<LocationSelectionSectionProps> =
         {t("onboarding.location")}
       </Text>
 
-      {/* Country (Default Pakistan) */}
       <Text
         semiBold
         FONT_12
@@ -97,7 +96,6 @@ export const LocationSelectionSection: React.FC<LocationSelectionSectionProps> =
         </View>
       </View>
 
-      {/* Province / State Field */}
       <Text
         semiBold
         FONT_12
@@ -164,7 +162,6 @@ export const LocationSelectionSection: React.FC<LocationSelectionSectionProps> =
         </Text>
       )}
 
-      {/* City Field */}
       <Text
         semiBold
         FONT_12

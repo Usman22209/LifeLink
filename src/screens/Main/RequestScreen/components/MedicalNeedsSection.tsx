@@ -50,7 +50,6 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
         </AppText>
       </View>
 
-      {/* Blood Group Grid */}
       <View style={{ marginBottom: verticalScale(16) }}>
         <AppText semiBold FONT_12 style={styles.inputLabel}>
           {t("requestForm.bloodGroup") || "Blood Group"}
@@ -95,7 +94,6 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
         )}
       </View>
 
-      {/* Units Required Stepper */}
       <View style={{ marginBottom: verticalScale(16) }}>
         <AppText semiBold FONT_12 style={styles.inputLabel}>
           {t("requestForm.units") || "Units Required"}
@@ -148,7 +146,6 @@ const MedicalNeedsSection: React.FC<MedicalNeedsSectionProps> = ({
         </View>
       </View>
 
-      {/* Urgency Level Grid Cards */}
       <View>
         <AppText semiBold FONT_12 style={styles.inputLabel}>
           {t("requestForm.urgency") || "Urgency Level"}

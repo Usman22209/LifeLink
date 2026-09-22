@@ -9,6 +9,7 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface NotificationPermissionModalProps {
   isVisible: boolean;
@@ -21,6 +22,8 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
   onClose,
   onEnable,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Modal
       visible={isVisible}
@@ -49,10 +52,11 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
 
           {/* Title & Subtitle */}
           <Text bold FONT_18 style={styles.title}>
-            Enable Emergency Alerts 🚨
+            {t("notificationModal.title") || "Enable Emergency Alerts 🚨"}
           </Text>
           <Text regular FONT_12 style={styles.subtitle}>
-            LifeLink requires notifications to alert you instantly when a patient urgently needs blood in your area.
+            {t("notificationModal.subtitle") ||
+              "LifeLink requires notifications to alert you instantly when a patient urgently needs blood in your area."}
           </Text>
 
           {/* Value Items */}
@@ -68,10 +72,11 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
               </View>
               <View style={styles.benefitTextWrap}>
                 <Text bold FONT_12 style={{ color: colors.text }}>
-                  Urgent Blood Alerts
+                  {t("notificationModal.urgentAlerts") || "Urgent Blood Alerts"}
                 </Text>
                 <Text regular FONT_11 style={{ color: colors.textSecondary }}>
-                  Get notified when patients near you need your blood group.
+                  {t("notificationModal.urgentAlertsDesc") ||
+                    "Get notified when patients near you need your blood group."}
                 </Text>
               </View>
             </View>
@@ -87,10 +92,11 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
               </View>
               <View style={styles.benefitTextWrap}>
                 <Text bold FONT_12 style={{ color: colors.text }}>
-                  Donation Chat Messages
+                  {t("notificationModal.chatMessages") || "Donation Chat Messages"}
                 </Text>
                 <Text regular FONT_11 style={{ color: colors.textSecondary }}>
-                  Instant updates when someone responds to your donation.
+                  {t("notificationModal.chatMessagesDesc") ||
+                    "Instant updates when someone responds to your donation."}
                 </Text>
               </View>
             </View>
@@ -109,7 +115,7 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
               color={colors.white}
             />
             <Text bold FONT_13 style={styles.primaryBtnText}>
-              Enable Notifications
+              {t("notificationModal.enableNotifications") || "Enable Notifications"}
             </Text>
           </TouchableOpacity>
 
@@ -119,7 +125,7 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
             activeOpacity={0.75}
           >
             <Text bold FONT_12 style={styles.secondaryBtnText}>
-              Maybe Later
+              {t("notificationModal.maybeLater") || "Maybe Later"}
             </Text>
           </TouchableOpacity>
         </View>

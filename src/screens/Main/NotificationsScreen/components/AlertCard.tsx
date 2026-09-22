@@ -27,7 +27,6 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        {/* Category Icon */}
         <View style={[styles.iconWrap, { backgroundColor: config.bg }]}>
           <AnyIcon
             type={Icons.Feather}
@@ -37,7 +36,6 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
           />
         </View>
 
-        {/* Text Content */}
         <View style={styles.cardBody}>
           <View
             style={[
@@ -81,7 +79,6 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
           </AppText>
         </View>
 
-        {/* Subtle Chevron Indicator */}
         <View style={styles.chevronWrap}>
           <AnyIcon
             type={Icons.Feather}

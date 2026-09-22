@@ -67,9 +67,14 @@ export interface EligibilityResult {
   answers: Record<string, boolean>;
   evaluatedAt: string;
   nextEligibleDate?: string | null;
+  userId?: string;
 }
 
 const STORAGE_KEY = "@lifelink_donor_eligibility";
+
+export const getStorageKey = (userId?: string) => {
+  return userId ? `@lifelink_donor_eligibility_${userId}` : STORAGE_KEY;
+};
 
 export const evaluateDonorEligibility = (
   answers: Record<string, boolean>,
@@ -166,21 +171,50 @@ export const evaluateDonorEligibility = (
 
 export const saveStoredEligibility = async (
   result: EligibilityResult,
+  userId?: string,
 ): Promise<void> => {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+    const payload = {
+      ...result,
+      userId: userId || result.userId,
+    };
+    const jsonStr = JSON.stringify(payload);
+    if (userId) {
+      await AsyncStorage.setItem(`@lifelink_donor_eligibility_${userId}`, jsonStr);
+    }
+    await AsyncStorage.setItem(STORAGE_KEY, jsonStr);
   } catch (e) {
     console.error("Error saving eligibility to AsyncStorage:", e);
   }
 };
 
-export const getStoredEligibility = async (): Promise<EligibilityResult | null> => {
+export const getStoredEligibility = async (
+  userId?: string,
+): Promise<EligibilityResult | null> => {
   try {
+    if (userId) {
+      const userRaw = await AsyncStorage.getItem(`@lifelink_donor_eligibility_${userId}`);
+      if (userRaw) {
+        return JSON.parse(userRaw);
+      }
+    }
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (userId && parsed?.userId && parsed.userId !== userId) {
+      return null;
+    }
+    return parsed;
   } catch (e) {
     console.error("Error loading eligibility from AsyncStorage:", e);
     return null;
   }
+};
+
+export const hasUserCompletedScreeningOnDevice = async (
+  userId?: string,
+): Promise<boolean> => {
+  if (!userId) return false;
+  const stored = await getStoredEligibility(userId);
+  return Boolean(stored && stored.answers && Object.keys(stored.answers).length > 0);
 };

@@ -4,6 +4,7 @@ import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface DonationEligibilityCardProps {
   daysUntilEligible?: number;
@@ -16,6 +17,7 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
   totalDaysCycle = 56,
   onDonatePress,
 }) => {
+  const { t } = useTranslation();
   const isRtl = I18nManager.isRTL;
   const isEligible = daysUntilEligible <= 0;
   const progress = isEligible
@@ -56,7 +58,9 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
           ]}
         >
           <Text semiBold FONT_14 style={{ color: colors.text }}>
-            {isEligible ? "You're Eligible to Donate!" : "Next Donation"}
+            {isEligible
+              ? (t("home.eligibleToDonate") || "You're Eligible to Donate!")
+              : (t("home.nextDonation") || "Next Donation")}
           </Text>
           <Text
             medium
@@ -64,8 +68,9 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
             style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}
           >
             {isEligible
-              ? "Your body is ready for the next donation"
-              : `${daysUntilEligible} days until you can donate again`}
+              ? (t("home.readyForDonation") || "Your body is ready for the next donation")
+              : (t("home.daysUntilDonation", { days: daysUntilEligible }) ||
+                 `${daysUntilEligible} days until you can donate again`)}
           </Text>
         </View>
       </View>
@@ -99,7 +104,7 @@ const DonationEligibilityCard: React.FC<DonationEligibilityCardProps> = ({
             FONT_12
             style={{ color: colors.white, marginLeft: scale(6) }}
           >
-            Donate Now
+            {t("home.donateNow") || "Donate Now"}
           </Text>
         </TouchableOpacity>
       )}

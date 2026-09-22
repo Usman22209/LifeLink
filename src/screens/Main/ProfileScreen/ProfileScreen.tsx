@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ScrollView, Alert, View } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -13,6 +13,7 @@ import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
 import { useDeleteAccount, useUpdateSettings, useGetProfile } from "@shared/query/profile/useProfile";
+import { getStoredEligibility } from "@shared/utils/donorEligibilityService";
 import { ROUTES } from "@utils/Routes";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { styles } from "./ProfileScreen.styles";
@@ -28,8 +29,28 @@ const ProfileScreen = () => {
   const dispatch = useDispatch();
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const rawUser = profile || reduxUser;
-  const user = rawUser?.user || rawUser?.profile || rawUser;
+  const rawProfileUser = profile?.data || profile?.user || profile?.profile || profile;
+  const profileUser = rawProfileUser?.user || rawProfileUser?.profile || rawProfileUser;
+
+  const user = useMemo(() => {
+    if (!profileUser && !reduxUser) return undefined;
+    return {
+      ...(reduxUser || {}),
+      ...(profileUser || {}),
+      stats: {
+        ...(reduxUser?.stats || {}),
+        ...(profileUser?.stats || {}),
+        is_eligible:
+          profileUser?.stats?.is_eligible !== undefined
+            ? profileUser.stats.is_eligible
+            : reduxUser?.stats?.is_eligible,
+        next_eligible_date:
+          profileUser?.stats?.next_eligible_date !== undefined
+            ? profileUser.stats.next_eligible_date
+            : reduxUser?.stats?.next_eligible_date,
+      },
+    };
+  }, [reduxUser, profileUser]);
 
   useEffect(() => {
     if (profile) {
@@ -37,6 +58,25 @@ const ProfileScreen = () => {
       dispatch(updateUser(profileData));
     }
   }, [profile, dispatch]);
+
+  useEffect(() => {
+    (async () => {
+      if (reduxUser?.stats?.is_eligible === undefined) {
+        const stored = await getStoredEligibility(reduxUser?.id);
+        if (stored) {
+          dispatch(
+            updateUser({
+              stats: {
+                ...(reduxUser?.stats || {}),
+                is_eligible: stored.isEligible,
+                next_eligible_date: stored.nextEligibleDate || undefined,
+              },
+            }),
+          );
+        }
+      }
+    })();
+  }, [reduxUser?.stats?.is_eligible, dispatch]);
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
@@ -152,7 +192,7 @@ const ProfileScreen = () => {
             />
             <SettingItem
               iconName="check-circle"
-              label="Donor Eligibility Check"
+              label={t("profile.donorEligibilityCheck") || "Donor Eligibility Check"}
               onPress={() => {
                 navigation.navigate(ROUTES.DONOR_QUESTIONNAIRE as any, {
                   isEditing: true,

@@ -111,7 +111,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   initialCoords,
 }) => {
   const { t } = useTranslation();
-  const webViewRef = useRef<WebView>(null);
+  const webViewRef = useRef<any>(null);
   const mapRef = useRef<MapView>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -157,7 +157,6 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   const isProgrammaticChangeRef = useRef(false);
 
-  // ── Google Places Autocomplete ──
   const fetchPredictions = useCallback(async (text: string) => {
     if (!text || text.length < 3 || !ENV.MAP_API_KEY) {
       setPredictions([]);
@@ -171,7 +170,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         text,
       )}&components=country:pk&key=${ENV.MAP_API_KEY}`;
       const res = await fetch(url);
-      const data = await res.json();
+      const data: any = await res.json();
       console.log("[LocationPickerModal] Predictions response status:", data.status, "Count:", data.predictions?.length || 0);
       if (data.status === "OK" && data.predictions) {
         setPredictions(data.predictions);
@@ -218,7 +217,7 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       try {
         const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,name,formatted_address,address_components&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(url);
-        const data = await res.json();
+        const data: any = await res.json();
         console.log("[LocationPickerModal] Place details status:", data.status);
         if (data.status === "OK" && data.result?.geometry?.location) {
           const { lat, lng } = data.result.geometry.location;
@@ -263,7 +262,6 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             }
           }
 
-          // Fallback: parse formatted_address if components didn't yield a matched city
           if (!extractedCity && data.result.formatted_address) {
             const parts = data.result.formatted_address
               .split(",")
@@ -296,7 +294,6 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     [],
   );
 
-  // ── Locate Me ──
   const handleLocateMe = useCallback(async () => {
     console.log("[LocationPickerModal] Requesting user location...");
     setLocating(true);
@@ -333,13 +330,12 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     const currentRegion = regionRef.current;
     console.log("[LocationPickerModal] Confirm pressed | region:", currentRegion, "info:", info);
 
-    // If cityId was not resolved from search, reverse geocode the pinned coordinates
     if (!info?.cityId && ENV.MAP_API_KEY) {
       try {
         console.log("[LocationPickerModal] Reverse geocoding pinned coords...");
         const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentRegion.latitude},${currentRegion.longitude}&key=${ENV.MAP_API_KEY}`;
         const res = await fetch(geoUrl);
-        const geoData = await res.json();
+        const geoData: any = await res.json();
         console.log("[LocationPickerModal] Reverse geocode status:", geoData.status);
         if (geoData.status === "OK" && geoData.results?.[0]) {
           const topResult = geoData.results[0];
@@ -397,11 +393,9 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         regionRef.current = { latitude: data.latitude, longitude: data.longitude };
       }
     } catch {
-      // Silently ignore
+      // ignore
     }
   };
-
-  // ── Render autocomplete suggestion row ──
   const renderPrediction = ({ item }: { item: PlacePrediction }) => (
     <TouchableOpacity
       style={styles.predictionRow}
@@ -447,29 +441,34 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
         />
 
         <View style={styles.mapWrapper}>
-          {/* Search Bar */}
           <View style={styles.searchBarContainer}>
             <View style={styles.searchBarInner}>
               <AnyIcon
                 type={Icons.Feather}
                 name="search"
-                size={moderateScale(16)}
+                size={moderateScale(15)}
                 color={colors.textSecondary}
               />
               <TextInput
                 style={styles.searchBarInput}
-                placeholder="Search hospital, area, or city..."
+                placeholder={
+                  t("requestForm.searchLocation") ||
+                  "Search hospital, area, landmark..."
+                }
                 placeholderTextColor={colors.placeholder}
                 value={searchQuery}
                 onChangeText={handleSearchChange}
                 returnKeyType="search"
                 autoCorrect={false}
-                autoCapitalize="none"
               />
               {searching && (
-                <ActivityIndicator size="small" color={colors.primary} />
+                <ActivityIndicator
+                  size="small"
+                  color={colors.primary}
+                  style={{ marginRight: scale(4) }}
+                />
               )}
-              {!searching && searchQuery.length > 0 && (
+              {searchQuery.length > 0 && !searching && (
                 <TouchableOpacity
                   onPress={() => {
                     setSearchQuery("");
@@ -481,28 +480,26 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                   <AnyIcon
                     type={Icons.Ionicons}
                     name="close-circle"
-                    size={moderateScale(18)}
-                    color={colors.gray300}
+                    size={moderateScale(16)}
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
               )}
             </View>
 
-            {/* Autocomplete Results Dropdown */}
             {showResults && predictions.length > 0 && (
               <View style={styles.predictionsContainer}>
                 <FlatList
                   data={predictions}
-                  renderItem={renderPrediction}
                   keyExtractor={(item) => item.place_id}
+                  renderItem={renderPrediction}
                   keyboardShouldPersistTaps="handled"
-                  style={{ maxHeight: verticalScale(200) }}
+                  style={{ maxHeight: verticalScale(220) }}
                 />
               </View>
             )}
           </View>
 
-          {/* Map */}
           {mapLoaded ? (
             Platform.OS === "ios" ? (
               <WebView
@@ -551,12 +548,11 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             <View style={[styles.map, { justifyContent: "center", alignItems: "center", backgroundColor: colors.gray100 }]}>
               <ActivityIndicator size="large" color={colors.primary} />
               <AppText regular FONT_12 style={{ marginTop: verticalScale(8), color: colors.textSecondary }}>
-                Loading map...
+                {t("requestForm.loadingMap") || "Loading map..."}
               </AppText>
             </View>
           )}
 
-          {/* Center Pin */}
           <View style={styles.centerMarkerContainer}>
             <AnyIcon
               type={Icons.MaterialIcons}
@@ -566,7 +562,6 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             />
           </View>
 
-          {/* Locate Me FAB */}
           <TouchableOpacity
             style={styles.floatingLocateButton}
             activeOpacity={0.8}
@@ -584,7 +579,6 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             )}
           </TouchableOpacity>
 
-          {/* Confirm Button */}
           <View style={styles.floatingConfirmContainer}>
             <AppButton
               title={

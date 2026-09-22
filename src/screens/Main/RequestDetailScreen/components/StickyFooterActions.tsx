@@ -4,6 +4,7 @@ import { moderateScale, verticalScale } from "react-native-size-matters";
 import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 import { styles } from "../RequestDetailScreen.styles";
 
 interface StickyFooterActionsProps {
@@ -37,6 +38,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
   onManageRequest,
   onViewMyDonations,
 }) => {
+  const { t } = useTranslation();
   const safeBottomPadding = Math.max(verticalScale(18), insetsBottom + verticalScale(8));
 
   if (isOwner) {
@@ -59,7 +61,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.white}
           />
           <AppText bold FONT_13 style={{ color: colors.white }}>
-            Manage in My Requests
+            {t("requestDetail.manageInMyRequests") || "Manage in My Requests"}
           </AppText>
         </TouchableOpacity>
       </View>
@@ -86,7 +88,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.primary}
           />
           <AppText bold FONT_12 style={styles.callText}>
-            Call
+            {t("requestDetail.call") || "Call"}
           </AppText>
         </TouchableOpacity>
       )}
@@ -103,7 +105,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
           color={colors.text}
         />
         <AppText bold FONT_12 style={styles.contactText}>
-          Message
+          {t("requestDetail.message") || "Message"}
         </AppText>
       </TouchableOpacity>
 
@@ -120,7 +122,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.white}
           />
           <AppText bold FONT_12 style={styles.donateText} numberOfLines={1}>
-            Fulfilled
+            {t("requestDetail.fulfilled") || "Fulfilled"}
           </AppText>
         </TouchableOpacity>
       ) : donationPledged ? (
@@ -136,7 +138,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.white}
           />
           <AppText bold FONT_12 style={styles.donateText} numberOfLines={1}>
-            Pledged
+            {t("requestDetail.pledged") || "Pledged"}
           </AppText>
         </TouchableOpacity>
       ) : !isCompatible ? (
@@ -152,7 +154,7 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.white}
           />
           <AppText bold FONT_13 style={styles.donateText} numberOfLines={1}>
-            Share to Help
+            {t("requestDetail.shareToHelp") || "Share to Help"}
           </AppText>
         </TouchableOpacity>
       ) : (
@@ -168,7 +170,9 @@ export const StickyFooterActions: React.FC<StickyFooterActionsProps> = ({
             color={colors.white}
           />
           <AppText bold FONT_13 style={styles.donateText} numberOfLines={1}>
-            {isUrgent ? "Respond Now" : "Donate Now"}
+            {isUrgent
+              ? (t("requestDetail.respondNow") || "Respond Now")
+              : (t("requestDetail.donateNow") || "Donate Now")}
           </AppText>
         </TouchableOpacity>
       )}

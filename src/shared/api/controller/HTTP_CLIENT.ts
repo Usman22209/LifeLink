@@ -4,7 +4,7 @@ import store from "@store/store";
 import { logout, updateUser } from "@store/slices/authSlice";
 import { Alert } from "react-native";
 import { refreshTokenFlow } from "./tokenRefresh";
-import { captureBackendError } from "@shared/utils/sentryLogger";
+import { captureBackendError, logScreenBreadcrumb } from "@shared/utils/sentryLogger";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -16,6 +16,7 @@ const HTTP_CLIENT: AxiosInstance = axios.create({
 
 HTTP_CLIENT.interceptors.request.use(
   (config) => {
+    (config as any)._startTime = Date.now();
     if (config.url?.startsWith("/") && config.baseURL?.endsWith("/")) {
       config.url = config.url.substring(1);
     }
@@ -52,6 +53,17 @@ HTTP_CLIENT.interceptors.request.use(
 HTTP_CLIENT.interceptors.response.use(
   (response) => {
     const fullUrl = `${response.config.baseURL || ""}${response.config.url || ""}`;
+    const startTime = (response.config as any)?._startTime;
+    const duration = startTime ? Date.now() - startTime : undefined;
+
+    if (duration && duration > 4000) {
+      logScreenBreadcrumb(
+        "Network",
+        `Slow API Response (${duration}ms): ${response.config.method?.toUpperCase()} ${response.config.url}`,
+        { duration, status: response.status }
+      );
+    }
+
     console.log(
       `✅ [HTTP_CLIENT Response] ${response.status} ${response.statusText} from ${fullUrl}`,
     );
@@ -61,6 +73,8 @@ HTTP_CLIENT.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     const fullUrl = `${originalRequest?.baseURL || ""}${originalRequest?.url || ""}`;
+    const startTime = (originalRequest as any)?._startTime;
+    const duration = startTime ? Date.now() - startTime : undefined;
 
     const status = error?.response?.status;
     const isInitial401 = status === 401 && !originalRequest?._retry;
@@ -79,11 +93,14 @@ HTTP_CLIENT.interceptors.response.use(
       }
     }
 
-    // Automatically log server errors (5xx) and network connectivity breakdowns to Sentry
-    if (!status || status >= 500) {
+    if (!status || status >= 500 || status === 408) {
       captureBackendError(error, {
         feature: "network",
         action: "http_request",
+        additionalData: {
+          durationMs: duration,
+          isTimeout: error?.code === "ECONNABORTED" || status === 408,
+        },
       });
     }
 

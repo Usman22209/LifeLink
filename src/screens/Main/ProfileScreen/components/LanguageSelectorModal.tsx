@@ -52,7 +52,6 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
         >
           <View style={styles.modalHandle} />
 
-          {/* Minimal Clean Header */}
           <View
             style={[
               styles.modalHeaderRow,
@@ -98,7 +97,7 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                 FONT_14
                 style={{ color: tempLanguage === "en" ? colors.primary : colors.text }}
               >
-                English
+                {t("english") || "English"}
               </Text>
               {tempLanguage === "en" && (
                 <AnyIcon

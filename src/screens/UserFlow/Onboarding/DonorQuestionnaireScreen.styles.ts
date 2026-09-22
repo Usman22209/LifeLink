@@ -11,23 +11,11 @@ export const styles = StyleSheet.create({
     paddingBottom: verticalScale(40),
   },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     marginTop: verticalScale(10),
     marginBottom: verticalScale(4),
   },
   title: {
     color: colors.text,
-  },
-  langButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: scale(12),
-    paddingVertical: verticalScale(5),
-    borderRadius: moderateScale(6),
-  },
-  langButtonText: {
-    color: colors.white,
   },
   subtitle: {
     color: colors.textSecondary,
