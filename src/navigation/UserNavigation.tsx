@@ -30,8 +30,7 @@ export default function UserNavigation() {
   const [hasScreeningOnDevice, setHasScreeningOnDevice] = useState(false);
 
   const isOnboarded =
-    Boolean(user?.is_onboarded) ||
-    Boolean(user?.phone && user?.blood_group);
+    Boolean(user?.is_onboarded) || Boolean(user?.phone && user?.blood_group);
 
   useEffect(() => {
     let isMounted = true;

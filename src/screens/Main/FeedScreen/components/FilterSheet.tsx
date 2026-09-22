@@ -65,10 +65,7 @@ const OptionRow: React.FC<OptionRowProps> = ({
         </Text>
       </View>
       <View
-        style={[
-          s.optionWrap,
-          { flexDirection: isRtl ? "row-reverse" : "row" },
-        ]}
+        style={[s.optionWrap, { flexDirection: isRtl ? "row-reverse" : "row" }]}
       >
         {options.map((opt) => {
           const active = selected === opt;
@@ -180,16 +177,16 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           </View>
 
           <View
-            style={[
-              s.header,
-              { flexDirection: isRtl ? "row-reverse" : "row" },
-            ]}
+            style={[s.header, { flexDirection: isRtl ? "row-reverse" : "row" }]}
           >
             <View style={{ alignItems: isRtl ? "flex-end" : "flex-start" }}>
               <Text
                 bold
                 FONT_16
-                style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
+                style={{
+                  color: colors.text,
+                  textAlign: isRtl ? "right" : "left",
+                }}
               >
                 {t("feed.filterModalTitle")}
               </Text>
@@ -255,10 +252,7 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           />
 
           <View
-            style={[
-              s.footer,
-              { flexDirection: isRtl ? "row-reverse" : "row" },
-            ]}
+            style={[s.footer, { flexDirection: isRtl ? "row-reverse" : "row" }]}
           >
             <TouchableOpacity
               style={[

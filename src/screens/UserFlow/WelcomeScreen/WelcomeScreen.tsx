@@ -54,7 +54,10 @@ const WelcomeScreen = () => {
       scrollable={false}
       safeArea
       backgroundColor={colors.background}
-      style={[styles.wrapper, Platform.OS === "ios" && { paddingTop: insets.top }]}
+      style={[
+        styles.wrapper,
+        Platform.OS === "ios" && { paddingTop: insets.top },
+      ]}
     >
       <View style={styles.container}>
         <View style={styles.topBar}>

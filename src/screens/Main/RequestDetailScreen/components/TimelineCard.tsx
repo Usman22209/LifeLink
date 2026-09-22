@@ -83,8 +83,8 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
         request?.time_left
           ? `Active countdown: ${request.time_left}`
           : isEmergency
-          ? "Emergency Request — Expires in 48 hours"
-          : "Standard Emergency — Active for 7 days",
+            ? "Emergency Request — Expires in 48 hours"
+            : "Standard Emergency — Active for 7 days",
         true,
       )}
       {renderTimelineStep(

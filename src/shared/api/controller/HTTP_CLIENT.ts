@@ -4,7 +4,10 @@ import store from "@store/store";
 import { logout, updateUser } from "@store/slices/authSlice";
 import { Alert } from "react-native";
 import { refreshTokenFlow } from "./tokenRefresh";
-import { captureBackendError, logScreenBreadcrumb } from "@shared/utils/sentryLogger";
+import {
+  captureBackendError,
+  logScreenBreadcrumb,
+} from "@shared/utils/sentryLogger";
 
 const HTTP_CLIENT: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -32,14 +35,19 @@ HTTP_CLIENT.interceptors.request.use(
     }
 
     if (config.data) {
-      console.log(`📦 [HTTP_CLIENT Body]:`, JSON.stringify(config.data, null, 2));
+      console.log(
+        `📦 [HTTP_CLIENT Body]:`,
+        JSON.stringify(config.data, null, 2),
+      );
     }
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
       console.log(`🔑 [HTTP_CLIENT Auth]: Token Attached`);
     } else {
-      console.warn("⚠️ [HTTP_CLIENT Auth]: No accessToken found in Redux store");
+      console.warn(
+        "⚠️ [HTTP_CLIENT Auth]: No accessToken found in Redux store",
+      );
     }
 
     return config;
@@ -60,7 +68,7 @@ HTTP_CLIENT.interceptors.response.use(
       logScreenBreadcrumb(
         "Network",
         `Slow API Response (${duration}ms): ${response.config.method?.toUpperCase()} ${response.config.url}`,
-        { duration, status: response.status }
+        { duration, status: response.status },
       );
     }
 
@@ -89,7 +97,10 @@ HTTP_CLIENT.interceptors.response.use(
       );
 
       if (error.response?.data) {
-        console.error(`🚨 [HTTP_CLIENT Error Response Body]:`, error.response.data);
+        console.error(
+          `🚨 [HTTP_CLIENT Error Response Body]:`,
+          error.response.data,
+        );
       }
     }
 
@@ -112,7 +123,6 @@ HTTP_CLIENT.interceptors.response.use(
       );
       return Promise.reject(error);
     }
-
 
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

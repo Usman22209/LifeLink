@@ -69,12 +69,7 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
             </AppText>
           </View>
 
-          <AppText
-            regular
-            FONT_12
-            style={styles.cardMessage}
-            numberOfLines={2}
-          >
+          <AppText regular FONT_12 style={styles.cardMessage} numberOfLines={2}>
             {body}
           </AppText>
         </View>
@@ -93,4 +88,3 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
 };
 
 export default AlertCard;
-

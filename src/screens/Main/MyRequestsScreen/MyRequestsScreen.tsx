@@ -27,9 +27,16 @@ const MyRequestsScreen: React.FC = () => {
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
   const navigation = useNavigation<any>();
-  const [activeTab, setActiveTab] = useState<"all" | "active" | "fulfilled" | "expired">("all");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "active" | "fulfilled" | "expired"
+  >("all");
 
-  const { data: myRequestsData, isLoading, refetch, isRefetching } = useMyBloodRequests();
+  const {
+    data: myRequestsData,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useMyBloodRequests();
 
   const rawData: any = myRequestsData;
   const requestsList = Array.isArray(rawData)
@@ -37,19 +44,24 @@ const MyRequestsScreen: React.FC = () => {
     : rawData?.data?.requests || rawData?.requests || rawData?.data || [];
 
   const filteredRequests = requestsList.filter((item: any) => {
-    if (activeTab === "active") return item.status === "open" || item.status === "partially_fulfilled";
-    if (activeTab === "fulfilled") return item.status === "fulfilled" || item.status === "completed";
-    if (activeTab === "expired") return item.status === "expired" || item.is_expired;
+    if (activeTab === "active")
+      return item.status === "open" || item.status === "partially_fulfilled";
+    if (activeTab === "fulfilled")
+      return item.status === "fulfilled" || item.status === "completed";
+    if (activeTab === "expired")
+      return item.status === "expired" || item.is_expired;
     return true;
   });
 
   const totalCreated = requestsList.length;
   const activeCount = requestsList.filter(
-    (item: any) => (item.status === "open" || item.status === "partially_fulfilled") && !item.is_expired
+    (item: any) =>
+      (item.status === "open" || item.status === "partially_fulfilled") &&
+      !item.is_expired,
   ).length;
   const totalFulfilled = requestsList.reduce(
     (acc: number, item: any) => acc + (item.fulfilled_units || 0),
-    0
+    0,
   );
 
   const tabs = [
@@ -87,7 +99,12 @@ const MyRequestsScreen: React.FC = () => {
         />
 
         {/* Filter Tabs */}
-        <View style={[styles.tabsRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+        <View
+          style={[
+            styles.tabsRow,
+            { flexDirection: isRtl ? "row-reverse" : "row" },
+          ]}
+        >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -100,7 +117,9 @@ const MyRequestsScreen: React.FC = () => {
                 <Text
                   semiBold
                   FONT_11
-                  style={{ color: isActive ? colors.white : colors.textSecondary }}
+                  style={{
+                    color: isActive ? colors.white : colors.textSecondary,
+                  }}
                 >
                   {tab.label}
                 </Text>
@@ -124,13 +143,28 @@ const MyRequestsScreen: React.FC = () => {
                 color={colors.textSecondary}
               />
             </View>
-            <Text semiBold FONT_14 style={{ color: colors.text, marginTop: verticalScale(12) }}>
+            <Text
+              semiBold
+              FONT_14
+              style={{ color: colors.text, marginTop: verticalScale(12) }}
+            >
               {t("myRequests.noRequestsFound") || "No Requests Found"}
             </Text>
-            <Text regular FONT_12 style={{ color: colors.textSecondary, marginTop: verticalScale(4), textAlign: "center" }}>
+            <Text
+              regular
+              FONT_12
+              style={{
+                color: colors.textSecondary,
+                marginTop: verticalScale(4),
+                textAlign: "center",
+              }}
+            >
               {activeTab === "all"
-                ? (t("myRequests.noRequestsAll") || "You haven't posted any blood requests yet.")
-                : (t("myRequests.noRequestsTab", { tab: t(`myRequests.${activeTab}`) || activeTab }) || `No ${activeTab} blood requests.`)}
+                ? t("myRequests.noRequestsAll") ||
+                  "You haven't posted any blood requests yet."
+                : t("myRequests.noRequestsTab", {
+                    tab: t(`myRequests.${activeTab}`) || activeTab,
+                  }) || `No ${activeTab} blood requests.`}
             </Text>
           </View>
         ) : (

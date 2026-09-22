@@ -87,16 +87,18 @@ const SortSheet: React.FC<SortSheetProps> = ({
 
           {/* Header */}
           <View
-            style={[
-              s.header,
-              { flexDirection: isRtl ? "row-reverse" : "row" },
-            ]}
+            style={[s.header, { flexDirection: isRtl ? "row-reverse" : "row" }]}
           >
-            <View style={{ flex: 1, alignItems: isRtl ? "flex-end" : "flex-start" }}>
+            <View
+              style={{ flex: 1, alignItems: isRtl ? "flex-end" : "flex-start" }}
+            >
               <Text
                 bold
                 FONT_16
-                style={{ color: colors.text, textAlign: isRtl ? "right" : "left" }}
+                style={{
+                  color: colors.text,
+                  textAlign: isRtl ? "right" : "left",
+                }}
               >
                 {t("feed.sortModalTitle")}
               </Text>
@@ -132,7 +134,10 @@ const SortSheet: React.FC<SortSheetProps> = ({
           <View style={styles.listContainer}>
             {SORT_OPTIONS.map((opt, index) => {
               const active = selectedSort === opt;
-              const iconCfg = SORT_ICONS[opt] || { lib: Icons.Feather, name: "clock" };
+              const iconCfg = SORT_ICONS[opt] || {
+                lib: Icons.Feather,
+                name: "clock",
+              };
               const isLast = index === SORT_OPTIONS.length - 1;
 
               return (
