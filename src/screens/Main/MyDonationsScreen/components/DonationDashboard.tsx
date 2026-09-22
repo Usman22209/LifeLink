@@ -95,7 +95,11 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
 
       <TouchableOpacity
         activeOpacity={0.75}
-        onPress={() => (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE, { isEditing: true })}
+        onPress={() =>
+          (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE, {
+            isEditing: true,
+          })
+        }
         style={[
           styles.eligibilityBanner,
           {
@@ -107,7 +111,13 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
       >
         <AnyIcon
           type={Icons.Feather}
-          name={isEligible ? "check-circle" : nextEligibleDateStr ? "clock" : "alert-circle"}
+          name={
+            isEligible
+              ? "check-circle"
+              : nextEligibleDateStr
+                ? "clock"
+                : "alert-circle"
+          }
           size={moderateScale(18)}
           color={statusColor}
         />
@@ -124,26 +134,35 @@ const DonationDashboard: React.FC<DonationDashboardProps> = ({
           <AppText
             semiBold
             FONT_12
-            style={[styles.eligibilityTitle, { color: statusColor, textAlign: isRtl ? "right" : "left" }]}
+            style={[
+              styles.eligibilityTitle,
+              { color: statusColor, textAlign: isRtl ? "right" : "left" },
+            ]}
           >
             {isEligible
               ? t("myDonations.eligibleToDonate") || "Eligible to Donate"
               : nextEligibleDateStr
-              ? t("myDonations.cooldownPeriod") || "Cooldown Period"
-              : t("myDonations.deferred") || "Currently Deferred"}
+                ? t("myDonations.cooldownPeriod") || "Cooldown Period"
+                : t("myDonations.deferred") || "Currently Deferred"}
           </AppText>
           <AppText
             regular
             FONT_10
-            style={[styles.eligibilityDesc, { textAlign: isRtl ? "right" : "left" }]}
+            style={[
+              styles.eligibilityDesc,
+              { textAlign: isRtl ? "right" : "left" },
+            ]}
           >
             {isEligible
-              ? t("myDonations.eligibleDesc") || "You are eligible to donate blood. Tap to review questionnaire."
+              ? t("myDonations.eligibleDesc") ||
+                "You are eligible to donate blood. Tap to review questionnaire."
               : nextEligibleDateStr
-              ? t("myDonations.nextEligibleOn", { date: nextEligibleDateStr }) ||
-                `Next eligible on ${nextEligibleDateStr}. Tap to review status.`
-              : t("myDonations.deferredDesc") ||
-                "Based on your health screening, you are currently deferred from donating."}
+                ? t("myDonations.nextEligibleOn", {
+                    date: nextEligibleDateStr,
+                  }) ||
+                  `Next eligible on ${nextEligibleDateStr}. Tap to review status.`
+                : t("myDonations.deferredDesc") ||
+                  "Based on your health screening, you are currently deferred from donating."}
           </AppText>
         </View>
         <AnyIcon

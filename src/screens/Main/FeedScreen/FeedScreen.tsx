@@ -1,5 +1,11 @@
 import React, { useState, useCallback, useRef } from "react";
-import { View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import ScreenWrapper from "@components/ScreenWrapper";
@@ -26,7 +32,10 @@ import { selectIsRtl } from "@store/slices/appSlice";
 
 import { useInfiniteBloodRequestFeed } from "@shared/query/blood-requests/useBloodRequests";
 import { getCityNameById } from "@shared/utils/cityUtils";
-import { useUserLocation, calculateDistanceKm } from "@shared/utils/locationService";
+import {
+  useUserLocation,
+  calculateDistanceKm,
+} from "@shared/utils/locationService";
 
 interface ListHeaderProps {
   searchQuery: string;
@@ -179,8 +188,8 @@ const FeedScreen = () => {
       filters.sortBy === "Most Units"
         ? "most_units"
         : filters.sortBy === "Nearest First"
-        ? "nearest"
-        : "created_at",
+          ? "nearest"
+          : "created_at",
     lat: userLocation?.latitude,
     lng: userLocation?.longitude,
   });
@@ -211,12 +220,12 @@ const FeedScreen = () => {
         page?.data?.requests
           ? page.data.requests
           : page?.requests
-          ? page.requests
-          : page?.data
-          ? page.data
-          : Array.isArray(page)
-          ? page
-          : [],
+            ? page.requests
+            : page?.data
+              ? page.data
+              : Array.isArray(page)
+                ? page
+                : [],
       )
     : [];
 

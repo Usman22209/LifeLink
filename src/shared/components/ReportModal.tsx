@@ -184,8 +184,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                 <View style={styles.headerText}>
                   <Text bold FONT_16 style={{ color: colors.text }}>
                     {targetType === "request"
-                      ? (t("reportModal.reportRequest") || "Report Blood Request")
-                      : (t("reportModal.reportUser") || "Report User")}
+                      ? t("reportModal.reportRequest") || "Report Blood Request"
+                      : t("reportModal.reportUser") || "Report User"}
                   </Text>
                   <Text
                     regular
@@ -195,15 +195,18 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                     {targetTitle
                       ? targetTitle
                       : targetType === "request"
-                      ? (t("reportModal.requestHelp") || "Help maintain genuine, verified requests")
-                      : (t("reportModal.userHelp") || "Help keep our community safe and respectful")}
+                        ? t("reportModal.requestHelp") ||
+                          "Help maintain genuine, verified requests"
+                        : t("reportModal.userHelp") ||
+                          "Help keep our community safe and respectful"}
                   </Text>
                 </View>
               </View>
 
               {/* Category Selector */}
               <Text bold FONT_12 style={styles.sectionLabel}>
-                {t("reportModal.reasonSelect") || "Select the reason for reporting:"}
+                {t("reportModal.reasonSelect") ||
+                  "Select the reason for reporting:"}
               </Text>
 
               <View style={styles.categoriesList}>
@@ -229,7 +232,9 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                           type={Icons.Feather}
                           name={cat.icon as any}
                           size={moderateScale(15)}
-                          color={isSelected ? colors.primary : colors.textSecondary}
+                          color={
+                            isSelected ? colors.primary : colors.textSecondary
+                          }
                         />
                       </View>
                       <View style={{ flex: 1 }}>
@@ -261,8 +266,13 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               </View>
 
               {/* Additional Details Input */}
-              <Text bold FONT_12 style={[styles.sectionLabel, { marginTop: verticalScale(14) }]}>
-                {t("reportModal.additionalDetails") || "Additional details (optional):"}
+              <Text
+                bold
+                FONT_12
+                style={[styles.sectionLabel, { marginTop: verticalScale(14) }]}
+              >
+                {t("reportModal.additionalDetails") ||
+                  "Additional details (optional):"}
               </Text>
               <TextInput
                 value={description}
@@ -281,11 +291,16 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               {/* Action Buttons */}
               <View style={styles.buttonContainer}>
                 <AppButton
-                  title={t("reportModal.submitReport") || "Submit Incident Report"}
+                  title={
+                    t("reportModal.submitReport") || "Submit Incident Report"
+                  }
                   onPress={handleSubmit}
                   loading={isPending}
                   style={styles.submitBtn}
-                  textStyle={{ color: colors.white, fontSize: moderateScale(13) }}
+                  textStyle={{
+                    color: colors.white,
+                    fontSize: moderateScale(13),
+                  }}
                 />
 
                 <TouchableOpacity
@@ -294,7 +309,11 @@ export const ReportModal: React.FC<ReportModalProps> = ({
                   onPress={onClose}
                   disabled={isPending}
                 >
-                  <Text semiBold FONT_12 style={{ color: colors.textSecondary }}>
+                  <Text
+                    semiBold
+                    FONT_12
+                    style={{ color: colors.textSecondary }}
+                  >
                     {t("common.cancel") || "Cancel"}
                   </Text>
                 </TouchableOpacity>

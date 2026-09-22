@@ -26,10 +26,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       <Text
         bold
         FONT_14
-        style={[
-          styles.sectionTitle,
-          { textAlign: isRtl ? "right" : "left" },
-        ]}
+        style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}
       >
         {t("onboarding.basicInfo")}
       </Text>

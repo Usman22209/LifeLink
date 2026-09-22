@@ -43,7 +43,11 @@ export const DetailsSheet: React.FC<DetailsSheetProps> = ({
 
   return (
     <View style={styles.infoContainer}>
-      {renderInfoRow("user", "Patient", request?.patientName || "Anonymous Patient")}
+      {renderInfoRow(
+        "user",
+        "Patient",
+        request?.patientName || "Anonymous Patient",
+      )}
       {renderInfoRow("droplet", "Blood Group", request?.bloodType || "N/A")}
       {renderInfoRow(
         "database",
@@ -64,7 +68,9 @@ export const DetailsSheet: React.FC<DetailsSheetProps> = ({
         : renderInfoRow(
             "phone",
             "Contact Number",
-            request?.contact_number || request?.contactNumber || "Available via Chat",
+            request?.contact_number ||
+              request?.contactNumber ||
+              "Available via Chat",
             true,
           )}
     </View>

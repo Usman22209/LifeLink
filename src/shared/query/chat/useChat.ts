@@ -6,7 +6,8 @@ import { supabase } from "@shared/config/supabase";
 export const chatKeys = {
   all: ["chat"] as const,
   threads: () => [...chatKeys.all, "threads"] as const,
-  messages: (threadId: string) => [...chatKeys.all, "messages", threadId] as const,
+  messages: (threadId: string) =>
+    [...chatKeys.all, "messages", threadId] as const,
 };
 
 export const useChatThreads = (enabled = true) => {
@@ -23,14 +24,14 @@ export const useChatThreads = (enabled = true) => {
         { event: "*", schema: "public", table: "chat_threads" },
         () => {
           queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
-        }
+        },
       )
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages" },
         () => {
           queryClient.invalidateQueries({ queryKey: chatKeys.threads() });
-        }
+        },
       )
       .subscribe();
 
@@ -127,7 +128,7 @@ export const useMarkThreadAsRead = () => {
         const updated = raw.map((t: any) =>
           String(t.id) === String(threadId)
             ? { ...t, unreadCount: 0, unread_count: 0 }
-            : t
+            : t,
         );
         return oldData.data ? { ...oldData, data: updated } : updated;
       });

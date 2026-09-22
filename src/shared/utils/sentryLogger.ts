@@ -16,7 +16,9 @@ function maskEmail(email?: string): string | undefined {
     const [user, domain] = email.split("@");
     if (!domain) return "***";
     const maskedUser =
-      user.length <= 2 ? user[0] + "***" : user.slice(0, 2) + "***" + user.slice(-1);
+      user.length <= 2
+        ? user[0] + "***"
+        : user.slice(0, 2) + "***" + user.slice(-1);
     return `${maskedUser}@${domain}`;
   } catch {
     return "***";
@@ -28,7 +30,7 @@ function maskEmail(email?: string): string | undefined {
  */
 export const captureBackendError = (
   error: any,
-  context: SentryErrorContext = {}
+  context: SentryErrorContext = {},
 ) => {
   try {
     const status = error?.response?.status;
@@ -70,15 +72,17 @@ export const captureBackendError = (
     const titleMessage = status
       ? `[${method} ${cleanEndpoint}] HTTP ${status}: ${errorMessage}`
       : `[${method} ${cleanEndpoint}] Network Error: ${
-          error?.code === "ECONNABORTED" ? "Request Timeout (10s)" : errorMessage
+          error?.code === "ECONNABORTED"
+            ? "Request Timeout (10s)"
+            : errorMessage
         }`;
 
     const errorToCapture = new Error(titleMessage);
     errorToCapture.name = status
       ? `ApiError_${status}`
       : error?.code === "ECONNABORTED"
-      ? "ApiTimeoutError"
-      : "NetworkConnectionError";
+        ? "ApiTimeoutError"
+        : "NetworkConnectionError";
 
     // Preserve original stack trace if available
     if (error instanceof Error && error.stack) {
@@ -110,7 +114,7 @@ export const captureBackendError = (
     });
 
     console.log(
-      `🚨 [Sentry] Logged non-fatal backend issue: ${method} ${endpoint || ""} (${status || "NET_ERR"}): ${errorMessage}`
+      `🚨 [Sentry] Logged non-fatal backend issue: ${method} ${endpoint || ""} (${status || "NET_ERR"}): ${errorMessage}`,
     );
   } catch (sentryErr) {
     console.error("Failed to log error to Sentry:", sentryErr);
@@ -122,15 +126,13 @@ export const captureBackendError = (
  */
 export const captureLoginFailure = (
   error: any,
-  meta?: { email?: string; loginMethod?: "email" | "google" }
+  meta?: { email?: string; loginMethod?: "email" | "google" },
 ) => {
   try {
     const status = error?.response?.status;
     const responseData = error?.response?.data;
     const responseMessage =
-      responseData?.message ||
-      error?.message ||
-      "Unknown login error";
+      responseData?.message || error?.message || "Unknown login error";
 
     const isBackendIssue =
       !status ||
@@ -149,7 +151,9 @@ export const captureLoginFailure = (
     const errorToLog =
       error instanceof Error
         ? error
-        : new Error(`Login Failed [${status || "NET_ERR"}]: ${responseMessage}`);
+        : new Error(
+            `Login Failed [${status || "NET_ERR"}]: ${responseMessage}`,
+          );
 
     Sentry.captureException(errorToLog, {
       tags: {
@@ -171,7 +175,7 @@ export const captureLoginFailure = (
     });
 
     console.log(
-      `🔒 [Sentry] Logged login failure (${meta?.loginMethod || "email"}, status: ${status || "NET_ERR"}): ${responseMessage}`
+      `🔒 [Sentry] Logged login failure (${meta?.loginMethod || "email"}, status: ${status || "NET_ERR"}): ${responseMessage}`,
     );
   } catch (sentryErr) {
     console.error("Failed to log login failure to Sentry:", sentryErr);
@@ -181,7 +185,7 @@ export const captureLoginFailure = (
 export const logScreenBreadcrumb = (
   screenName: string,
   action: string,
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ) => {
   try {
     Sentry.addBreadcrumb({
@@ -199,7 +203,7 @@ export const captureScreenStuck = (
   screenName: string,
   action: string,
   durationMs: number,
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ) => {
   try {
     const seconds = Math.round(durationMs / 1000);
@@ -242,7 +246,7 @@ export const useScreenHangWatchdog = (
     timeoutMs?: number;
     actionName?: string;
     context?: Record<string, any>;
-  }
+  },
 ) => {
   const actionName = options?.actionName || "loading";
   const timeoutMs = options?.timeoutMs ?? 12000;
@@ -254,7 +258,11 @@ export const useScreenHangWatchdog = (
     if (isBusy) {
       startTimeRef.current = Date.now();
       hasFiredRef.current = false;
-      logScreenBreadcrumb(screenName, `Started ${actionName}`, options?.context);
+      logScreenBreadcrumb(
+        screenName,
+        `Started ${actionName}`,
+        options?.context,
+      );
 
       timerRef.current = setTimeout(() => {
         hasFiredRef.current = true;
@@ -269,7 +277,10 @@ export const useScreenHangWatchdog = (
       if (startTimeRef.current > 0) {
         const elapsed = Date.now() - startTimeRef.current;
         if (!hasFiredRef.current) {
-          logScreenBreadcrumb(screenName, `Finished ${actionName} in ${elapsed}ms`);
+          logScreenBreadcrumb(
+            screenName,
+            `Finished ${actionName} in ${elapsed}ms`,
+          );
         }
         startTimeRef.current = 0;
       }
@@ -302,4 +313,3 @@ export const initNetworkSentryTracking = () => {
     console.warn("Failed to initialize network tracking for Sentry:", err);
   }
 };
-

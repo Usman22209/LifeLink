@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Modal,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import Text from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
@@ -62,13 +57,16 @@ const DonationPledgedModal: React.FC<DonationPledgedModalProps> = ({
           {/* Title & Subtitle */}
           <Text bold FONT_18 style={styles.title}>
             {isAlreadyPledged
-              ? (t("donationPledgedModal.titlePledged") || "Donation Pledged")
-              : (t("donationPledgedModal.titlePledgedCelebration") || "Donation Pledged! 🎉")}
+              ? t("donationPledgedModal.titlePledged") || "Donation Pledged"
+              : t("donationPledgedModal.titlePledgedCelebration") ||
+                "Donation Pledged! 🎉"}
           </Text>
           <Text regular FONT_12 style={styles.subtitle}>
             {isAlreadyPledged
-              ? (t("donationPledgedModal.subtitleAlready") || "You have already offered to donate for this patient.")
-              : (t("donationPledgedModal.subtitleNew") || "Thank you for stepping forward to save a life.")}
+              ? t("donationPledgedModal.subtitleAlready") ||
+                "You have already offered to donate for this patient."
+              : t("donationPledgedModal.subtitleNew") ||
+                "Thank you for stepping forward to save a life."}
           </Text>
 
           {/* Request Details Box */}
@@ -80,10 +78,20 @@ const DonationPledgedModal: React.FC<DonationPledgedModalProps> = ({
                 </Text>
               </View>
               <View style={styles.detailTextWrap}>
-                <Text bold FONT_13 style={{ color: colors.text }} numberOfLines={1}>
+                <Text
+                  bold
+                  FONT_13
+                  style={{ color: colors.text }}
+                  numberOfLines={1}
+                >
                   {patientName}
                 </Text>
-                <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: 1 }} numberOfLines={1}>
+                <Text
+                  regular
+                  FONT_11
+                  style={{ color: colors.textSecondary, marginTop: 1 }}
+                  numberOfLines={1}
+                >
                   {hospitalName}
                 </Text>
               </View>
@@ -100,10 +108,10 @@ const DonationPledgedModal: React.FC<DonationPledgedModalProps> = ({
             />
             <Text regular FONT_11 style={styles.infoText}>
               {isAlreadyPledged
-                ? (t("donationPledgedModal.infoAlready") ||
-                   "The requester will confirm the donation once fulfilled at the hospital. Coordinate with them anytime in chat.")
-                : (t("donationPledgedModal.infoNew") ||
-                   "A chat thread has been initiated with the requester so you can coordinate donation timing and location.")}
+                ? t("donationPledgedModal.infoAlready") ||
+                  "The requester will confirm the donation once fulfilled at the hospital. Coordinate with them anytime in chat."
+                : t("donationPledgedModal.infoNew") ||
+                  "A chat thread has been initiated with the requester so you can coordinate donation timing and location."}
             </Text>
           </View>
 
@@ -137,7 +145,8 @@ const DonationPledgedModal: React.FC<DonationPledgedModalProps> = ({
                 color={colors.primary}
               />
               <Text bold FONT_12 style={{ color: colors.primary }}>
-                {t("donationPledgedModal.viewMyDonations") || "View My Donations"}
+                {t("donationPledgedModal.viewMyDonations") ||
+                  "View My Donations"}
               </Text>
             </TouchableOpacity>
           )}

@@ -23,7 +23,10 @@ import { useOnboardingForm } from "@shared/forms/hooks/useOnboardingForm";
 import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
-import { useUpdateProfile, useGetProfile } from "@shared/query/profile/useProfile";
+import {
+  useUpdateProfile,
+  useGetProfile,
+} from "@shared/query/profile/useProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
@@ -66,7 +69,8 @@ const CompleteProfileScreen = () => {
     (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(true);
+  const { data: serverProfile, isLoading: isProfileLoading } =
+    useGetProfile(true);
   const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t } = useTranslation();
@@ -103,7 +107,8 @@ const CompleteProfileScreen = () => {
 
       let dobValue = "";
       if (profile.dob) {
-        dobValue = typeof profile.dob === "string" ? profile.dob.split("T")[0] : "";
+        dobValue =
+          typeof profile.dob === "string" ? profile.dob.split("T")[0] : "";
       }
 
       const bloodGroupValue = (
@@ -238,7 +243,7 @@ const CompleteProfileScreen = () => {
         try {
           const locationPromise = getCurrentLocation(true);
           const timeoutPromise = new Promise<null>((resolve) =>
-            setTimeout(() => resolve(null), 3500)
+            setTimeout(() => resolve(null), 3500),
           );
           finalLocation = await Promise.race([locationPromise, timeoutPromise]);
         } catch {
@@ -267,10 +272,15 @@ const CompleteProfileScreen = () => {
     } catch (error: any) {
       console.error("[CompleteProfile] Update error:", error);
       let errorMsg = "Could not update profile. Please try again.";
-      if (error?.code === "ECONNABORTED" || error?.message?.includes("timeout")) {
-        errorMsg = "Connection timed out. Please check your internet connection.";
+      if (
+        error?.code === "ECONNABORTED" ||
+        error?.message?.includes("timeout")
+      ) {
+        errorMsg =
+          "Connection timed out. Please check your internet connection.";
       } else if (!error?.response || error?.message === "Network Error") {
-        errorMsg = "Network error. Please check your internet connection and try again.";
+        errorMsg =
+          "Network error. Please check your internet connection and try again.";
       } else if (error?.response?.data?.message) {
         errorMsg = Array.isArray(error.response.data.message)
           ? error.response.data.message.join(", ")
@@ -336,7 +346,13 @@ const CompleteProfileScreen = () => {
     const active = serverProfile || user;
     if (active && !isInitializedRef.current) {
       const defaults = resolveProfileDefaults(active);
-      if (defaults && (defaults.full_name || defaults.phone || defaults.blood_group || defaults.email)) {
+      if (
+        defaults &&
+        (defaults.full_name ||
+          defaults.phone ||
+          defaults.blood_group ||
+          defaults.email)
+      ) {
         isInitializedRef.current = true;
         reset(defaults);
       }
@@ -401,7 +417,9 @@ const CompleteProfileScreen = () => {
   if (isProfileLoading && !isEditing) {
     return (
       <ScreenWrapper backgroundColor={colors.background} safeArea>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </ScreenWrapper>

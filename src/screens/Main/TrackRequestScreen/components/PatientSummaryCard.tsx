@@ -30,31 +30,31 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
     urgencyKey === "critical"
       ? colors.danger
       : urgencyKey === "high" || urgencyKey === "urgent"
-      ? colors.warning
-      : colors.info;
+        ? colors.warning
+        : colors.info;
 
   const urgencyLabel =
     urgencyKey === "critical"
-      ? (t("feed.critical") || "Critical")
+      ? t("feed.critical") || "Critical"
       : urgencyKey === "high" || urgencyKey === "urgent"
-      ? (t("feed.high") || t("feed.urgent") || "High")
-      : (t("feed.normal") || "Normal");
+        ? t("feed.high") || t("feed.urgent") || "High"
+        : t("feed.normal") || "Normal";
 
   const isCancelled = request.status === "cancelled";
 
   const statusLabel = isFulfilled
-    ? (t("myRequests.fulfilled") || "Fulfilled")
+    ? t("myRequests.fulfilled") || "Fulfilled"
     : isCancelled
-    ? (t("myRequests.cancelled") || "Cancelled")
-    : isExpired
-    ? (t("myRequests.expired") || "Expired")
-    : (t("myRequests.active") || "Active");
+      ? t("myRequests.cancelled") || "Cancelled"
+      : isExpired
+        ? t("myRequests.expired") || "Expired"
+        : t("myRequests.active") || "Active";
 
   const statusColor = isFulfilled
     ? colors.success
     : isCancelled || isExpired
-    ? colors.textSecondary
-    : colors.success;
+      ? colors.textSecondary
+      : colors.success;
 
   return (
     <View style={styles.card}>
@@ -107,7 +107,11 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
           ]}
         >
           <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-          <Text bold FONT_10 style={{ color: statusColor, marginHorizontal: scale(3) }}>
+          <Text
+            bold
+            FONT_10
+            style={{ color: statusColor, marginHorizontal: scale(3) }}
+          >
             {statusLabel}
           </Text>
         </View>
@@ -126,8 +130,17 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
             { flexDirection: isRtl ? "row-reverse" : "row" },
           ]}
         >
-          <AnyIcon type={Icons.Feather} name="alert-circle" size={moderateScale(12)} color={urgencyColor} />
-          <Text semiBold FONT_11 style={{ color: urgencyColor, marginHorizontal: scale(4) }}>
+          <AnyIcon
+            type={Icons.Feather}
+            name="alert-circle"
+            size={moderateScale(12)}
+            color={urgencyColor}
+          />
+          <Text
+            semiBold
+            FONT_11
+            style={{ color: urgencyColor, marginHorizontal: scale(4) }}
+          >
             {urgencyLabel}
           </Text>
         </View>
@@ -138,8 +151,20 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
               { flexDirection: isRtl ? "row-reverse" : "row" },
             ]}
           >
-            <AnyIcon type={Icons.Feather} name="clock" size={moderateScale(12)} color={colors.textSecondary} />
-            <Text regular FONT_11 style={{ color: colors.textSecondary, marginHorizontal: scale(4) }}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="clock"
+              size={moderateScale(12)}
+              color={colors.textSecondary}
+            />
+            <Text
+              regular
+              FONT_11
+              style={{
+                color: colors.textSecondary,
+                marginHorizontal: scale(4),
+              }}
+            >
               {request.time_left}
             </Text>
           </View>
@@ -150,9 +175,21 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
             { flexDirection: isRtl ? "row-reverse" : "row" },
           ]}
         >
-          <AnyIcon type={Icons.Feather} name="droplet" size={moderateScale(12)} color={colors.primary} />
-          <Text regular FONT_11 style={{ color: colors.textSecondary, marginHorizontal: scale(4) }}>
-            {unitsRequired} {unitsRequired === 1 ? (t("feed.unit") || "unit") : (t("feed.units") || "units")}
+          <AnyIcon
+            type={Icons.Feather}
+            name="droplet"
+            size={moderateScale(12)}
+            color={colors.primary}
+          />
+          <Text
+            regular
+            FONT_11
+            style={{ color: colors.textSecondary, marginHorizontal: scale(4) }}
+          >
+            {unitsRequired}{" "}
+            {unitsRequired === 1
+              ? t("feed.unit") || "unit"
+              : t("feed.units") || "units"}
           </Text>
         </View>
       </View>

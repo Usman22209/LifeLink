@@ -31,8 +31,8 @@ export const MedicalCaseNotesCard: React.FC<MedicalCaseNotesCardProps> = ({
         </AppText>
         <AppText regular FONT_11 style={styles.caseNotesText}>
           Emergency surgery request at Mayo Intensive Care Unit. The patient
-          requires compatibly matched {bloodType} blood due to severe blood loss.
-          Please respond if you are matching.
+          requires compatibly matched {bloodType} blood due to severe blood
+          loss. Please respond if you are matching.
         </AppText>
       </View>
     </View>

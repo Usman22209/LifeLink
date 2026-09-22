@@ -24,12 +24,21 @@ export const SummaryStatsCard: React.FC<SummaryStatsCardProps> = ({
 
   return (
     <View style={styles.card}>
-      <View style={[styles.statsRow, { flexDirection: isRtl ? "row-reverse" : "row" }]}>
+      <View
+        style={[
+          styles.statsRow,
+          { flexDirection: isRtl ? "row-reverse" : "row" },
+        ]}
+      >
         <View style={styles.statItem}>
           <Text bold FONT_20 style={{ color: colors.primary }}>
             {totalCreated}
           </Text>
-          <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}>
+          <Text
+            regular
+            FONT_11
+            style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}
+          >
             {t("myRequests.posted") || "Posted"}
           </Text>
         </View>
@@ -38,7 +47,11 @@ export const SummaryStatsCard: React.FC<SummaryStatsCardProps> = ({
           <Text bold FONT_20 style={{ color: colors.warning }}>
             {activeCount}
           </Text>
-          <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}>
+          <Text
+            regular
+            FONT_11
+            style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}
+          >
             {t("myRequests.active") || "Active"}
           </Text>
         </View>
@@ -47,7 +60,11 @@ export const SummaryStatsCard: React.FC<SummaryStatsCardProps> = ({
           <Text bold FONT_20 style={{ color: colors.success }}>
             {totalFulfilled}
           </Text>
-          <Text regular FONT_11 style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}>
+          <Text
+            regular
+            FONT_11
+            style={{ color: colors.textSecondary, marginTop: verticalScale(2) }}
+          >
             {t("myRequests.received") || "Received"}
           </Text>
         </View>

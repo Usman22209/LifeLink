@@ -20,7 +20,9 @@ interface LocationSelectionSectionProps {
   errors: any;
 }
 
-export const LocationSelectionSection: React.FC<LocationSelectionSectionProps> = ({
+export const LocationSelectionSection: React.FC<
+  LocationSelectionSectionProps
+> = ({
   isRtl,
   currentFlag,
   selectedCountry,
@@ -39,10 +41,7 @@ export const LocationSelectionSection: React.FC<LocationSelectionSectionProps> =
       <Text
         bold
         FONT_14
-        style={[
-          styles.sectionTitle,
-          { textAlign: isRtl ? "right" : "left" },
-        ]}
+        style={[styles.sectionTitle, { textAlign: isRtl ? "right" : "left" }]}
       >
         {t("onboarding.location")}
       </Text>

@@ -1,5 +1,8 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { SUPPORT_SERVICE, CreateReportPayload } from "../../api/service/support.service";
+import {
+  SUPPORT_SERVICE,
+  CreateReportPayload,
+} from "../../api/service/support.service";
 import Toast from "react-native-toast-message";
 export const supportKeys = {
   all: ["support"] as const,
@@ -38,7 +41,8 @@ export const useSubmitReport = (onSuccessCallback?: () => void) => {
       Toast.show({
         type: "success",
         text1: "Report Submitted",
-        text2: data?.message || "Thank you. Our moderation team has been notified.",
+        text2:
+          data?.message || "Thank you. Our moderation team has been notified.",
       });
       if (onSuccessCallback) {
         onSuccessCallback();
@@ -48,7 +52,9 @@ export const useSubmitReport = (onSuccessCallback?: () => void) => {
       Toast.show({
         type: "error",
         text1: "Failed to Submit Report",
-        text2: error?.response?.data?.message || "Please check your network and try again.",
+        text2:
+          error?.response?.data?.message ||
+          "Please check your network and try again.",
       });
     },
   });
