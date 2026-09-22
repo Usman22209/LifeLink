@@ -3,6 +3,7 @@ export const ROUTES = {
   AUTH_FLOW: "AuthFlow",
   MAIN_FLOW: "MainFlow",
   ONBOARDING: "Onboarding",
+  DONOR_QUESTIONNAIRE: "DonorQuestionnaire",
 
   // Auth
   WELCOME: "Welcome",

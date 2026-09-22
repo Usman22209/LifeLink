@@ -14,7 +14,8 @@ import AppButton from "@components/AppButton";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useFaqs, useContactSupport } from "@shared/query/support/useSupport";
+import { useContactSupport } from "@shared/query/support/useSupport";
+import staticFaqs from "@shared/data/faqs.json";
 import { styles } from "./HelpSupportScreen.styles";
 
 interface FAQItemProps {
@@ -54,8 +55,8 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 const HelpSupportScreen = () => {
   const { t } = useTranslation();
 
-  const { data: remoteFaqs } = useFaqs();
-  const { mutate: submitContact, isPending: isSubmitting } = useContactSupport();
+  const { mutate: submitContact, isPending: isSubmitting } =
+    useContactSupport();
 
   const handleContactEmail = () => {
     submitContact({
@@ -63,38 +64,11 @@ const HelpSupportScreen = () => {
       message: "User initiated contact support request from HelpSupportScreen",
     });
     Linking.openURL(
-      "mailto:support@lifelink.org?subject=LifeLink Support Request",
+      "mailto:usman.shafiq.dev@gmail.com?subject=LifeLink Support Request",
     );
   };
 
-  const defaultFaqs = [
-    {
-      question: t("helpSupport.faqQuestion1") || "Who can donate blood?",
-      answer:
-        t("helpSupport.faqAnswer1") ||
-        "Anyone aged 18-65, weighing over 50kg, and in good general health with no active infections can donate.",
-    },
-    {
-      question: t("helpSupport.faqQuestion2") || "How often can I donate?",
-      answer:
-        t("helpSupport.faqAnswer2") ||
-        "You can safely donate whole blood once every 90 days (3 months) to allow your body to fully replenish iron levels.",
-    },
-    {
-      question: t("helpSupport.faqQuestion3") || "Is my personal data secure?",
-      answer:
-        t("helpSupport.faqAnswer3") ||
-        "Yes, your contact details are encrypted and only shown to verified requesters when you explicitly choose to respond to a request.",
-    },
-    {
-      question: t("helpSupport.faqQuestion4") || "How do I request blood?",
-      answer:
-        t("helpSupport.faqAnswer4") ||
-        "Navigate to the 'Request' tab, fill in the patient details, select the blood type and hospital, and submit. Matched donors nearby will be notified.",
-    },
-  ];
-
-  const faqs = remoteFaqs && Array.isArray(remoteFaqs) && remoteFaqs.length > 0 ? remoteFaqs : defaultFaqs;
+  const faqs = staticFaqs;
 
   return (
     <ScreenWrapper
@@ -128,6 +102,30 @@ const HelpSupportScreen = () => {
             {t("helpSupport.contactSubtitle") ||
               "Have questions or feedback about LifeLink? Reach out to our support team."}
           </AppText>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: scale(6),
+              backgroundColor: "rgba(229, 57, 53, 0.08)",
+              paddingHorizontal: scale(12),
+              paddingVertical: verticalScale(6),
+              borderRadius: moderateScale(8),
+              marginBottom: verticalScale(14),
+            }}
+            onPress={handleContactEmail}
+            activeOpacity={0.7}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="mail"
+              size={moderateScale(13)}
+              color={colors.primary}
+            />
+            <AppText bold FONT_12 style={{ color: colors.primary }}>
+              usman.shafiq.dev@gmail.com
+            </AppText>
+          </TouchableOpacity>
           <AppButton
             title={t("helpSupport.emailSupport") || "Email Support"}
             onPress={handleContactEmail}

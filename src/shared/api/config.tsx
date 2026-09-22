@@ -1,4 +1,11 @@
-const API_URL = "https://life-link-backend-production-7226.up.railway.app/";
+// Railway production backend:
+const API_URL = "https://life-link-backend-production-58a8.up.railway.app/";
+
+// Local Wi-Fi connection fallback:
+// const API_URL = "http://192.168.18.123:3001/";
+
+export const BASE_URL = API_URL;
+
 const API_CONFIG = {
   BASE_URL: API_URL,
   AUTH: {
@@ -42,9 +49,13 @@ const API_CONFIG = {
     readAll: "notifications/read-all",
     deviceToken: "notifications/device-token",
   },
+  REPORTS: {
+    base: "reports",
+    create: "reports",
+  },
   SUPPORT: {
-    faqs: "support/faqs",
     contact: "support/contact",
+    reports: "support/reports",
   },
 };
 export { API_CONFIG };

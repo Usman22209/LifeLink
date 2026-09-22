@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, I18nManager, Platform } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  I18nManager,
+  Platform,
+} from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -13,8 +19,6 @@ import AnySvg from "@components/AnySvg";
 import KeyboardAwareContainer from "@components/KeyboardAwareContainer";
 import AppInput from "@components/AppInput";
 import AppButton from "@components/AppButton";
-import { useSelector, useDispatch } from "react-redux";
-import { setAuth } from "@store/slices/authSlice";
 import { ROUTES } from "@utils/Routes";
 import { colors } from "@theme/colors";
 import type { AuthStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
@@ -22,6 +26,7 @@ import { useLogin } from "@shared/query/auth/useLogin";
 import { useGoogleLogin } from "@shared/query/auth/useGoogleLogin";
 import useGoogleSignIn from "@shared/hooks/auth/useGoogleSignin";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
+import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 
 type LoginScreenNavigationProp = StackNavigationProp<
   AuthStackParamList,
@@ -37,21 +42,11 @@ const LoginScreen = () => {
   const { mutate: googleLoginMutate, isPending: googleLoginPending } =
     useGoogleLogin();
   const { signIn } = useGoogleSignIn();
-  const dispatch = useDispatch();
 
-  const handleDevLogin = () => {
-    dispatch(
-      setAuth({
-        accessToken: "dev-token-12345",
-        user: {
-          id: "dev-user-001",
-          email: "dev@lifelink.test",
-          full_name: "Dev User",
-          is_onboarded: true,
-        },
-      }),
-    );
-  };
+  useScreenHangWatchdog("LoginScreen", loginPending || googleLoginPending, {
+    actionName: loginPending ? "email_login" : "google_login",
+    timeoutMs: 12000,
+  });
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -185,18 +180,6 @@ const LoginScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-
-          {__DEV__ && (
-            <TouchableOpacity
-              style={styles.devButton}
-              activeOpacity={0.7}
-              onPress={handleDevLogin}
-            >
-              <Text semiBold FONT_12 style={styles.devButtonText}>
-                🛠 Dev Login (Skip Backend)
-              </Text>
-            </TouchableOpacity>
-          )}
         </View>
       </KeyboardAwareContainer>
     </ScreenWrapper>
@@ -248,19 +231,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: verticalScale(20),
-  },
-  devButton: {
-    marginTop: verticalScale(16),
-    paddingVertical: verticalScale(10),
-    borderRadius: moderateScale(10),
-    borderWidth: 1.5,
-    borderColor: "#F59E0B",
-    borderStyle: "dashed",
-    backgroundColor: "rgba(245, 158, 11, 0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  devButtonText: {
-    color: "#F59E0B",
   },
 });

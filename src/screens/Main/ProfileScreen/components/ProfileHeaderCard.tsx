@@ -19,8 +19,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
   const isRtl = useSelector(selectIsRtl);
   const actualUser = user?.user || user?.profile || user;
 
-  const avatarUri = actualUser?.avatar_url || actualUser?.profile_image;
-  const userBloodType = actualUser?.blood_type || actualUser?.blood_group || "O+";
+  const avatarUri =
+    actualUser?.avatar_url ||
+    actualUser?.profile_image ||
+    actualUser?.avatar ||
+    actualUser?.profileImage;
+  const userBloodType =
+    actualUser?.blood_type || actualUser?.blood_group || "O+";
 
   const userName =
     actualUser?.full_name ||
@@ -29,7 +34,19 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
     (actualUser?.email ? actualUser.email.split("@")[0] : null) ||
     t("profile.guestDonor");
 
-  const userEmail = actualUser?.email || "guest@lifelink.com";
+  const userSubtext =
+    actualUser?.email || actualUser?.phone || actualUser?.contact_number || "";
+
+  const defaultAvatarNode = (
+    <View style={[styles.avatar, styles.defaultAvatar]}>
+      <AnyIcon
+        type={Icons.Feather}
+        name="user"
+        size={scale(24)}
+        color={colors.textSecondary}
+      />
+    </View>
+  );
 
   return (
     <View
@@ -48,16 +65,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
         ]}
       >
         {avatarUri ? (
-          <AppImage source={{ uri: avatarUri }} style={styles.avatar} />
+          <AppImage
+            source={{ uri: avatarUri }}
+            style={styles.avatar}
+            placeholder={defaultAvatarNode}
+            fallbackComponent={defaultAvatarNode}
+          />
         ) : (
-          <View style={[styles.avatar, styles.defaultAvatar]}>
-            <AnyIcon
-              type={Icons.Feather}
-              name="user"
-              size={scale(24)}
-              color={colors.textSecondary}
-            />
-          </View>
+          defaultAvatarNode
         )}
         <View style={styles.badge}>
           <Text bold FONT_9 style={styles.badgeText}>
@@ -65,6 +80,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
           </Text>
         </View>
       </View>
+
       <View
         style={[
           styles.profileInfo,
@@ -78,13 +94,15 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({ user }) => {
         >
           {userName}
         </Text>
-        <Text
-          regular
-          FONT_12
-          style={[styles.email, { textAlign: isRtl ? "right" : "left" }]}
-        >
-          {userEmail}
-        </Text>
+        {Boolean(userSubtext) && (
+          <Text
+            regular
+            FONT_12
+            style={[styles.email, { textAlign: isRtl ? "right" : "left" }]}
+          >
+            {userSubtext}
+          </Text>
+        )}
       </View>
     </View>
   );

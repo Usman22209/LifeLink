@@ -56,7 +56,6 @@ export interface BloodRequest {
   contact_number?: string;
   description?: string;
   status: BloodRequestStatus;
-  is_verified: boolean;
   required_date?: string;
   created_at: string;
   updated_at: string;

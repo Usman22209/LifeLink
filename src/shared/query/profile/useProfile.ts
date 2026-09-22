@@ -18,13 +18,23 @@ export const useGetProfile = (enabled = true) => {
     queryFn: async () => {
       console.log("🔍 [useGetProfile] Fetching profile from API...");
       const response = await PROFILE_SERVICE.getProfile();
-      console.log("🔍 [useGetProfile] Raw API Response:", JSON.stringify(response.data));
+      console.log(
+        "🔍 [useGetProfile] Raw API Response:",
+        JSON.stringify(response.data),
+      );
       const rawData = response.data?.data || response.data;
       const profileData = rawData?.user || rawData?.profile || rawData;
-      console.log("🔍 [useGetProfile] Resolved profileData:", JSON.stringify(profileData));
+      console.log(
+        "🔍 [useGetProfile] Resolved profileData:",
+        JSON.stringify(profileData),
+      );
+      if (profileData) {
+        store.dispatch(updateUser(profileData));
+      }
       return profileData;
     },
     enabled,
+    staleTime: 1000 * 60 * 5, // Cache profile for 5 minutes
   });
 };
 
@@ -49,24 +59,33 @@ export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["deleteAccount"],
     mutationFn: async () => {
       const response = await PROFILE_SERVICE.deleteAccount();
       return response.data;
     },
     onSuccess: async () => {
-      queryClient.clear();
+      try {
+        await Promise.allSettled([tokenStorage.clearToken()]);
+      } catch (e) {
+        console.error("Token clear error:", e);
+      }
       store.dispatch(logout());
-      await tokenStorage.clearToken();
+      queryClient.clear();
       Toast.show({
         type: "success",
         text1: "Account Deleted",
-        text2: "Your account has been deleted.",
+        text2: "Your account has been permanently deleted.",
       });
     },
     onError: (error: any) => {
+      console.error("Delete account failed:", error);
       Toast.show({
         type: "error",
-        text2: error?.response?.data?.message || "Failed to delete account.",
+        text1: "Deletion Failed",
+        text2:
+          error?.response?.data?.message ||
+          "Could not delete account. Please try again.",
       });
     },
   });
@@ -79,6 +98,7 @@ export const useUpdateSettings = () => {
     mutationFn: async (data: {
       notifications_enabled?: boolean;
       language_preference?: string;
+      hide_phone_number?: boolean;
     }) => {
       const response = await PROFILE_SERVICE.updateSettings(data);
       return response.data;

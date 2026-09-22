@@ -26,6 +26,17 @@ const MessageItem: React.FC<MessageItemProps> = ({ item, patientImage }) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const defaultAvatarNode = (
+    <View style={[styles.avatar, styles.defaultMessageAvatar]}>
+      <AnyIcon
+        type={Icons.Feather}
+        name="user"
+        size={moderateScale(14)}
+        color={colors.textSecondary}
+      />
+    </View>
+  );
+
   return (
     <View
       style={[
@@ -35,16 +46,14 @@ const MessageItem: React.FC<MessageItemProps> = ({ item, patientImage }) => {
     >
       {!isMe &&
         (patientImage ? (
-          <AppImage source={{ uri: patientImage }} style={styles.avatar} />
+          <AppImage
+            source={{ uri: patientImage }}
+            style={styles.avatar}
+            placeholder={defaultAvatarNode}
+            fallbackComponent={defaultAvatarNode}
+          />
         ) : (
-          <View style={[styles.avatar, styles.defaultMessageAvatar]}>
-            <AnyIcon
-              type={Icons.Feather}
-              name="user"
-              size={moderateScale(14)}
-              color={colors.textSecondary}
-            />
-          </View>
+          defaultAvatarNode
         ))}
       <View
         style={[

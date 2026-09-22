@@ -26,6 +26,10 @@ export const useAcceptBloodRequest = () => {
       });
       // Invalidate feed to show updated status
       queryClient.invalidateQueries({ queryKey: bloodRequestKeys.feed() });
+      // Invalidate my donations and all donation queries so pledged state updates immediately
+      queryClient.invalidateQueries({ queryKey: ["donations"] });
+      // Invalidate chat threads so a new thread is visible
+      queryClient.invalidateQueries({ queryKey: ["chat"] });
     },
   });
 };

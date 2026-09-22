@@ -77,13 +77,22 @@
     "goodAfternoon": "Good Afternoon",
     "goodEvening": "Good Evening",
     "critical": "Critical",
-    "urgent": "Urgent",
+    "high": "High",
+    "urgent": "High",
     "normal": "Normal",
     "respond": "Respond",
     "share": "Share",
     "tapForTip": "Tap to read another tip",
     "unit": "unit",
-    "units": "units"
+    "units": "units",
+    "noCriticalNearby": "No critical emergencies nearby",
+    "checkLiveFeed": "Check the live blood feed to view all active requests.",
+    "viewFeed": "View Feed",
+    "eligibleToDonate": "You're Eligible to Donate!",
+    "nextDonation": "Next Donation",
+    "readyForDonation": "Your body is ready for the next donation",
+    "daysUntilDonation": "{{days}} days until you can donate again",
+    "donateNow": "Donate Now"
   },
   "profile": {
     "title": "Profile",
@@ -97,8 +106,15 @@
     "logoutConfirm": "Are you sure you want to sign out? You will need to log in again to receive emergency blood requests in your area.",
     "language": "Language",
     "notifications": "Notifications",
+    "hidePhoneNumber": "Hide Phone Number",
+    "hidePhoneNumberDesc": "Only allow in-app chat; hide phone number on your requests",
+    "call": "Call",
+    "chatOnly": "In-App Chat Only",
     "saveChanges": "Save Changes",
     "myDonationsTitle": "My Donations",
+    "myBloodRequests": "My Blood Requests",
+    "donorEligibilityCheck": "Donor Eligibility Check",
+    "appVersion": "Version {{version}} (Build {{build}})",
     "deleteAccount": "Delete Account",
     "deleteAccountConfirm": "Are you sure you want to permanently delete your account? This action is irreversible and all your health and donation history records will be completely removed.",
     "deleteAccountConfirmButton": "Delete permanently",
@@ -119,7 +135,8 @@
       "donations": "Donations",
       "livesSaved": "Lives Saved",
       "status": "Status",
-      "eligible": "Eligible"
+      "eligible": "Eligible",
+      "ineligible": "Ineligible"
     }
   },
   "common": {
@@ -138,7 +155,11 @@
     "close": "Close",
     "camera": "Camera",
     "gallery": "Gallery",
-    "select": "Select Source"
+    "select": "Select Source",
+    "search": "Search...",
+    "noResults": "No results found",
+    "noInternet": "No internet connection",
+    "report": "Report"
   },
   "errors": {
     "required": "This field is required",
@@ -160,6 +181,7 @@
     "unitsMinOne": "At least 1 unit is required",
     "hospitalNameRequired": "Hospital name is required (minimum 3 characters)",
     "descriptionTooLong": "Description must not exceed 500 characters",
+    "underageError": "You must be at least 18 years old to register as a donor",
     "confirmRequired": "You must confirm the information is correct"
   },
   "onboarding": {
@@ -194,7 +216,15 @@
     "provinceLabel": "(Province)",
     "selectProvince": "Select Province",
     "selectCity": "Select City",
-    "selectCityIn": "Select City in"
+    "selectCityIn": "Select City in",
+    "selectCountry": "Select Country",
+    "provinces": {
+      "Punjab": "Punjab",
+      "Sindh": "Sindh",
+      "Khyber Pakhtunkhwa": "Khyber Pakhtunkhwa",
+      "Balochistan": "Balochistan",
+      "Islamabad Capital Territory": "Islamabad Capital Territory"
+    }
   },
   "quotes": {
     "factText1": "A single blood donation can save up to three lives.",
@@ -228,6 +258,7 @@
   },
   "feed": {
     "title": "Blood Feed",
+    "loading": "Finding blood requests near you...",
     "searchPlaceholder": "Search by city, hospital or name…",
     "requestsFound": "requests found",
     "sort": "Sort",
@@ -258,7 +289,8 @@
     "mostUnits": "Most Units",
     "all": "All",
     "normal": "Normal",
-    "urgent": "Urgent",
+    "high": "High",
+    "urgent": "High",
     "critical": "Critical",
     "any": "Any"
   },
@@ -276,11 +308,62 @@
   },
   "myDonations": {
     "title": "My Donations",
+    "donationHistory": "Donation History",
+    "donations": "Donations",
+    "livesSaved": "Lives Saved",
+    "activeSince": "Active Since",
+    "eligibleToDonate": "Eligible to Donate",
+    "cooldownPeriod": "Cooldown Period",
+    "eligibleDesc": "You are eligible to donate blood again.",
+    "nextEligibleOn": "Next eligible on {{date}}",
     "emptyTitle": "No Donations Yet",
     "emptySubtitle": "Your donation history will appear here once you've helped save a life.",
     "eligibilityStatus": "Eligibility Status",
     "eligibleNow": "Eligible to Donate Now",
-    "nextEligibleOn": "Next eligible donation date:"
+    "deferred": "Currently Deferred",
+    "deferredDesc": "Based on your health screening, you are currently deferred from donating."
+  },
+  "myRequests": {
+    "title": "My Requests",
+    "all": "All",
+    "active": "Active",
+    "fulfilled": "Fulfilled",
+    "expired": "Expired",
+    "cancelled": "Cancelled",
+    "posted": "Posted",
+    "received": "Received",
+    "progress": "Progress",
+    "track": "Track",
+    "noRequestsFound": "No Requests Found",
+    "noRequestsAll": "You haven't posted any blood requests yet.",
+    "noRequestsTab": "No {{tab}} blood requests."
+  },
+  "trackRequest": {
+    "title": "Track Request",
+    "patientSummary": "Patient Summary",
+    "donationProgress": "Donation Progress",
+    "received": "Received",
+    "remaining": "Remaining",
+    "totalNeeded": "Total Needed",
+    "pledged": "Pledged",
+    "respondingDonors": "Responding Donors",
+    "donorsCount": "{{count}} donor",
+    "donorsCountPlural": "{{count}} donors",
+    "noDonorsYet": "No Donors Yet",
+    "noDonorsDesc": "Matching donors in your area are being notified about this request.",
+    "markAsFulfilled": "Mark as Fulfilled",
+    "markFulfilledTitle": "Mark as Fulfilled",
+    "markFulfilledConfirm": "Are all required blood units received for this patient? This will complete and close the request.",
+    "markFulfilledSuccess": "Request marked as fulfilled.",
+    "withdrawRequest": "Withdraw Request (Arranged Elsewhere)",
+    "withdrawTitle": "Withdraw Blood Request",
+    "withdrawConfirm": "Are you sure you want to withdraw this blood request? (e.g. arranged blood from another source or no longer needed).\n\nThis will remove it from the public feed.",
+    "withdrawSuccess": "Your blood request has been withdrawn.",
+    "confirmReceivedTitle": "Confirm Donation",
+    "confirmReceivedMsg": "Did {{name}} donate 1 unit of blood?",
+    "confirmReceivedSuccess": "Donation marked as received.",
+    "confirmReceivedBtn": "Confirm Received",
+    "message": "Message"
   },
   "requestDetail": {
     "title": "Request Details",
@@ -290,7 +373,23 @@
     "caseSummary": "Case Summary",
     "callNow": "Call Now",
     "chatNow": "Chat with Requester",
-    "shareRequest": "Share Request"
+    "shareRequest": "Share Request",
+    "needsBlood": "Needs emergency blood donation",
+    "manageInMyRequests": "Manage in My Requests",
+    "call": "Call",
+    "message": "Message",
+    "fulfilled": "Fulfilled",
+    "pledged": "Pledged",
+    "shareToHelp": "Share to Help",
+    "respondNow": "Respond Now",
+    "donateNow": "Donate Now",
+    "suspiciousTitle": "Notice something suspicious?",
+    "suspiciousDesc": "Report fake or fraudulent blood requests to protect our community.",
+    "report": "Report",
+    "navRoute": "Navigation Route",
+    "navDirections": "Directions to destination hospital",
+    "navigate": "Navigate",
+    "nearby": "Nearby"
   },
   "requestForm": {
     "title": "Create Request",
@@ -307,7 +406,7 @@
     "hospitalAddressPlaceholder": "Enter hospital detailed address (optional)",
     "urgency": "Urgency Level",
     "urgencyNormal": "Normal",
-    "urgencyHigh": "Urgent",
+    "urgencyHigh": "High",
     "urgencyCritical": "Critical",
     "description": "Additional Case Summary",
     "descriptionPlaceholder": "Provide medical details, surgery schedule, etc. (optional)",
@@ -321,7 +420,10 @@
     "selectOnMap": "Pin Location on Map",
     "confirmLocation": "Confirm Selected Location",
     "locationSelected": "Location pinned successfully",
-    "useCurrentLocation": "Locate Me"
+    "useCurrentLocation": "Locate Me",
+    "searchLocation": "Search hospital, area, landmark...",
+    "loadingMap": "Loading map...",
+    "additionalInfo": "Additional Info"
   },
   "helpSupport": {
     "title": "Help & Support",
@@ -349,5 +451,66 @@
     "sectionBody3": "LifeLink will never sell, lease, or distribute your personal metrics, geolocation tracks, or contact configurations to third-party marketing networks. All stored information is protected using state-of-the-art security layers.",
     "sectionTitle4": "4. Account Deletion",
     "sectionBody4": "You hold the full right to edit your health metrics or permanently purge your account datasets at any time. Tapping the Delete Account button in settings will immediately remove all your records from our databases."
+  },
+  "donationPledgedModal": {
+    "titlePledged": "Donation Pledged",
+    "titlePledgedCelebration": "Donation Pledged! 🎉",
+    "subtitleAlready": "You have already offered to donate for this patient.",
+    "subtitleNew": "Thank you for stepping forward to save a life.",
+    "infoAlready": "The requester will confirm the donation once fulfilled at the hospital. Coordinate with them anytime in chat.",
+    "infoNew": "A chat thread has been initiated with the requester so you can coordinate donation timing and location.",
+    "openChat": "Open Chat with Requester",
+    "viewMyDonations": "View My Donations",
+    "doneClose": "Done / Close"
+  },
+  "eligibilityModal": {
+    "title": "Donor Health & Safety Check",
+    "subtitle": "Confirm all 3 requirements to safely respond",
+    "weightTitle": "Weight & Current Health",
+    "weightDesc": "I weigh at least 50 kg and feel healthy today with no active fever, flu, or infection.",
+    "cooldownTitle": "90-Day Donation Interval",
+    "cooldownDesc": "I have not donated whole blood in the last 90 days to ensure safe red cell recovery.",
+    "medicalTitle": "Medical Safety & Screening",
+    "medicalDesc": "No major surgery, hepatitis, chronic illness, or new tattoos/piercings in the last 6 months.",
+    "verifiedNotice": "Requirements are verified with medical staff prior to blood donation.",
+    "pledging": "Pledging Donation...",
+    "confirmAndRespond": "Confirm & Respond to Emergency",
+    "confirmAllToProceed": "Confirm All 3 Items to Proceed ({{count}}/3)"
+  },
+  "notificationModal": {
+    "title": "Enable Emergency Alerts 🚨",
+    "subtitle": "LifeLink requires notifications to alert you instantly when a patient urgently needs blood in your area.",
+    "urgentAlerts": "Urgent Blood Alerts",
+    "urgentAlertsDesc": "Get notified when patients near you need your blood group.",
+    "chatMessages": "Donation Chat Messages",
+    "chatMessagesDesc": "Instant updates when someone responds to your donation.",
+    "enableNotifications": "Enable Notifications",
+    "maybeLater": "Maybe Later"
+  },
+  "reportModal": {
+    "reportRequest": "Report Blood Request",
+    "reportUser": "Report User",
+    "requestHelp": "Help maintain genuine, verified requests",
+    "userHelp": "Help keep our community safe and respectful",
+    "reasonSelect": "Select the reason for reporting:",
+    "additionalDetails": "Additional details (optional):",
+    "detailsPlaceholder": "Explain what happened so our moderation team can verify...",
+    "submitReport": "Submit Incident Report",
+    "fakeRequest": "Fake or Invalid Request",
+    "fakeRequestDesc": "Hospital or patient details appear fabricated",
+    "fraud": "Demanding Money / Commercial Selling",
+    "fraudDesc": "Money or fees demanded for blood donation",
+    "spam": "Duplicate or Spam Request",
+    "spamDesc": "Repeated, outdated, or irrelevant posting",
+    "otherSafety": "Other Safety Concern",
+    "otherSafetyDesc": "Any other issue violating community guidelines",
+    "harassment": "Harassment or Inappropriate Behavior",
+    "harassmentDesc": "Abusive messages, offensive conduct, or threats",
+    "fraudUser": "Fraudulent User or Impersonation",
+    "fraudUserDesc": "Scam attempts or false donor/patient identity",
+    "spamUser": "Spam or Promotional Activity",
+    "spamUserDesc": "Sending unsolicited advertisements or repetitive messages",
+    "otherUser": "Other Concern",
+    "otherUserDesc": "Other behavior violating community safety"
   }
 }

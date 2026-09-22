@@ -24,29 +24,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerDevButton: {
-    paddingHorizontal: scale(8),
-    paddingVertical: verticalScale(4),
-    borderRadius: moderateScale(8),
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(99, 102, 241, 0.3)",
-    marginRight: scale(6),
-  },
-
-  devSeedButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: scale(6),
-    marginTop: verticalScale(20),
-    paddingHorizontal: scale(16),
-    paddingVertical: verticalScale(9),
-    borderRadius: moderateScale(20),
-    backgroundColor: "rgba(229, 57, 53, 0.06)",
-    borderWidth: 1,
-    borderColor: "rgba(229, 57, 53, 0.25)",
-    borderStyle: "dashed",
-  },
 
   // Minimal Clean Card
   card: {

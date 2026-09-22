@@ -15,7 +15,7 @@ export interface Alert {
   body: string;
   time: string;
   read: boolean;
-  urgency?: "critical" | "urgent" | "normal";
+  urgency?: "critical" | "high" | "urgent" | "normal";
   bloodType?: string;
   hospital?: string;
   patientName?: string;
@@ -87,6 +87,3 @@ export const ALERT_TYPE_CONFIG: Record<
     label: "Profile",
   },
 };
-
-export { MOCK_ALERTS } from "../../../shared/constants/mockData";
-

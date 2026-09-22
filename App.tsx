@@ -5,6 +5,7 @@ import store, { persistor } from "@store/store";
 import AppNavigation from "@navigation/index";
 import "@shared/i18n";
 import OneSignalProvider from "@providers/OneSignalProvider";
+import PresenceProvider from "@providers/PresenceProvider";
 import Toast from "react-native-toast-message";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { toastConfig } from "@components/Toast";
@@ -57,13 +58,23 @@ const linking: LinkingOptions<any> = {
   },
 };
 
+import { initNetworkSentryTracking } from "@shared/utils/sentryLogger";
+
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay: true,
+});
+
 Sentry.init({
   dsn: ENV.SENTRY_DSN,
   sendDefaultPii: true,
   enableLogs: true,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+  integrations: [
+    navigationIntegration,
+    Sentry.mobileReplayIntegration(),
+    Sentry.feedbackIntegration(),
+  ],
 });
 
 const AppToast = () => {
@@ -78,17 +89,31 @@ const AppToast = () => {
 };
 
 const App = (): React.JSX.Element => {
+  const navigationRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    initNetworkSentryTracking();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <QueryClientProvider client={queryClient}>
-            <OneSignalProvider>
-              <NavigationContainer linking={linking}>
-                <AppNavigation />
-                <AppToast />
-              </NavigationContainer>
-            </OneSignalProvider>
+            <PresenceProvider>
+              <OneSignalProvider>
+                <NavigationContainer
+                  ref={navigationRef}
+                  linking={linking}
+                  onReady={() => {
+                    navigationIntegration.registerNavigationContainer(navigationRef);
+                  }}
+                >
+                  <AppNavigation />
+                  <AppToast />
+                </NavigationContainer>
+              </OneSignalProvider>
+            </PresenceProvider>
           </QueryClientProvider>
         </PersistGate>
       </Provider>

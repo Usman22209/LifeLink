@@ -60,7 +60,6 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
         </AppText>
       </View>
 
-      {/* State Picker */}
       <View style={{ marginBottom: verticalScale(12) }}>
         <AppText semiBold FONT_12 style={styles.inputLabel}>
           {t("requestForm.state") || "State / Province"}
@@ -109,7 +108,6 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* City Picker */}
       <View style={{ marginBottom: verticalScale(12) }}>
         <AppText semiBold FONT_12 style={styles.inputLabel}>
           {t("requestForm.city") || "City"}
@@ -188,7 +186,6 @@ const LocationDetailsSection: React.FC<LocationDetailsSectionProps> = ({
         iconName="map"
       />
 
-      {/* Map Pin Location */}
       <AppText semiBold FONT_12 style={styles.inputLabel}>
         {t("requestForm.selectOnMap") || "Pin Location on Map"}
       </AppText>

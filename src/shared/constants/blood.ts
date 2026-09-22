@@ -21,7 +21,7 @@ export const getUrgencyLevels = (
   },
   {
     value: UrgencyLevel.HIGH,
-    label: t("requestForm.urgencyHigh") || "Urgent",
+    label: t("requestForm.urgencyHigh") || "High",
     color: colors.warning,
     icon: "alert-circle",
   },

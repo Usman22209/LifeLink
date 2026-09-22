@@ -1,10 +1,24 @@
 # Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-keep class com.facebook.react.** { *; }
+-keep class com.facebook.hermes.** { *; }
+-keep class com.facebook.jni.** { *; }
 
-# Add any project specific keep options here:
+# Vector Icons
+-keep class com.oblador.vectoricons.** { *; }
+
+# FastImage
+-keep class com.dylanvann.fastimage.** { *; }
+
+# Keychain
+-keep class com.oblador.keychain.** { *; }
+
+# NetInfo
+-keep class com.reactnativecommunity.netinfo.** { *; }
+
+# WebView
+-keep class com.reactnativecommunity.webview.** { *; }
+
+# Sentry
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception

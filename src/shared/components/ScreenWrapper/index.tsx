@@ -12,6 +12,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import Text from "@components/AppText";
 import { verticalScale, moderateScale } from "react-native-size-matters";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -36,15 +37,19 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   statusBarStyle,
   showNetworkBanner = true,
   loading = false,
-  loadingText = "Loading...",
+  loadingText,
   safeArea = true,
   scrollable = false,
   backgroundColor,
   disableBottomSafeArea = false,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const netInfo = useNetInfo();
-  const isOffline = !netInfo.isConnected;
+  // Avoid flashing offline banner during initial launch while NetInfo is probing (isConnected === null)
+  const isOffline =
+    netInfo.isConnected === false ||
+    (netInfo.isConnected === true && netInfo.isInternetReachable === false);
 
   const Container = scrollable ? ScrollView : View;
   const bgColor = backgroundColor || colors.background;
@@ -74,7 +79,9 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           <View
             style={[styles.offlineBanner, { backgroundColor: colors.primary }]}
           >
-            <Text style={styles.offlineText}>No internet connection</Text>
+            <Text style={styles.offlineText}>
+              {t("common.noInternet") || "No internet connection"}
+            </Text>
           </View>
         )}
 
@@ -90,7 +97,7 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color={colors.primary} />
             <Text style={[styles.loadingText, { color: colors.text }]}>
-              {loadingText}
+              {loadingText || t("common.loading") || "Loading..."}
             </Text>
           </View>
         )}

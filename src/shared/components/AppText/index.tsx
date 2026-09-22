@@ -88,16 +88,15 @@ const Text = (props: Props) => {
 
   let fontFamily = fm.REGULAR;
 
-  if (thin) fontFamily = italic ? fm.THIN_ITALIC : fm.THIN;
-  else if (extraLight)
-    fontFamily = italic ? fm.EXTRALIGHT_ITALIC : fm.EXTRALIGHT;
-  else if (light) fontFamily = italic ? fm.LIGHT_ITALIC : fm.LIGHT;
-  else if (regular) fontFamily = italic ? fm.ITALIC : fm.REGULAR;
-  else if (medium) fontFamily = italic ? fm.MEDIUM_ITALIC : fm.MEDIUM;
-  else if (semiBold) fontFamily = italic ? fm.SEMIBOLD_ITALIC : fm.SEMIBOLD;
-  else if (bold) fontFamily = italic ? fm.BOLD_ITALIC : fm.BOLD;
-  else if (extraBold) fontFamily = italic ? fm.EXTRABOLD_ITALIC : fm.EXTRABOLD;
-  else if (black) fontFamily = italic ? fm.BLACK_ITALIC : fm.BLACK;
+  if (thin) fontFamily = fm.THIN;
+  else if (extraLight) fontFamily = fm.EXTRALIGHT;
+  else if (light) fontFamily = fm.LIGHT;
+  else if (regular) fontFamily = fm.REGULAR;
+  else if (medium) fontFamily = fm.MEDIUM;
+  else if (semiBold) fontFamily = fm.SEMIBOLD;
+  else if (bold) fontFamily = fm.BOLD;
+  else if (extraBold) fontFamily = fm.EXTRABOLD;
+  else if (black) fontFamily = fm.BLACK;
 
   if (Platform.OS === "ios" && isRtl) {
     const isBold = semiBold || bold || extraBold || black;

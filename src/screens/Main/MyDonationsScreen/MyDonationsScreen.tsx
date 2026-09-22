@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, FlatList } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { moderateScale } from "react-native-size-matters";
@@ -9,6 +9,10 @@ import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors, withOpacity } from "@theme/colors";
 import useTranslation from "@shared/hooks/useTranslation";
 import { ROUTES } from "@utils/Routes";
+import { useSelector, useDispatch } from "react-redux";
+import { selectIsRtl } from "@store/slices/appSlice";
+import { selectUser, updateUser } from "@store/slices/authSlice";
+import { getStoredEligibility } from "@shared/utils/donorEligibilityService";
 import { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { useMyDonations } from "@shared/query/donations/useDonations";
 import { styles } from "./MyDonationsScreen.styles";
@@ -19,57 +23,90 @@ import { MOCK_DONATIONS } from "@shared/constants/mockData";
 
 const MyDonationsScreen = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const isRtl = useSelector(selectIsRtl);
+  const user = useSelector(selectUser);
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const { data: myDonationsData } = useMyDonations();
 
+  useEffect(() => {
+    (async () => {
+      if (user?.stats?.is_eligible === undefined) {
+        const stored = await getStoredEligibility(user?.id);
+        if (stored) {
+          dispatch(
+            updateUser({
+              stats: {
+                ...(user?.stats || {}),
+                is_eligible: stored.isEligible,
+                next_eligible_date: stored.nextEligibleDate || undefined,
+              },
+            }),
+          );
+        }
+      }
+    })();
+  }, [user?.stats?.is_eligible, dispatch]);
+
   const donations: DonationLog[] =
     myDonationsData?.history && Array.isArray(myDonationsData.history)
       ? myDonationsData.history
-      : MOCK_DONATIONS;
+      : [];
 
   const stats = useMemo(() => {
-    if (myDonationsData?.stats) {
-      return {
-        totalDonations: myDonationsData.stats.totalDonations ?? donations.length,
-        livesSaved: myDonationsData.stats.livesSaved ?? (donations.length * 3),
-        isEligible: myDonationsData.stats.isEligible ?? true,
-        nextEligibleDateStr: myDonationsData.stats.nextEligibleDateStr || "",
-      };
-    }
-
-    const totalDonations = donations.length;
-    const totalUnits = donations.reduce((sum, item) => sum + item.units, 0);
-    const livesSaved = totalUnits * 3;
+    const totalDonations =
+      myDonationsData?.stats?.totalDonations ?? donations.length;
+    const totalUnits = donations.reduce(
+      (sum, item) => sum + (item.units || 1),
+      0,
+    );
+    const livesSaved =
+      myDonationsData?.stats?.livesSaved ??
+      (totalUnits > 0 ? totalUnits * 3 : 0);
 
     let isEligible = true;
     let nextEligibleDateStr = "";
 
+    // 1. Health screening eligibility check (CRITICAL: if user is deferred by health questionnaire)
+    if (user?.stats?.is_eligible === false) {
+      isEligible = false;
+      if (user?.stats?.next_eligible_date) {
+        nextEligibleDateStr = user.stats.next_eligible_date;
+      }
+    }
+
+    // 2. Cooldown check from donation history
     if (totalDonations > 0) {
-      const sorted = [...donations].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      );
-      const latestDonationDate = new Date(sorted[0].date);
-      const nextEligibleDate = new Date(latestDonationDate);
-      nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
+      const validDates = donations
+        .map((d) => (d.date ? new Date(d.date) : null))
+        .filter((d): d is Date => d !== null && !isNaN(d.getTime()))
+        .sort((a, b) => b.getTime() - a.getTime());
 
-      const today = new Date();
-      isEligible = today.getTime() >= nextEligibleDate.getTime();
+      if (validDates.length > 0) {
+        const latestDonationDate = validDates[0];
+        const nextEligibleDate = new Date(latestDonationDate);
+        nextEligibleDate.setDate(nextEligibleDate.getDate() + 90);
 
-      if (!isEligible) {
-        nextEligibleDateStr = nextEligibleDate.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        });
+        const today = new Date();
+        if (today.getTime() < nextEligibleDate.getTime()) {
+          isEligible = false;
+          nextEligibleDateStr = nextEligibleDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
       }
     }
 
     return { totalDonations, livesSaved, isEligible, nextEligibleDateStr };
-  }, [myDonationsData, donations]);
+  }, [myDonationsData, donations, user?.stats]);
 
   const handleItemPress = (item: DonationLog) => {
-    navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });
+    if (item.request) {
+      navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });
+    }
   };
 
   const renderEmptyState = () => (
@@ -119,7 +156,12 @@ const MyDonationsScreen = () => {
               nextEligibleDateStr={stats.nextEligibleDateStr}
             />
 
-            <View style={styles.sectionHeader}>
+            <View
+              style={[
+                styles.sectionHeader,
+                { flexDirection: isRtl ? "row-reverse" : "row" },
+              ]}
+            >
               <View style={styles.sectionIconWrap}>
                 <AnyIcon
                   type={Icons.Feather}
@@ -128,8 +170,15 @@ const MyDonationsScreen = () => {
                   color={colors.primary}
                 />
               </View>
-              <AppText bold FONT_14 style={styles.sectionTitle}>
-                Donation History
+              <AppText
+                bold
+                FONT_14
+                style={[
+                  styles.sectionTitle,
+                  { marginHorizontal: moderateScale(6) },
+                ]}
+              >
+                {t("myDonations.donationHistory") || "Donation History"}
               </AppText>
             </View>
           </>

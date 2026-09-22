@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import Toast from "react-native-toast-message";
 import {
   View,
   TouchableOpacity,
@@ -22,11 +23,15 @@ import { useOnboardingForm } from "@shared/forms/hooks/useOnboardingForm";
 import useTranslation from "@shared/hooks/useTranslation";
 import { OnboardingFormValues } from "@shared/forms/schemas/onboarding.schema";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
-import { useUpdateProfile, useGetProfile } from "@shared/query/profile/useProfile";
+import {
+  useUpdateProfile,
+  useGetProfile,
+} from "@shared/query/profile/useProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useUploadImage } from "@shared/query/file/useUploadImage";
+import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 import { getCurrentLocation, Coords } from "@shared/utils/locationService";
 
 import AppHeader from "@components/AppHeader";
@@ -64,7 +69,8 @@ const CompleteProfileScreen = () => {
     (route.params as any)?.isEditing === true;
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const { data: serverProfile, isLoading: isProfileLoading } = useGetProfile(true);
+  const { data: serverProfile, isLoading: isProfileLoading } =
+    useGetProfile(true);
   const { mutateAsync: updateProfileMutate } = useUpdateProfile();
   const selectedLang = useSelector(selectLanguage);
   const { t } = useTranslation();
@@ -101,7 +107,8 @@ const CompleteProfileScreen = () => {
 
       let dobValue = "";
       if (profile.dob) {
-        dobValue = typeof profile.dob === "string" ? profile.dob.split("T")[0] : "";
+        dobValue =
+          typeof profile.dob === "string" ? profile.dob.split("T")[0] : "";
       }
 
       const bloodGroupValue = (
@@ -146,6 +153,12 @@ const CompleteProfileScreen = () => {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [location, setLocation] = useState<Coords | null>(null);
+
+  useScreenHangWatchdog("CompleteProfileScreen", loading || isUploading, {
+    actionName: loading ? "save_profile" : "upload_image",
+    timeoutMs: 12000,
+    context: { isEditing, userId: user?.id },
+  });
 
   const maxDate = useMemo(() => {
     const date = new Date();
@@ -228,7 +241,11 @@ const CompleteProfileScreen = () => {
       let finalLocation = location;
       if (!finalLocation) {
         try {
-          finalLocation = await getCurrentLocation(true);
+          const locationPromise = getCurrentLocation(true);
+          const timeoutPromise = new Promise<null>((resolve) =>
+            setTimeout(() => resolve(null), 3500),
+          );
+          finalLocation = await Promise.race([locationPromise, timeoutPromise]);
         } catch {
           finalLocation = null;
         }
@@ -250,14 +267,31 @@ const CompleteProfileScreen = () => {
       if (isEditing) {
         navigation.goBack();
       } else {
-        dispatch(
-          updateUser({
-            is_onboarded: true,
-          }),
-        );
+        (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("[CompleteProfile] Update error:", error);
+      let errorMsg = "Could not update profile. Please try again.";
+      if (
+        error?.code === "ECONNABORTED" ||
+        error?.message?.includes("timeout")
+      ) {
+        errorMsg =
+          "Connection timed out. Please check your internet connection.";
+      } else if (!error?.response || error?.message === "Network Error") {
+        errorMsg =
+          "Network error. Please check your internet connection and try again.";
+      } else if (error?.response?.data?.message) {
+        errorMsg = Array.isArray(error.response.data.message)
+          ? error.response.data.message.join(", ")
+          : String(error.response.data.message);
+      }
+
+      Toast.show({
+        type: "error",
+        text1: "Update Failed",
+        text2: errorMsg,
+      });
     } finally {
       setLoading(false);
     }
@@ -288,8 +322,16 @@ const CompleteProfileScreen = () => {
             });
             setLocalImage(null);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("[CompleteProfile] Upload error:", error);
+          setLocalImage(null);
+          Toast.show({
+            type: "error",
+            text1: "Upload Failed",
+            text2:
+              error?.response?.data?.message ||
+              "Could not upload image. Please check your connection.",
+          });
         } finally {
           setImageModalVisible(false);
         }
@@ -304,7 +346,13 @@ const CompleteProfileScreen = () => {
     const active = serverProfile || user;
     if (active && !isInitializedRef.current) {
       const defaults = resolveProfileDefaults(active);
-      if (defaults && (defaults.full_name || defaults.phone || defaults.blood_group || defaults.email)) {
+      if (
+        defaults &&
+        (defaults.full_name ||
+          defaults.phone ||
+          defaults.blood_group ||
+          defaults.email)
+      ) {
         isInitializedRef.current = true;
         reset(defaults);
       }
@@ -369,7 +417,9 @@ const CompleteProfileScreen = () => {
   if (isProfileLoading && !isEditing) {
     return (
       <ScreenWrapper backgroundColor={colors.background} safeArea>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </ScreenWrapper>
@@ -401,7 +451,6 @@ const CompleteProfileScreen = () => {
         extraScrollHeight={verticalScale(150)}
         extraHeight={verticalScale(100)}
       >
-        {/* Profile Avatar Section */}
         <ProfileAvatarSection
           profileImage={profileImage}
           localImage={localImage}
@@ -409,7 +458,6 @@ const CompleteProfileScreen = () => {
           onOpenModal={() => setImageModalVisible(true)}
         />
 
-        {/* Basic Info Inputs */}
         <BasicInfoSection
           control={control}
           errors={errors}
@@ -417,7 +465,6 @@ const CompleteProfileScreen = () => {
           isRtl={isRtl}
         />
 
-        {/* Gender & DOB Selection */}
         <GenderAndDobSection
           watch={watch}
           setValue={setValue}
@@ -429,7 +476,6 @@ const CompleteProfileScreen = () => {
           maxDate={maxDate}
         />
 
-        {/* Location Dropdowns */}
         <LocationSelectionSection
           isRtl={isRtl}
           currentFlag={currentFlag}
@@ -443,7 +489,6 @@ const CompleteProfileScreen = () => {
           errors={errors}
         />
 
-        {/* Medical / Blood Group Grid */}
         <MedicalInfoSection
           isRtl={isRtl}
           watch={watch}
@@ -451,7 +496,6 @@ const CompleteProfileScreen = () => {
           errors={errors}
         />
 
-        {/* Submit Button */}
         <AppButton
           title={
             isEditing
@@ -464,7 +508,6 @@ const CompleteProfileScreen = () => {
         />
       </KeyboardAwareScrollView>
 
-      {/* Image Picker Modal */}
       <ImagePickerModal
         isVisible={isImageModalVisible}
         onClose={() => setImageModalVisible(false)}
@@ -476,7 +519,6 @@ const CompleteProfileScreen = () => {
         }}
       />
 
-      {/* Country Picker Modal */}
       <CountryPickerModal
         isVisible={isCountryModalVisible}
         onClose={() => setCountryModalVisible(false)}
@@ -489,7 +531,6 @@ const CompleteProfileScreen = () => {
         onSearch={setCountrySearch}
       />
 
-      {/* Province Selection Modal */}
       <SelectionModal
         isVisible={isProvinceModalVisible}
         onClose={() => setProvinceModalVisible(false)}
@@ -502,7 +543,6 @@ const CompleteProfileScreen = () => {
         }}
       />
 
-      {/* City Selection Modal */}
       <SelectionModal
         isVisible={isCityModalVisible}
         onClose={() => setCityModalVisible(false)}

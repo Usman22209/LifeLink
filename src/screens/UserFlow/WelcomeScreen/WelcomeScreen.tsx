@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { useTranslation as useI18NextTranslation } from "react-i18next"; // Temporarily kept if needed by other parts, but better to remove if unused
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
 import Text from "@components/AppText";
@@ -37,7 +36,6 @@ const WelcomeScreen = () => {
   const { language, changeLanguage } = useLanguage();
   const insets = useSafeAreaInsets();
 
-  // Local state for modal selection before confirming
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -56,7 +54,10 @@ const WelcomeScreen = () => {
       scrollable={false}
       safeArea
       backgroundColor={colors.background}
-      style={[styles.wrapper, Platform.OS === "ios" && { paddingTop: insets.top }]}
+      style={[
+        styles.wrapper,
+        Platform.OS === "ios" && { paddingTop: insets.top },
+      ]}
     >
       <View style={styles.container}>
         <View style={styles.topBar}>
@@ -262,7 +263,6 @@ const styles = StyleSheet.create({
     gap: verticalScale(14),
     paddingBottom: verticalScale(10),
   },
-  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { View, ScrollView, TouchableOpacity, I18nManager } from "react-native";
-import { verticalScale } from "react-native-size-matters";
+import { scale, moderateScale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppText from "@components/AppText";
+import AnyIcon, { Icons } from "@components/AnyIcon";
 import { selectUser, updateUser } from "@store/slices/authSlice";
 import { selectIsRtl } from "@store/slices/appSlice";
 import { ROUTES } from "@utils/Routes";
@@ -18,7 +19,7 @@ import HomeHeader from "./components/HomeHeader";
 import BloodTypeCard from "./components/BloodTypeCard";
 import InspirationalQuoteCard from "./components/InspirationalQuoteCard";
 import UrgentRequestCard from "./components/UrgentRequestCard";
-import { MOCK_URGENT_REQUESTS, UrgentRequest } from "./types";
+import { UrgentRequest } from "./types";
 import { styles } from "./HomeScreen.styles";
 
 const HomeScreen = () => {
@@ -50,19 +51,23 @@ const HomeScreen = () => {
   const rawUrgent = Array.isArray(urgentRequestsData?.data)
     ? urgentRequestsData.data
     : Array.isArray(urgentRequestsData)
-    ? urgentRequestsData
-    : [];
+      ? urgentRequestsData
+      : [];
 
-  const urgentRequests: UrgentRequest[] =
-    rawUrgent.length > 0 ? rawUrgent : MOCK_URGENT_REQUESTS;
+  const urgentRequests: UrgentRequest[] = rawUrgent;
 
   const stats = user?.stats || {};
   const bloodType = user?.blood_group || "O+";
   const donationsCount = stats.donations_count ?? 0;
-  const livesSaved = stats.lives_saved ?? (donationsCount * 3);
-  
+  const livesSaved = stats.lives_saved ?? donationsCount * 3;
+
   const formatLastDonated = (dateStr?: string) => {
-    if (!dateStr || dateStr === "N/A" || dateStr === "null" || dateStr === "undefined") {
+    if (
+      !dateStr ||
+      dateStr === "N/A" ||
+      dateStr === "null" ||
+      dateStr === "undefined"
+    ) {
       return "—";
     }
     const d = new Date(dateStr);
@@ -87,7 +92,12 @@ const HomeScreen = () => {
       header={
         <HomeHeader
           userName={displayName}
-          profileImage={user?.profile_image}
+          profileImage={
+            user?.profile_image ||
+            user?.profileImage ||
+            user?.avatar_url ||
+            user?.avatar
+          }
           notificationCount={unreadCount}
           onNotificationPress={() => navigation.navigate(ROUTES.NOTIFICATIONS)}
           onProfilePress={() => navigation.navigate(ROUTES.PROFILE)}
@@ -124,33 +134,67 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.urgentScrollWrapper}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.urgentScroll,
-            { flexDirection: isRtl ? "row-reverse" : "row" },
-          ]}
-          contentOffset={isRtl ? { x: 9999, y: 0 } : { x: 0, y: 0 }}
-        >
-          {urgentRequests.map((request: UrgentRequest) => (
-            <UrgentRequestCard
-              key={request.id}
-              {...request}
-              onPress={() =>
-                navigation.navigate(ROUTES.REQUEST_DETAIL, {
-                  request: {
-                    ...request,
-                    patientName: request.patientName || "Anonymous Patient",
-                    distance: request.distance || "0 km",
-                  },
-                })
-              }
+      {urgentRequests.length > 0 ? (
+        <View style={styles.urgentScrollWrapper}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.urgentScroll,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            {urgentRequests.map((request: UrgentRequest) => (
+              <UrgentRequestCard
+                key={request.id}
+                {...request}
+                onPress={() =>
+                  navigation.navigate(ROUTES.REQUEST_DETAIL, {
+                    request: {
+                      ...request,
+                      patientName: request.patientName || "Anonymous Patient",
+                      distance: request.distance || "0 km",
+                    },
+                  })
+                }
+              />
+            ))}
+          </ScrollView>
+        </View>
+      ) : (
+        <View style={styles.emptyUrgentCard}>
+          <View style={styles.emptyUrgentIcon}>
+            <AnyIcon
+              type={Icons.Feather}
+              name="check-circle"
+              size={moderateScale(20)}
+              color={colors.success}
             />
-          ))}
-        </ScrollView>
-      </View>
+          </View>
+          <View style={{ flex: 1, marginHorizontal: scale(10) }}>
+            <AppText semiBold FONT_13 style={{ color: colors.text }}>
+              {t("home.noCriticalNearby") || "No critical emergencies nearby"}
+            </AppText>
+            <AppText
+              regular
+              FONT_11
+              style={{ color: colors.textSecondary, marginTop: 2 }}
+            >
+              {t("home.checkLiveFeed") ||
+                "Check the live blood feed to view all active requests."}
+            </AppText>
+          </View>
+          <TouchableOpacity
+            style={styles.emptyUrgentBtn}
+            onPress={() => navigation.navigate(ROUTES.FEED)}
+            activeOpacity={0.7}
+          >
+            <AppText bold FONT_11 style={{ color: colors.primary }}>
+              {t("home.viewFeed") || "View Feed"}
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={{ height: verticalScale(30) }} />
     </ScreenWrapper>

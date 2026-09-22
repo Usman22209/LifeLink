@@ -6,6 +6,7 @@ import { setAuth } from "@store/slices/authSlice";
 import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 
 import { Platform } from "react-native";
+import { captureLoginFailure } from "@shared/utils/sentryLogger";
 
 interface LoginPayload {
   email: string;
@@ -68,7 +69,12 @@ export const useLogin = () => {
       });
     },
 
-    onError: (error: any) => {
+    onError: (error: any, variables: LoginPayload) => {
+      captureLoginFailure(error, {
+        email: variables?.email,
+        loginMethod: "email",
+      });
+
       Toast.show({
         type: "error",
         text2:

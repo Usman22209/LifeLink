@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ScrollView, Alert, View } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -12,7 +12,12 @@ import { colors } from "@theme/colors";
 import { useLogout } from "@shared/query/auth/useLogout";
 import useTranslation from "@shared/hooks/useTranslation";
 import useLanguage from "@shared/hooks/useLanguage";
-import { useDeleteAccount, useUpdateSettings, useGetProfile } from "@shared/query/profile/useProfile";
+import {
+  useDeleteAccount,
+  useUpdateSettings,
+  useGetProfile,
+} from "@shared/query/profile/useProfile";
+import { getStoredEligibility } from "@shared/utils/donorEligibilityService";
 import { ROUTES } from "@utils/Routes";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { styles } from "./ProfileScreen.styles";
@@ -21,13 +26,37 @@ import StatsSection from "./components/StatsSection";
 import SettingItem from "./components/SettingItem";
 import LanguageSelectorModal from "./components/LanguageSelectorModal";
 import LogoutConfirmationModal from "@shared/components/LogoutConfirmationModal";
+import DeleteAccountConfirmationModal from "@shared/components/DeleteAccountConfirmationModal";
+import { OneSignal } from "react-native-onesignal";
 
 const ProfileScreen = () => {
   const dispatch = useDispatch();
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const rawUser = profile || reduxUser;
-  const user = rawUser?.user || rawUser?.profile || rawUser;
+  const rawProfileUser =
+    profile?.data || profile?.user || profile?.profile || profile;
+  const profileUser =
+    rawProfileUser?.user || rawProfileUser?.profile || rawProfileUser;
+
+  const user = useMemo(() => {
+    if (!profileUser && !reduxUser) return undefined;
+    return {
+      ...(reduxUser || {}),
+      ...(profileUser || {}),
+      stats: {
+        ...(reduxUser?.stats || {}),
+        ...(profileUser?.stats || {}),
+        is_eligible:
+          profileUser?.stats?.is_eligible !== undefined
+            ? profileUser.stats.is_eligible
+            : reduxUser?.stats?.is_eligible,
+        next_eligible_date:
+          profileUser?.stats?.next_eligible_date !== undefined
+            ? profileUser.stats.next_eligible_date
+            : reduxUser?.stats?.next_eligible_date,
+      },
+    };
+  }, [reduxUser, profileUser]);
 
   useEffect(() => {
     if (profile) {
@@ -35,24 +64,75 @@ const ProfileScreen = () => {
       dispatch(updateUser(profileData));
     }
   }, [profile, dispatch]);
+
+  useEffect(() => {
+    (async () => {
+      if (reduxUser?.stats?.is_eligible === undefined) {
+        const stored = await getStoredEligibility(reduxUser?.id);
+        if (stored) {
+          dispatch(
+            updateUser({
+              stats: {
+                ...(reduxUser?.stats || {}),
+                is_eligible: stored.isEligible,
+                next_eligible_date: stored.nextEligibleDate || undefined,
+              },
+            }),
+          );
+        }
+      }
+    })();
+  }, [reduxUser?.stats?.is_eligible, dispatch]);
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
   const { language, changeLanguage } = useLanguage();
   const { mutate: logoutMutate, isPending: logoutPending } = useLogout();
-  const { mutate: deleteAccountMutate } = useDeleteAccount();
+  const { mutate: deleteAccountMutate, isPending: deleteAccountPending } =
+    useDeleteAccount();
   const { mutate: updateSettingsMutate } = useUpdateSettings();
   const navigation = useNavigation<NavigationProp<UserStackParamList>>();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [deleteAccountModalVisible, setDeleteAccountModalVisible] =
+    useState(false);
   const [tempLanguage, setTempLanguage] = useState<"en" | "ur">(language);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     user?.notifications_enabled ?? true,
   );
+  const [hidePhoneNumber, setHidePhoneNumber] = useState(
+    user?.hide_phone_number ?? false,
+  );
+
+  useEffect(() => {
+    if (user?.notifications_enabled !== undefined) {
+      setNotificationsEnabled(Boolean(user.notifications_enabled));
+    }
+  }, [user?.notifications_enabled]);
+
+  useEffect(() => {
+    if (user?.hide_phone_number !== undefined) {
+      setHidePhoneNumber(Boolean(user.hide_phone_number));
+    }
+  }, [user?.hide_phone_number]);
 
   const handleNotificationToggle = (val: boolean) => {
     setNotificationsEnabled(val);
     updateSettingsMutate({ notifications_enabled: val });
+    try {
+      if (val) {
+        OneSignal.User.pushSubscription.optIn();
+      } else {
+        OneSignal.User.pushSubscription.optOut();
+      }
+    } catch (e: any) {
+      console.log("OneSignal push subscription toggle error:", e?.message);
+    }
+  };
+
+  const handleHidePhoneToggle = (val: boolean) => {
+    setHidePhoneNumber(val);
+    updateSettingsMutate({ hide_phone_number: val });
   };
 
   const handleLogout = () => {
@@ -60,21 +140,7 @@ const ProfileScreen = () => {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      t("profile.deleteAccount") || "Delete Account",
-      t("profile.deleteAccountConfirm") ||
-        "Are you sure you want to permanently delete your account? This action is irreversible.",
-      [
-        { text: t("common.cancel") || "Cancel", style: "cancel" },
-        {
-          text: t("profile.deleteAccountConfirmButton") || "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteAccountMutate();
-          },
-        },
-      ],
-    );
+    setDeleteAccountModalVisible(true);
   };
 
   const openLanguageModal = () => {
@@ -133,8 +199,20 @@ const ProfileScreen = () => {
               }}
             />
             <SettingItem
+              iconName="check-circle"
+              label={
+                t("profile.donorEligibilityCheck") || "Donor Eligibility Check"
+              }
+              onPress={() => {
+                navigation.navigate(ROUTES.DONOR_QUESTIONNAIRE as any, {
+                  isEditing: true,
+                });
+              }}
+              iconColor={colors.success}
+            />
+            <SettingItem
               iconName="file-text"
-              label="My Blood Requests"
+              label={t("profile.myBloodRequests") || "My Blood Requests"}
               onPress={() => {
                 navigation.navigate(ROUTES.MY_REQUESTS as any);
               }}
@@ -143,11 +221,19 @@ const ProfileScreen = () => {
             <SettingItem
               iconName="bell"
               label={t("profile.notifications")}
-              isLast={true}
               iconColor={colors.primary}
               hasSwitch={true}
               switchValue={notificationsEnabled}
               onSwitchValueChange={handleNotificationToggle}
+            />
+            <SettingItem
+              iconName="phone-off"
+              label={t("profile.hidePhoneNumber") || "Hide Phone Number"}
+              isLast={true}
+              iconColor={colors.primary}
+              hasSwitch={true}
+              switchValue={hidePhoneNumber}
+              onSwitchValueChange={handleHidePhoneToggle}
             />
           </View>
         </View>
@@ -197,8 +283,8 @@ const ProfileScreen = () => {
               iconName="trash-2"
               label={t("profile.deleteAccount")}
               onPress={handleDeleteAccount}
-              iconColor={colors.error}
-              textColor={colors.error}
+              iconColor={colors.primary}
+              textColor={colors.primary}
               isLast={true}
             />
           </View>
@@ -213,7 +299,8 @@ const ProfileScreen = () => {
         />
 
         <Text regular FONT_10 style={styles.versionText}>
-          Version 1.0.0 (Build 12)
+          {t("profile.appVersion", { version: "1.0.0", build: "12" }) ||
+            "Version 1.0.0 (Build 12)"}
         </Text>
       </ScrollView>
 
@@ -233,6 +320,15 @@ const ProfileScreen = () => {
           logoutMutate();
         }}
         isLoading={logoutPending}
+      />
+
+      <DeleteAccountConfirmationModal
+        visible={deleteAccountModalVisible}
+        onClose={() => setDeleteAccountModalVisible(false)}
+        onConfirm={() => {
+          deleteAccountMutate();
+        }}
+        isLoading={deleteAccountPending}
       />
     </ScreenWrapper>
   );

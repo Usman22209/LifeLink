@@ -6,7 +6,10 @@ import AppHeader from "@components/AppHeader";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
 import useTranslation from "@shared/hooks/useTranslation";
-import { useChatThreads, useMarkThreadAsRead } from "@shared/query/chat/useChat";
+import {
+  useChatThreads,
+  useMarkThreadAsRead,
+} from "@shared/query/chat/useChat";
 import { styles } from "./ChatsListScreen.styles";
 
 import ChatItem, { ChatThread } from "./components/ChatItem";
@@ -25,17 +28,28 @@ const ChatsListScreen = () => {
     }, [refetch]),
   );
 
-  const threads: ChatThread[] = Array.isArray(chatThreadsData?.data)
+  const rawThreads: any[] = Array.isArray(chatThreadsData?.data)
     ? chatThreadsData.data
     : Array.isArray(chatThreadsData)
-    ? chatThreadsData
-    : [];
+      ? chatThreadsData
+      : [];
+
+  const threads: ChatThread[] = React.useMemo(() => {
+    const seen = new Set<string>();
+    return rawThreads.filter((t: any) => {
+      const key = `${t.request_id || t.request?.id}_${t.participant?.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [rawThreads]);
 
   const handleThreadPress = (item: ChatThread) => {
     markReadMutate(item.id);
     (navigation as any).navigate(ROUTES.CHAT, {
       request: item.request,
       threadId: item.id,
+      participant: (item as any)?.participant,
     });
   };
 

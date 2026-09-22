@@ -15,6 +15,7 @@ export interface User {
   profile_image?: string;
   language_preference?: string;
   notifications_enabled?: boolean;
+  hide_phone_number?: boolean;
   stats?: {
     donations_count?: number;
     lives_saved?: number;
@@ -22,6 +23,7 @@ export interface User {
     is_eligible?: boolean;
     next_eligible_date?: string;
   };
+  has_completed_screening?: boolean;
 }
 
 export interface Profile {
@@ -39,6 +41,7 @@ export interface Profile {
   is_onboarded: boolean;
   language_preference?: string;
   notifications_enabled?: boolean;
+  hide_phone_number?: boolean;
   stats?: {
     donations_count?: number;
     lives_saved?: number;

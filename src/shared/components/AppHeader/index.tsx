@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(16),
   },
   actionContainer: {
-    width: scale(60),
+    minWidth: scale(48),
     alignItems: "flex-start",
     justifyContent: "center",
   },

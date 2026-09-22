@@ -32,6 +32,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   distance,
   latitude,
   longitude,
+  requester_id,
 }) => {
   const navigation = useNavigation<any>();
   const { t } = useTranslation();
@@ -40,11 +41,17 @@ const RequestCard: React.FC<RequestCardProps> = ({
   const userLocation = useUserLocation();
 
   const cityName = getCityNameById(city, selectedLang);
-  const urgencyKey = (urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const urgencyKey = (urgency?.toLowerCase() ||
+    "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
 
-  const computedDistance = formatDistance(userLocation, { latitude, longitude });
-  const validDistance = computedDistance || (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
+  const computedDistance = formatDistance(userLocation, {
+    latitude,
+    longitude,
+  });
+  const validDistance =
+    computedDistance ||
+    (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
 
   const getUrgencyText = (urgencyVal: string) => {
     switch (urgencyVal?.toLowerCase()) {
@@ -52,7 +59,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
         return t("feed.critical");
       case "urgent":
       case "high":
-        return t("feed.urgent");
+        return t("feed.high") || t("feed.urgent") || "High";
       case "normal":
       default:
         return t("feed.normal");
@@ -64,9 +71,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
       await Share.share({
         message: `🚨 ${t("feed.title")}: ${bloodType} ${t("requestForm.bloodGroup")} required for ${patientName} at ${hospital}, ${city}. Please help save a life!`,
       });
-    } catch (e) {
-      // ignore share error
-    }
+    } catch (e) {}
   };
 
   return (
@@ -105,7 +110,10 @@ const RequestCard: React.FC<RequestCardProps> = ({
           <Text
             regular
             FONT_11
-            style={[styles.hospitalText, { textAlign: isRtl ? "right" : "left" }]}
+            style={[
+              styles.hospitalText,
+              { textAlign: isRtl ? "right" : "left" },
+            ]}
             numberOfLines={1}
           >
             {hospital} · {cityName}
@@ -230,6 +238,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
                 distance,
                 latitude,
                 longitude,
+                requester_id,
               },
             })
           }

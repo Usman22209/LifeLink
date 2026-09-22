@@ -37,6 +37,21 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
   const { t } = useTranslation();
   const isRtl = useSelector(selectIsRtl);
   const firstName = userName ? userName.split(" ")[0] : "User";
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageError(false);
+  }, [profileImage]);
+
+  const hasImage = Boolean(
+    profileImage &&
+    typeof profileImage === "string" &&
+    profileImage.trim().length > 0 &&
+    !imageError,
+  );
+
+  const initial =
+    firstName && firstName !== "User" ? firstName.charAt(0).toUpperCase() : "";
 
   return (
     <View
@@ -57,19 +72,47 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
         onPress={onProfilePress}
       >
         <View style={styles.avatarContainer}>
-          {profileImage ? (
-            <AppImage
-              source={{ uri: profileImage }}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text bold FONT_16 style={{ color: colors.white }}>
-                {firstName.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-          )}
+          <View style={styles.avatarWrapper}>
+            {hasImage ? (
+              <AppImage
+                source={{ uri: profileImage!.trim() }}
+                style={styles.avatar}
+                resizeMode="cover"
+                onError={() => setImageError(true)}
+                placeholder={
+                  <View style={styles.avatarPlaceholder}>
+                    {initial ? (
+                      <Text bold FONT_16 style={styles.avatarInitial}>
+                        {initial}
+                      </Text>
+                    ) : (
+                      <AnyIcon
+                        type={Icons.Feather}
+                        name="user"
+                        size={moderateScale(20)}
+                        color={colors.primary}
+                      />
+                    )}
+                  </View>
+                }
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                {initial ? (
+                  <Text bold FONT_16 style={styles.avatarInitial}>
+                    {initial}
+                  </Text>
+                ) : (
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="user"
+                    size={moderateScale(20)}
+                    color={colors.primary}
+                  />
+                )}
+              </View>
+            )}
+          </View>
           <View
             style={[
               styles.onlineDot,

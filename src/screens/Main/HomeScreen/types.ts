@@ -7,11 +7,10 @@ export interface UrgentRequest {
   patientName?: string;
   patientImage?: string;
   units: number;
-  urgency: "critical" | "urgent" | "normal";
+  urgency: "critical" | "high" | "urgent" | "normal";
   time: string;
   distance?: string;
   latitude?: number;
   longitude?: number;
+  requester_id?: string;
 }
-
-export { MOCK_URGENT_REQUESTS } from "../../../shared/constants/mockData";

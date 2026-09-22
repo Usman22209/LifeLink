@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { BLOOD_REQUEST_SERVICE } from "@shared/api/service/blood-request.service";
 import {
   CreateBloodRequestDto,
@@ -152,8 +157,8 @@ export const useUpdateBloodRequest = () => {
 };
 
 /**
-  * Get urgent blood requests for HomeScreen
-  */
+ * Get urgent blood requests for HomeScreen
+ */
 export const useUrgentBloodRequests = (params?: {
   limit?: number;
   lat?: number;
@@ -166,7 +171,10 @@ export const useUrgentBloodRequests = (params?: {
         const response = await BLOOD_REQUEST_SERVICE.getUrgentRequests(params);
         return response.data?.data || response.data;
       } catch (error) {
-        console.warn("[useUrgentBloodRequests] Backend returned error, falling back:", error);
+        console.warn(
+          "[useUrgentBloodRequests] Backend returned error, falling back:",
+          error,
+        );
         return [];
       }
     },

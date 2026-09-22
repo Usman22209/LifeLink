@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  View,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
+import { View, TouchableOpacity, useWindowDimensions } from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
@@ -40,7 +36,8 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   longitude,
   onPress,
 }) => {
-  const urgencyKey = (urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const urgencyKey = (urgency?.toLowerCase() ||
+    "normal") as keyof typeof URGENCY_CONFIG;
   const config = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
   const isRtl = useSelector(selectIsRtl);
   const selectedLang = useSelector(selectLanguage);
@@ -52,8 +49,13 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   const cardWidth = (usableWidth - moderateScale(20) - scale(12)) / 2;
 
   const cityName = getCityNameById(city, selectedLang);
-  const computedDistance = formatDistance(userLocation, { latitude, longitude });
-  const validDistance = computedDistance || (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
+  const computedDistance = formatDistance(userLocation, {
+    latitude,
+    longitude,
+  });
+  const validDistance =
+    computedDistance ||
+    (distance && distance !== "N/A" && distance !== "0 km" ? distance : "");
   const locationText = [cityName, validDistance].filter(Boolean).join(" · ");
 
   const getUrgencyText = (val?: string) => {
@@ -71,7 +73,13 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { width: cardWidth }]}
+      style={[
+        styles.card,
+        {
+          width: cardWidth,
+          flexDirection: isRtl ? "row-reverse" : "row",
+        },
+      ]}
       activeOpacity={0.8}
       onPress={onPress}
     >
@@ -110,14 +118,19 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             <Text
               semiBold
               FONT_9
-              style={{ color: config.color, marginLeft: scale(3) }}
+              style={{ color: config.color, marginHorizontal: scale(3) }}
             >
               {getUrgencyText(urgency)}
             </Text>
           </View>
         </View>
 
-        <View style={[styles.hospitalContainer, { alignItems: isRtl ? "flex-end" : "flex-start" }]}>
+        <View
+          style={[
+            styles.hospitalContainer,
+            { alignItems: isRtl ? "flex-end" : "flex-start" },
+          ]}
+        >
           <Text
             semiBold
             FONT_12
@@ -146,8 +159,9 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             numberOfLines={1}
             style={{
               color: colors.textSecondary,
-              marginLeft: scale(3),
+              marginHorizontal: scale(3),
               flex: 1,
+              textAlign: isRtl ? "right" : "left",
             }}
           >
             {locationText}
@@ -177,9 +191,15 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
             <Text
               medium
               FONT_10
-              style={{ color: colors.textSecondary, marginLeft: scale(3) }}
+              style={{
+                color: colors.textSecondary,
+                marginHorizontal: scale(3),
+              }}
             >
-              {units} {units === 1 ? t("home.unit") : t("home.units")}
+              {units}{" "}
+              {units === 1
+                ? t("feed.unit") || "unit"
+                : t("feed.units") || "units"}
             </Text>
           </View>
           <Text medium FONT_9 style={{ color: colors.textSecondary }}>

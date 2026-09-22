@@ -13,6 +13,7 @@ import Text from "@components/AppText";
 import AppInput from "@components/AppInput";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
+import useTranslation from "@shared/hooks/useTranslation";
 
 interface SelectionOption {
   label: string;
@@ -38,8 +39,9 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
   options,
   selectedValue,
   onSelect,
-  placeholder = "Search...",
+  placeholder,
 }) => {
+  const { t } = useTranslation();
   const isRtl = I18nManager.isRTL;
   const [search, setSearch] = useState("");
   const showModal = isVisible ?? visible ?? false;
@@ -84,7 +86,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
         <View style={styles.searchContainer}>
           <AppInput
             name="search_selection"
-            placeholder={placeholder}
+            placeholder={placeholder || t("common.search") || "Search..."}
             value={search}
             onChangeText={setSearch}
             iconType={Icons.Ionicons}
@@ -139,7 +141,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Text regular FONT_14 style={{ color: colors.textSecondary }}>
-                No results found
+                {t("common.noResults") || "No results found"}
               </Text>
             </View>
           }

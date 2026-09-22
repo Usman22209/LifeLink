@@ -12,6 +12,7 @@ import { moderateScale } from "react-native-size-matters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScreenWrapper from "@components/ScreenWrapper";
 import AppHeader from "@components/AppHeader";
+import AppText from "@components/AppText";
 import AnyIcon, { Icons } from "@components/AnyIcon";
 import { colors } from "@theme/colors";
 import { ROUTES } from "@utils/Routes";
@@ -20,20 +21,32 @@ import { selectLanguage } from "@store/slices/appSlice";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
 import { useGetProfile } from "@shared/query/profile/useProfile";
-import { requireCompleteProfile } from "@shared/utils/profileUtils";
+import {
+  requireCompleteProfile,
+  isProfileComplete,
+} from "@shared/utils/profileUtils";
 import { useUserLocation, formatDistance } from "@shared/utils/locationService";
 import { URGENCY_CONFIG } from "@screens/Main/FeedScreen/types";
 import type { UserStackParamList } from "@shared/interfaces/navigation/navigation-params.interface";
 import { getCityNameById, getProvinceByCityId } from "@shared/utils/cityUtils";
-import { useAcceptBloodRequest } from "@shared/query/donations/useDonations";
+import {
+  useAcceptBloodRequest,
+  useMyDonations,
+} from "@shared/query/donations/useDonations";
+import { useBloodRequestDetails } from "@shared/query/blood-requests/useBloodRequests";
+import { useChatThreads } from "@shared/query/chat/useChat";
 import EligibilityChecklistModal from "@components/EligibilityChecklistModal";
+import ReportModal from "@shared/components/ReportModal";
+import DonationPledgedModal from "@components/DonationPledgedModal";
 
 import { HeroBanner } from "./components/HeroBanner";
 import { MedicalCaseNotesCard } from "./components/MedicalCaseNotesCard";
+import { BloodCompatibilityCard } from "./components/BloodCompatibilityCard";
 import { TimelineCard } from "./components/TimelineCard";
 import { DetailsSheet } from "./components/DetailsSheet";
 import { MapPreviewCard } from "./components/MapPreviewCard";
 import { StickyFooterActions } from "./components/StickyFooterActions";
+import { isBloodCompatible } from "@shared/utils/bloodCompatibility";
 import { styles } from "./RequestDetailScreen.styles";
 
 type RequestDetailScreenRouteProp = RouteProp<
@@ -51,25 +64,89 @@ const RequestDetailScreen: React.FC = () => {
 
   const rawRequest: any = route.params?.request || {};
 
-  // Normalize request schema to handle both camelCase and backend snake_case properties
+  const { data: requestDetails } = useBloodRequestDetails(
+    rawRequest.id,
+    !!rawRequest.id,
+  );
+  const detailData: any = requestDetails?.data || requestDetails || {};
+
+  const { data: chatThreadsData } = useChatThreads();
+  const threadsList = Array.isArray(chatThreadsData?.data)
+    ? chatThreadsData.data
+    : Array.isArray(chatThreadsData)
+      ? chatThreadsData
+      : [];
+
+  const { data: myDonationsData } = useMyDonations();
+  const myDonationsList: any[] = Array.isArray(myDonationsData?.history)
+    ? myDonationsData.history
+    : Array.isArray(myDonationsData?.data)
+      ? myDonationsData.data
+      : Array.isArray(myDonationsData)
+        ? myDonationsData
+        : [];
+
   const request = useMemo(() => {
+    const combined = { ...rawRequest, ...detailData };
     return {
-      ...rawRequest,
-      id: rawRequest.id || "",
-      patientName: rawRequest.patientName || rawRequest.patient_name || "Anonymous Patient",
-      bloodType: rawRequest.bloodType || rawRequest.blood_group || "O+",
-      hospital: rawRequest.hospital || rawRequest.hospital_name || "Hospital",
-      city: rawRequest.city || rawRequest.city_id || "",
-      units: rawRequest.units || rawRequest.units_required || 1,
-      urgency: (rawRequest.urgency || "normal").toLowerCase(),
-      time: rawRequest.time || "Recently",
-      time_left: rawRequest.time_left || "",
-      patientImage: rawRequest.patientImage || rawRequest.patient_image || rawRequest.requester?.profile_image,
-      latitude: rawRequest.latitude ? Number(rawRequest.latitude) : undefined,
-      longitude: rawRequest.longitude ? Number(rawRequest.longitude) : undefined,
-      distance: rawRequest.distance || "",
+      ...combined,
+      id: combined.id || "",
+      patientName:
+        combined.patientName || combined.patient_name || "Anonymous Patient",
+      bloodType: combined.bloodType || combined.blood_group || "O+",
+      hospital: combined.hospital || combined.hospital_name || "Hospital",
+      city: combined.city || combined.city_id || "",
+      units: combined.units || combined.units_required || 1,
+      urgency: (combined.urgency || "normal").toLowerCase(),
+      time: combined.time || "Recently",
+      time_left: combined.time_left || "",
+      patientImage:
+        combined.patientImage ||
+        combined.patient_image ||
+        combined.requester?.profile_image,
+      latitude: combined.latitude ? Number(combined.latitude) : undefined,
+      longitude: combined.longitude ? Number(combined.longitude) : undefined,
+      distance: combined.distance || "",
+      requester_id:
+        combined.requester_id || combined.requesterId || combined.requester?.id,
+      contact_number:
+        combined.contact_number ||
+        combined.contactNumber ||
+        combined.requester?.phone,
+      hide_phone_number: Boolean(
+        combined.hide_phone_number ||
+        combined.requester?.hide_phone_number ||
+        detailData.hide_phone_number ||
+        detailData.requester?.hide_phone_number,
+      ),
     };
-  }, [rawRequest]);
+  }, [rawRequest, detailData]);
+
+  const existingThread = useMemo(() => {
+    if (!request.id) return null;
+    return threadsList.find(
+      (t: any) => String(t.request_id || t.request?.id) === String(request.id),
+    );
+  }, [threadsList, request.id]);
+
+  const existingDonation = useMemo(() => {
+    if (!request.id) return null;
+    return myDonationsList.find(
+      (d: any) =>
+        (String(d.request?.id || d.request_id) === String(request.id) ||
+          String(d.requestId) === String(request.id)) &&
+        d.status !== "cancelled",
+    );
+  }, [myDonationsList, request.id]);
+
+  const [justPledged, setJustPledged] = useState(false);
+
+  const donationPledged =
+    justPledged ||
+    Boolean(existingDonation && existingDonation.status === "intent");
+  const donationCompleted = Boolean(
+    existingDonation && existingDonation.status === "completed",
+  );
 
   const cityName = useMemo(
     () => getCityNameById(request.city, selectedLang),
@@ -88,22 +165,63 @@ const RequestDetailScreen: React.FC = () => {
 
   const displayDistance = computedDist
     ? `${computedDist} away`
-    : request.distance && request.distance !== "N/A" && request.distance !== "0 km"
-    ? `${request.distance} away`
-    : "";
+    : request.distance &&
+        request.distance !== "N/A" &&
+        request.distance !== "0 km"
+      ? `${request.distance} away`
+      : "";
 
-  const mapOverlayText = [cityName, displayDistance].filter(Boolean).join(" · ");
+  const mapOverlayText = [cityName, displayDistance]
+    .filter(Boolean)
+    .join(" · ");
 
   const [matchSheetVisible, setMatchSheetVisible] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [pledgedModalVisible, setPledgedModalVisible] = useState(false);
+  const [isAlreadyPledgedModal, setIsAlreadyPledgedModal] = useState(false);
   const { mutateAsync: acceptBloodRequestMutate, isPending: isAccepting } =
     useAcceptBloodRequest();
 
-  const urgencyKey = (request?.urgency?.toLowerCase() || "normal") as keyof typeof URGENCY_CONFIG;
+  const urgencyKey = (request?.urgency?.toLowerCase() ||
+    "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+  const isUrgent = urgencyKey === "urgent" || urgencyKey === "critical";
 
   const reduxUser = useSelector(selectUser);
   const { data: profile } = useGetProfile();
-  const user = profile || reduxUser;
+  const rawUser =
+    profile?.data || profile?.user || profile?.profile || profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
+  const currentUserId = user?.id || reduxUser?.id;
+
+  const requesterId =
+    detailData?.requester_id ||
+    detailData?.requesterId ||
+    detailData?.requester?.id ||
+    detailData?.user_id ||
+    request?.requester_id ||
+    request?.requesterId ||
+    request?.requester?.id ||
+    request?.user_id ||
+    rawRequest?.requester_id ||
+    rawRequest?.requesterId ||
+    rawRequest?.requester?.id ||
+    rawRequest?.user_id;
+
+  const isOwner = Boolean(
+    currentUserId &&
+    requesterId &&
+    String(currentUserId).trim().toLowerCase() ===
+      String(requesterId).trim().toLowerCase(),
+  );
+
+  const donorBloodGroup =
+    user?.blood_group || (user as any)?.bloodType || reduxUser?.blood_group;
+  const patientBloodGroup = request.bloodType || (request as any)?.blood_group;
+  const isCompatible = useMemo(
+    () => isBloodCompatible(donorBloodGroup, patientBloodGroup),
+    [donorBloodGroup, patientBloodGroup],
+  );
 
   const handleShare = useCallback(async () => {
     try {
@@ -115,41 +233,136 @@ const RequestDetailScreen: React.FC = () => {
     }
   }, [request, cityName, t]);
 
+  const participant = useMemo(() => {
+    const rawPId = existingThread?.participant?.id;
+    const pId =
+      (rawPId && rawPId !== "usr_unknown" ? rawPId : requesterId) || null;
+    const pName =
+      existingThread?.participant?.name ||
+      detailData?.requester?.full_name ||
+      detailData?.requester?.name ||
+      (request as any)?.requester?.full_name ||
+      (request as any)?.requester?.name ||
+      (request as any)?.user?.full_name ||
+      (request as any)?.user?.name ||
+      request?.patientName;
+
+    const isValidAvatar = (url?: string | null) =>
+      Boolean(
+        url &&
+        typeof url === "string" &&
+        url.trim().length > 0 &&
+        !url.includes("cdn.lifelink.org") &&
+        (url.startsWith("http://") || url.startsWith("https://")),
+      );
+
+    const candidates = [
+      detailData?.requester?.profile_image,
+      (request as any)?.requester?.profile_image,
+      existingThread?.participant?.avatar,
+      (existingThread as any)?.participant?.profile_image,
+      request?.patientImage,
+      (request as any)?.patient_image,
+    ];
+    let pAvatar: string | undefined = undefined;
+    for (const c of candidates) {
+      if (isValidAvatar(c)) {
+        pAvatar = c;
+        break;
+      }
+    }
+
+    return {
+      id: pId,
+      name: pName,
+      avatar: pAvatar,
+    };
+  }, [existingThread, requesterId, detailData, request]);
+
   const handleContact = useCallback(() => {
-    if (user && !requireCompleteProfile(user, navigation, t)) {
+    if (isOwner) {
+      (navigation as any).navigate(ROUTES.MY_REQUESTS);
       return;
     }
-    (navigation as any).navigate(ROUTES.CHAT, { request });
-  }, [navigation, request, user, t]);
+    const isUserOnboarded =
+      user?.is_onboarded === true || isProfileComplete(user);
+    if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
+      return;
+    }
+    (navigation as any).navigate(ROUTES.CHAT, {
+      request,
+      threadId: existingThread?.id,
+      participant,
+    });
+  }, [navigation, request, user, t, isOwner, existingThread, participant]);
+
+  const handleManageRequest = useCallback(() => {
+    (navigation as any).navigate(ROUTES.MY_REQUESTS);
+  }, [navigation]);
 
   const handleConfirmMatch = useCallback(async () => {
-    if (user && !requireCompleteProfile(user, navigation, t)) {
+    if (isOwner) {
+      Alert.alert(
+        "Action Not Allowed",
+        "You cannot donate blood to your own request.",
+      );
+      return;
+    }
+    const isUserOnboarded =
+      user?.is_onboarded === true || isProfileComplete(user);
+    if (!isUserOnboarded && !requireCompleteProfile(user, navigation, t)) {
       return;
     }
     if (!request.id) return;
     try {
       await acceptBloodRequestMutate(request.id);
+      setJustPledged(true);
       setMatchSheetVisible(false);
-
-      Alert.alert(
-        "Donation Pledged! 🎉",
-        `Thank you for offering to save a life!\n\nWe have initiated a chat thread with the requester for ${request.hospital}.`,
-        [
-          {
-            text: "Open Chat",
-            onPress: () =>
-              (navigation as any).navigate(ROUTES.CHAT, { request }),
-          },
-        ],
-      );
+      setIsAlreadyPledgedModal(false);
+      setPledgedModalVisible(true);
     } catch (err: any) {
       setMatchSheetVisible(false);
       Alert.alert("Error", err?.message || "Could not respond to request.");
     }
-  }, [acceptBloodRequestMutate, request, navigation, user, t]);
+  }, [isOwner, acceptBloodRequestMutate, request.id, navigation, user, t]);
+
+  const canCall = Boolean(
+    !isOwner &&
+    !request.hide_phone_number &&
+    (request.contact_number || request.contactNumber),
+  );
+
+  const handleCall = useCallback(() => {
+    const rawPhone = request.contact_number || request.contactNumber;
+    if (!rawPhone) {
+      Alert.alert(
+        "Direct Call Unavailable",
+        "This user prefers in-app chat. Please tap Message to contact them directly.",
+      );
+      return;
+    }
+    const cleanPhone = String(rawPhone).replace(/[^\d+]/g, "");
+    const phoneUrl = `tel:${cleanPhone}`;
+    Linking.canOpenURL(phoneUrl)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(phoneUrl);
+        } else {
+          Alert.alert(
+            "Cannot Make Call",
+            `Unable to initiate phone call to ${rawPhone} on this device.`,
+          );
+        }
+      })
+      .catch(() => {
+        Linking.openURL(phoneUrl);
+      });
+  }, [request]);
 
   const handleNavigate = useCallback(() => {
-    const query = encodeURIComponent(`${request.hospital}, ${cityName || request.city}`);
+    const query = encodeURIComponent(
+      `${request.hospital}, ${cityName || request.city}`,
+    );
     const url = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
     Linking.openURL(url).catch((err) => {
       console.log("Error launching native maps:", err.message);
@@ -172,18 +385,41 @@ const RequestDetailScreen: React.FC = () => {
             showBackButton
             onBackPress={() => navigation.goBack()}
             rightComponent={
-              <TouchableOpacity
-                onPress={handleShare}
-                activeOpacity={0.7}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
               >
-                <AnyIcon
-                  type={Icons.Feather}
-                  name="share-2"
-                  size={moderateScale(18)}
-                  color={colors.text}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.headerShareBtn}
+                  onPress={handleShare}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="share-2"
+                    size={moderateScale(15)}
+                    color={colors.text}
+                  />
+                </TouchableOpacity>
+                {!isOwner && (
+                  <TouchableOpacity
+                    style={styles.headerReportPill}
+                    onPress={() => setReportModalVisible(true)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <AnyIcon
+                      type={Icons.Feather}
+                      name="shield"
+                      size={moderateScale(12)}
+                      color={colors.error}
+                    />
+                    <AppText bold FONT_11 style={styles.headerReportText}>
+                      {t("requestDetail.report") || "Report"}
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
             }
             titleSize={15}
             hasBorder={true}
@@ -195,39 +431,146 @@ const RequestDetailScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Cardless Hero Banner */}
           <HeroBanner
             request={request}
             cfg={cfg}
             displayDistance={displayDistance}
           />
 
-          {/* Medical Case Notes */}
+          {!isOwner && (
+            <BloodCompatibilityCard
+              donorBloodGroup={donorBloodGroup}
+              patientBloodGroup={patientBloodGroup}
+              onShare={handleShare}
+            />
+          )}
+
           <MedicalCaseNotesCard bloodType={request.bloodType} />
 
-          {/* Donation Step Timeline */}
           <TimelineCard request={request} cityName={cityName} />
 
-          {/* Unified Details Sheet */}
           <DetailsSheet
             request={request}
             cityName={cityName}
             provinceName={provinceName}
           />
 
-          {/* Vector Map Preview Card (Android only) */}
           <MapPreviewCard
             request={request}
             mapOverlayText={mapOverlayText}
             onNavigate={handleNavigate}
           />
+
+          {!isOwner && (
+            <TouchableOpacity
+              style={styles.safetyReportCard}
+              onPress={() => setReportModalVisible(true)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.safetyReportLeft}>
+                <View style={styles.safetyShieldWrap}>
+                  <AnyIcon
+                    type={Icons.Feather}
+                    name="shield"
+                    size={moderateScale(16)}
+                    color={colors.textSecondary}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <AppText bold FONT_12 style={{ color: colors.text }}>
+                    {t("requestDetail.suspiciousTitle") ||
+                      "Notice something suspicious?"}
+                  </AppText>
+                  <AppText
+                    regular
+                    FONT_11
+                    style={{ color: colors.textSecondary, marginTop: 1 }}
+                  >
+                    {t("requestDetail.suspiciousDesc") ||
+                      "Report fake or fraudulent blood requests to protect our community."}
+                  </AppText>
+                </View>
+              </View>
+              <View style={styles.reportBadge}>
+                <AppText bold FONT_11 style={{ color: colors.error }}>
+                  {t("requestDetail.report") || "Report"}
+                </AppText>
+                <AnyIcon
+                  type={Icons.Feather}
+                  name="chevron-right"
+                  size={moderateScale(12)}
+                  color={colors.error}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
         </ScrollView>
 
-        {/* Sticky Actions Footer */}
         <StickyFooterActions
           insetsBottom={insets.bottom}
+          isOwner={isOwner}
+          canCall={canCall}
+          donationPledged={donationPledged}
+          donationCompleted={donationCompleted}
+          isUrgent={isUrgent}
+          isCompatible={isCompatible}
+          onCall={handleCall}
           onContact={handleContact}
-          onDonate={() => setMatchSheetVisible(true)}
+          onShare={handleShare}
+          onDonate={() => {
+            if (!isCompatible) {
+              handleShare();
+              return;
+            }
+
+            if (donationPledged) {
+              setIsAlreadyPledgedModal(true);
+              setPledgedModalVisible(true);
+              return;
+            }
+            if (donationCompleted) {
+              Alert.alert(
+                "Donation Completed",
+                "Thank you! Your donation for this patient has already been confirmed as fulfilled.",
+                [
+                  {
+                    text: "View My Donations",
+                    onPress: () =>
+                      (navigation as any).navigate(ROUTES.MY_DONATIONS),
+                  },
+                  { text: "OK", style: "cancel" },
+                ],
+              );
+              return;
+            }
+
+            if (user?.stats?.is_eligible === false) {
+              const reason = user?.stats?.next_eligible_date
+                ? `You have an active donation cooldown until ${user.stats.next_eligible_date}.`
+                : "You are currently marked as ineligible to donate blood based on your health screening.";
+              Alert.alert(
+                "Donor Eligibility Notice",
+                `${reason}\n\nWould you like to review your screening questionnaire?`,
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Review Questionnaire",
+                    onPress: () =>
+                      (navigation as any).navigate(ROUTES.DONOR_QUESTIONNAIRE, {
+                        isEditing: true,
+                      }),
+                  },
+                ],
+              );
+              return;
+            }
+
+            setMatchSheetVisible(true);
+          }}
+          onManageRequest={handleManageRequest}
+          onViewMyDonations={() =>
+            (navigation as any).navigate(ROUTES.MY_DONATIONS)
+          }
         />
       </ScreenWrapper>
 
@@ -236,6 +579,35 @@ const RequestDetailScreen: React.FC = () => {
         onClose={() => setMatchSheetVisible(false)}
         onConfirm={handleConfirmMatch}
         isLoading={isAccepting}
+      />
+
+      <ReportModal
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+        targetType="request"
+        targetId={String(request.id)}
+        targetTitle={`Request: ${request.patientName} (${request.bloodType})`}
+      />
+
+      <DonationPledgedModal
+        isVisible={pledgedModalVisible}
+        onClose={() => setPledgedModalVisible(false)}
+        isAlreadyPledged={isAlreadyPledgedModal}
+        hospitalName={request.hospital}
+        patientName={request.patientName}
+        bloodType={request.bloodType}
+        onOpenChat={() => {
+          setPledgedModalVisible(false);
+          (navigation as any).navigate(ROUTES.CHAT, {
+            request,
+            threadId: existingThread?.id,
+            participant,
+          });
+        }}
+        onViewMyDonations={() => {
+          setPledgedModalVisible(false);
+          (navigation as any).navigate(ROUTES.MY_DONATIONS);
+        }}
       />
     </View>
   );

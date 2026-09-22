@@ -47,12 +47,16 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
         <View
           style={[
             styles.modalContent,
-            { paddingBottom: Math.max(insets.bottom + verticalScale(14), verticalScale(20)) },
+            {
+              paddingBottom: Math.max(
+                insets.bottom + verticalScale(14),
+                verticalScale(20),
+              ),
+            },
           ]}
         >
           <View style={styles.modalHandle} />
 
-          {/* Minimal Clean Header */}
           <View
             style={[
               styles.modalHeaderRow,
@@ -62,7 +66,10 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
             <Text
               bold
               FONT_16
-              style={[styles.modalTitle, { textAlign: isRtl ? "right" : "left" }]}
+              style={[
+                styles.modalTitle,
+                { textAlign: isRtl ? "right" : "left" },
+              ]}
             >
               {t("profile.languageModalTitle")}
             </Text>
@@ -96,9 +103,11 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                 semiBold={tempLanguage === "en"}
                 medium={tempLanguage !== "en"}
                 FONT_14
-                style={{ color: tempLanguage === "en" ? colors.primary : colors.text }}
+                style={{
+                  color: tempLanguage === "en" ? colors.primary : colors.text,
+                }}
               >
-                English
+                {t("english") || "English"}
               </Text>
               {tempLanguage === "en" && (
                 <AnyIcon
@@ -126,7 +135,9 @@ const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                 semiBold={tempLanguage === "ur"}
                 medium={tempLanguage !== "ur"}
                 FONT_14
-                style={{ color: tempLanguage === "ur" ? colors.primary : colors.text }}
+                style={{
+                  color: tempLanguage === "ur" ? colors.primary : colors.text,
+                }}
               >
                 اردو (Urdu)
               </Text>

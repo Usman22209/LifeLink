@@ -27,7 +27,6 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        {/* Category Icon */}
         <View style={[styles.iconWrap, { backgroundColor: config.bg }]}>
           <AnyIcon
             type={Icons.Feather}
@@ -37,7 +36,6 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
           />
         </View>
 
-        {/* Text Content */}
         <View style={styles.cardBody}>
           <View
             style={[
@@ -58,7 +56,7 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
                 FONT_13
                 style={[
                   styles.cardTitle,
-                  { color: read ? colors.gray700 : colors.text },
+                  { color: read ? colors.textSecondary : colors.text },
                 ]}
                 numberOfLines={1}
               >
@@ -71,23 +69,17 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
             </AppText>
           </View>
 
-          <AppText
-            regular
-            FONT_12
-            style={styles.cardMessage}
-            numberOfLines={2}
-          >
+          <AppText regular FONT_12 style={styles.cardMessage} numberOfLines={2}>
             {body}
           </AppText>
         </View>
 
-        {/* Subtle Chevron Indicator */}
         <View style={styles.chevronWrap}>
           <AnyIcon
             type={Icons.Feather}
             name={isRtl ? "chevron-left" : "chevron-right"}
             size={moderateScale(16)}
-            color={colors.gray400}
+            color={colors.gray600}
           />
         </View>
       </TouchableOpacity>
@@ -96,4 +88,3 @@ const AlertCard: React.FC<AlertCardProps> = (props) => {
 };
 
 export default AlertCard;
-

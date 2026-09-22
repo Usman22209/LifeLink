@@ -23,7 +23,11 @@ import { useBloodRequestForm } from "@shared/forms/hooks/useBloodRequestForm";
 import { useCreateBloodRequest } from "@shared/query/blood-requests/useBloodRequests";
 import { Coords } from "@shared/utils/locationService";
 import { formatPhoneNumber, toE164Phone } from "@shared/utils/phoneUtils";
-import { requireCompleteProfile, isProfileComplete } from "@shared/utils/profileUtils";
+import {
+  requireCompleteProfile,
+  isProfileComplete,
+} from "@shared/utils/profileUtils";
+import { useScreenHangWatchdog } from "@shared/utils/sentryLogger";
 import CitiesData from "@shared/data/cities.json";
 
 import { styles } from "./RequestScreen.styles";
@@ -44,22 +48,13 @@ const RequestScreen = () => {
   const { data: profile } = useGetProfile();
   const user = profile || reduxUser;
 
-  // Check if profile is complete whenever user visits RequestScreen
-  useFocusEffect(
-    useCallback(() => {
-      const active = profile || reduxUser;
-      if (active && !isProfileComplete(active)) {
-        requireCompleteProfile(active, navigation, t);
-      }
-    }, [profile, reduxUser, navigation, t]),
-  );
-
   const {
     control,
     handleSubmit,
     setValue,
     watch,
     reset,
+    getValues,
     formState: { errors },
   } = useBloodRequestForm();
 
@@ -76,19 +71,30 @@ const RequestScreen = () => {
   const selectedProvince = watch("state");
   const selectedCityId = watch("city_id");
 
-  // Prefill user data (name, contact number, blood group, state, city)
-  React.useEffect(() => {
-    console.log("🔍 [RequestScreen] useEffect user:", JSON.stringify(user));
-    if (user) {
-      const name = user.full_name || (user as any).name || "";
-      const rawPhone = user.phone || (user as any).contact_number || "";
+  useScreenHangWatchdog("RequestScreen", createRequestMutation.isPending, {
+    actionName: "submit_blood_request",
+    timeoutMs: 12000,
+    context: {
+      bloodGroup: selectedBloodGroup,
+      units: selectedUnits,
+      urgency: selectedUrgency,
+      cityId: selectedCityId,
+      hasPinnedLocation: !!pinnedLocation,
+    },
+  });
+
+  const populateUserDefaults = useCallback(
+    (userData: any, force = false) => {
+      if (!userData) return;
+      const name = userData.full_name || (userData as any).name || "";
+      const rawPhone = userData.phone || (userData as any).contact_number || "";
       const bloodGroup = (
-        user.blood_group ||
-        (user as any).blood_type ||
+        userData.blood_group ||
+        (userData as any).blood_type ||
         ""
       ).toUpperCase();
-      let state = user.state || (user as any).province || "";
-      let cityId = user.city_id || (user as any).city || "";
+      let state = userData.state || (userData as any).province || "";
+      let cityId = userData.city_id || (userData as any).city || "";
 
       if (cityId) {
         const foundCity = CitiesData.cities.find(
@@ -105,33 +111,44 @@ const RequestScreen = () => {
         }
       }
 
-      console.log("🔍 [RequestScreen] Extracted predata ->", {
-        name,
-        rawPhone,
-        bloodGroup,
-        state,
-        cityId,
-      });
-
-      if (name && !watch("patient_name")) {
+      if (name && (force || !getValues("patient_name"))) {
         setValue("patient_name", name, { shouldValidate: true });
       }
-      if (rawPhone && !watch("contact_number")) {
+      if (rawPhone && (force || !getValues("contact_number"))) {
         setValue("contact_number", formatPhoneNumber(rawPhone), {
           shouldValidate: true,
         });
       }
-      if (bloodGroup && !watch("blood_group")) {
+      if (bloodGroup && (force || !getValues("blood_group"))) {
         setValue("blood_group", bloodGroup, { shouldValidate: true });
       }
-      if (state && !watch("state")) {
+      if (state && (force || !getValues("state"))) {
         setValue("state", state, { shouldValidate: true });
       }
-      if (cityId && !watch("city_id")) {
+      if (cityId && (force || !getValues("city_id"))) {
         setValue("city_id", cityId, { shouldValidate: true });
       }
+    },
+    [getValues, setValue],
+  );
+
+  React.useEffect(() => {
+    if (user) {
+      populateUserDefaults(user, false);
     }
-  }, [user, setValue, watch]);
+  }, [user, populateUserDefaults]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const activeUser = profile || reduxUser;
+      if (activeUser) {
+        const current = getValues();
+        if (!current.patient_name && !current.contact_number) {
+          populateUserDefaults(activeUser, false);
+        }
+      }
+    }, [profile, reduxUser, getValues, populateUserDefaults]),
+  );
 
   const handleMapConfirm = useCallback(
     (coords: Coords, placeInfo?: PlaceInfo) => {
@@ -232,7 +249,6 @@ const RequestScreen = () => {
         }),
       };
 
-      // Clean up empty optional fields
       if (!payload.city_id) delete payload.city_id;
       if (!payload.hospital_address) delete payload.hospital_address;
       if (!payload.patient_name) delete payload.patient_name;
@@ -248,7 +264,11 @@ const RequestScreen = () => {
           t("requestForm.successMessage") || "Request created successfully!",
       });
 
+      setPinnedLocation(null);
       reset();
+      if (active) {
+        populateUserDefaults(active, true);
+      }
       navigation.navigate(ROUTES.FEED);
     } catch (error: any) {
       Toast.show({
