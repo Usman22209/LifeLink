@@ -163,18 +163,20 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             </AppText>
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          style={styles.headerAction}
-          onPress={handleCall}
-          activeOpacity={0.7}
-        >
-          <AnyIcon
-            type={Icons.Feather}
-            name="phone"
-            size={moderateScale(18)}
-            color={colors.textSecondary}
-          />
-        </TouchableOpacity>
+        {Boolean(phoneNumber) && (
+          <TouchableOpacity
+            style={styles.headerAction}
+            onPress={handleCall}
+            activeOpacity={0.7}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="phone"
+              size={moderateScale(18)}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

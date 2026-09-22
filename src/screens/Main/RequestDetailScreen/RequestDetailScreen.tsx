@@ -20,7 +20,7 @@ import useTranslation from "@shared/hooks/useTranslation";
 import { selectLanguage } from "@store/slices/appSlice";
 import { useSelector } from "react-redux";
 import { selectUser } from "@store/slices/authSlice";
-import { useGetProfile } from "@shared/query/profile/useProfile";
+import { useGetProfile, usePublicProfile } from "@shared/query/profile/useProfile";
 import {
   requireCompleteProfile,
   isProfileComplete,
@@ -62,6 +62,19 @@ const RequestDetailScreen: React.FC = () => {
   const selectedLang = useSelector(selectLanguage);
   const userLocation = useUserLocation();
 
+  const reduxUser = useSelector(selectUser);
+  const { data: profile } = useGetProfile();
+  const rawUser =
+    profile?.data || profile?.user || profile?.profile || profile || reduxUser;
+  const user = rawUser?.user || rawUser?.profile || rawUser;
+  const currentUserId = user?.id || reduxUser?.id;
+  const currentUserPhone = String(
+    user?.phone ||
+    (user as any)?.contact_number ||
+    reduxUser?.phone ||
+    "",
+  ).replace(/[^\d]/g, "");
+
   const rawRequest: any = route.params?.request || {};
 
   const { data: requestDetails } = useBloodRequestDetails(
@@ -86,8 +99,68 @@ const RequestDetailScreen: React.FC = () => {
         ? myDonationsData
         : [];
 
+  const resolvedRequesterId =
+    detailData?.requester_id ||
+    detailData?.requesterId ||
+    detailData?.requester?.id ||
+    detailData?.user_id ||
+    rawRequest?.requester_id ||
+    rawRequest?.requesterId ||
+    rawRequest?.requester?.id ||
+    rawRequest?.user_id;
+
+  const rawReqPhone = String(
+    detailData?.contact_number ||
+    detailData?.contactNumber ||
+    detailData?.requester?.phone ||
+    rawRequest?.contact_number ||
+    rawRequest?.contactNumber ||
+    rawRequest?.requester?.phone ||
+    "",
+  ).replace(/[^\d]/g, "");
+
+  const isOwner = useMemo(() => {
+    if (
+      currentUserId &&
+      resolvedRequesterId &&
+      String(currentUserId).trim().toLowerCase() ===
+        String(resolvedRequesterId).trim().toLowerCase()
+    ) {
+      return true;
+    }
+
+    if (
+      currentUserPhone &&
+      rawReqPhone &&
+      (currentUserPhone === rawReqPhone ||
+        (currentUserPhone.length >= 10 && rawReqPhone.endsWith(currentUserPhone.slice(-10))) ||
+        (rawReqPhone.length >= 10 && currentUserPhone.endsWith(rawReqPhone.slice(-10))))
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [currentUserId, resolvedRequesterId, currentUserPhone, rawReqPhone]);
+
+  const { data: requesterProfile } = usePublicProfile(
+    resolvedRequesterId,
+    rawReqPhone,
+  );
+
+  const shouldHidePhone = Boolean(
+    (isOwner &&
+      (user?.hide_phone_number ||
+        reduxUser?.hide_phone_number ||
+        profile?.hide_phone_number)) ||
+    requesterProfile?.hide_phone_number ||
+    requesterProfile?.data?.hide_phone_number ||
+    detailData.requester?.hide_phone_number ||
+    rawRequest?.requester?.hide_phone_number,
+  );
+
   const request = useMemo(() => {
     const combined = { ...rawRequest, ...detailData };
+
     return {
       ...combined,
       id: combined.id || "",
@@ -103,24 +176,25 @@ const RequestDetailScreen: React.FC = () => {
       patientImage:
         combined.patientImage ||
         combined.patient_image ||
-        combined.requester?.profile_image,
+        combined.requester?.profile_image ||
+        requesterProfile?.profile_image,
       latitude: combined.latitude ? Number(combined.latitude) : undefined,
       longitude: combined.longitude ? Number(combined.longitude) : undefined,
       distance: combined.distance || "",
       requester_id:
-        combined.requester_id || combined.requesterId || combined.requester?.id,
-      contact_number:
-        combined.contact_number ||
-        combined.contactNumber ||
-        combined.requester?.phone,
-      hide_phone_number: Boolean(
-        combined.hide_phone_number ||
-        combined.requester?.hide_phone_number ||
-        detailData.hide_phone_number ||
-        detailData.requester?.hide_phone_number,
-      ),
+        combined.requester_id ||
+        combined.requesterId ||
+        combined.requester?.id ||
+        resolvedRequesterId,
+      contact_number: shouldHidePhone
+        ? undefined
+        : combined.contact_number ||
+          combined.contactNumber ||
+          combined.requester?.phone,
+      contactNumber: shouldHidePhone ? undefined : combined.contactNumber,
+      hide_phone_number: shouldHidePhone,
     };
-  }, [rawRequest, detailData]);
+  }, [rawRequest, detailData, requesterProfile, resolvedRequesterId, shouldHidePhone]);
 
   const existingThread = useMemo(() => {
     if (!request.id) return null;
@@ -187,33 +261,7 @@ const RequestDetailScreen: React.FC = () => {
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
   const isUrgent = urgencyKey === "urgent" || urgencyKey === "critical";
 
-  const reduxUser = useSelector(selectUser);
-  const { data: profile } = useGetProfile();
-  const rawUser =
-    profile?.data || profile?.user || profile?.profile || profile || reduxUser;
-  const user = rawUser?.user || rawUser?.profile || rawUser;
-  const currentUserId = user?.id || reduxUser?.id;
 
-  const requesterId =
-    detailData?.requester_id ||
-    detailData?.requesterId ||
-    detailData?.requester?.id ||
-    detailData?.user_id ||
-    request?.requester_id ||
-    request?.requesterId ||
-    request?.requester?.id ||
-    request?.user_id ||
-    rawRequest?.requester_id ||
-    rawRequest?.requesterId ||
-    rawRequest?.requester?.id ||
-    rawRequest?.user_id;
-
-  const isOwner = Boolean(
-    currentUserId &&
-    requesterId &&
-    String(currentUserId).trim().toLowerCase() ===
-      String(requesterId).trim().toLowerCase(),
-  );
 
   const donorBloodGroup =
     user?.blood_group || (user as any)?.bloodType || reduxUser?.blood_group;
@@ -236,7 +284,7 @@ const RequestDetailScreen: React.FC = () => {
   const participant = useMemo(() => {
     const rawPId = existingThread?.participant?.id;
     const pId =
-      (rawPId && rawPId !== "usr_unknown" ? rawPId : requesterId) || null;
+      (rawPId && rawPId !== "usr_unknown" ? rawPId : resolvedRequesterId) || null;
     const pName =
       existingThread?.participant?.name ||
       detailData?.requester?.full_name ||
@@ -277,7 +325,7 @@ const RequestDetailScreen: React.FC = () => {
       name: pName,
       avatar: pAvatar,
     };
-  }, [existingThread, requesterId, detailData, request]);
+  }, [existingThread, resolvedRequesterId, detailData, request]);
 
   const handleContact = useCallback(() => {
     if (isOwner) {
@@ -328,13 +376,14 @@ const RequestDetailScreen: React.FC = () => {
 
   const canCall = Boolean(
     !isOwner &&
+    !shouldHidePhone &&
     !request.hide_phone_number &&
     (request.contact_number || request.contactNumber),
   );
 
   const handleCall = useCallback(() => {
     const rawPhone = request.contact_number || request.contactNumber;
-    if (!rawPhone) {
+    if (!rawPhone || request.hide_phone_number || shouldHidePhone) {
       Alert.alert(
         "Direct Call Unavailable",
         "This user prefers in-app chat. Please tap Message to contact them directly.",
@@ -343,21 +392,13 @@ const RequestDetailScreen: React.FC = () => {
     }
     const cleanPhone = String(rawPhone).replace(/[^\d+]/g, "");
     const phoneUrl = `tel:${cleanPhone}`;
-    Linking.canOpenURL(phoneUrl)
-      .then((supported) => {
-        if (supported) {
-          Linking.openURL(phoneUrl);
-        } else {
-          Alert.alert(
-            "Cannot Make Call",
-            `Unable to initiate phone call to ${rawPhone} on this device.`,
-          );
-        }
-      })
-      .catch(() => {
-        Linking.openURL(phoneUrl);
-      });
-  }, [request]);
+    Linking.openURL(phoneUrl).catch(() => {
+      Alert.alert(
+        "Cannot Make Call",
+        `Unable to initiate phone call to ${rawPhone} on this device.`,
+      );
+    });
+  }, [request, shouldHidePhone]);
 
   const handleNavigate = useCallback(() => {
     const query = encodeURIComponent(

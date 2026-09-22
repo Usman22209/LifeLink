@@ -172,7 +172,10 @@ const MyRequestsScreen: React.FC = () => {
             <MyRequestCard
               key={item.id}
               item={item}
-              onDetails={() =>
+              onDetails={() => {
+                const isPhoneHidden = Boolean(
+                  item.hide_phone_number || item.requester?.hide_phone_number,
+                );
                 navigation.navigate(ROUTES.REQUEST_DETAIL, {
                   request: {
                     ...item,
@@ -181,9 +184,13 @@ const MyRequestsScreen: React.FC = () => {
                     hospital: item.hospital_name || item.hospital,
                     city: item.city_id || item.city,
                     units: item.units_required || item.units,
+                    hide_phone_number: isPhoneHidden,
+                    contact_number: isPhoneHidden
+                      ? undefined
+                      : item.contact_number || item.contactNumber,
                   },
-                })
-              }
+                });
+              }}
               onTrack={() =>
                 navigation.navigate(ROUTES.TRACK_REQUEST, {
                   requestId: item.id,

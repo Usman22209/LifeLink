@@ -15,12 +15,14 @@ interface PatientDetailsSectionProps {
   control: Control<BloodRequestFormValues>;
   errors: FieldErrors<BloodRequestFormValues>;
   t: (key: string) => string;
+  isPhoneHidden?: boolean;
 }
 
 const PatientDetailsSection: React.FC<PatientDetailsSectionProps> = ({
   control,
   errors,
   t,
+  isPhoneHidden = false,
 }) => {
   return (
     <View style={styles.section}>
@@ -56,22 +58,54 @@ const PatientDetailsSection: React.FC<PatientDetailsSectionProps> = ({
         iconName="user"
       />
 
-      <Controller
-        control={control}
-        name="contact_number"
-        render={({ field: { onChange, value } }) => (
-          <AppInput
-            label={t("requestForm.contactNumber") || "Contact Number"}
-            placeholder="0303 1234567"
-            value={value}
-            onChangeText={(text) => onChange(formatPhoneNumber(text))}
-            keyboardType="phone-pad"
-            error={errors.contact_number?.message}
-            iconType={Icons.Feather}
-            iconName="phone"
+      {isPhoneHidden ? (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: moderateScale(12),
+            backgroundColor: withOpacity(colors.primary, 0.08),
+            borderRadius: moderateScale(8),
+            marginTop: moderateScale(6),
+          }}
+        >
+          <AnyIcon
+            type={Icons.Feather}
+            name="shield"
+            size={moderateScale(15)}
+            color={colors.primary}
           />
-        )}
-      />
+          <AppText
+            regular
+            FONT_11
+            style={{
+              color: colors.textSecondary,
+              marginLeft: moderateScale(8),
+              flex: 1,
+            }}
+          >
+            {t("requestForm.phoneHiddenNotice") ||
+              "Your phone number is hidden by your profile privacy settings. Responders will contact you via In-App Chat."}
+          </AppText>
+        </View>
+      ) : (
+        <Controller
+          control={control}
+          name="contact_number"
+          render={({ field: { onChange, value } }) => (
+            <AppInput
+              label={t("requestForm.contactNumber") || "Contact Number"}
+              placeholder="0303 1234567"
+              value={value}
+              onChangeText={(text) => onChange(formatPhoneNumber(text))}
+              keyboardType="phone-pad"
+              error={errors.contact_number?.message}
+              iconType={Icons.Feather}
+              iconName="phone"
+            />
+          )}
+        />
+      )}
     </View>
   );
 };

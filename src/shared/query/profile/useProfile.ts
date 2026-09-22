@@ -6,10 +6,12 @@ import { tokenStorage } from "@shared/utils/storage/tokenStorage";
 import Toast from "react-native-toast-message";
 
 import { updateUser } from "@store/slices/authSlice";
+import { supabase } from "@shared/config/supabase";
 
 export const profileKeys = {
   all: ["profile"] as const,
   me: () => [...profileKeys.all, "me"] as const,
+  public: (userId: string) => [...profileKeys.all, "public", userId] as const,
 };
 
 export const useGetProfile = (enabled = true) => {
@@ -108,3 +110,75 @@ export const useUpdateSettings = () => {
     },
   });
 };
+
+export const usePublicProfile = (userId?: string, phone?: string) => {
+  const cleanPhone = phone
+    ? String(phone).replace(/[^\d]/g, "").slice(-10)
+    : "";
+  return useQuery({
+    queryKey: [...profileKeys.all, "public", userId || "", cleanPhone],
+    queryFn: async () => {
+      if (!userId && !cleanPhone) return null;
+      let supabaseData: any = null;
+      let apiData: any = null;
+
+      if (userId) {
+        try {
+          const { data } = await supabase
+            .from("profiles")
+            .select(
+              "id, full_name, profile_image, hide_phone_number, phone, contact_number",
+            )
+            .eq("id", userId)
+            .maybeSingle();
+          if (data) {
+            supabaseData = data;
+          }
+        } catch (err) {
+          console.log("Supabase profile lookup error:", err);
+        }
+      }
+
+      if (!supabaseData && cleanPhone) {
+        try {
+          const { data } = await supabase
+            .from("profiles")
+            .select(
+              "id, full_name, profile_image, hide_phone_number, phone, contact_number",
+            )
+            .like("phone", `%${cleanPhone}%`)
+            .maybeSingle();
+          if (data) {
+            supabaseData = data;
+          }
+        } catch (err) {
+          console.log("Supabase phone lookup error:", err);
+        }
+      }
+
+      if (userId) {
+        try {
+          const response = await PROFILE_SERVICE.getPublicProfile(userId);
+          apiData = response?.data?.data || response?.data;
+        } catch {
+          // Fallback
+        }
+      }
+
+      if (!supabaseData && !apiData) return null;
+
+      return {
+        ...apiData,
+        ...supabaseData,
+        hide_phone_number: Boolean(
+          supabaseData?.hide_phone_number ??
+          apiData?.hide_phone_number ??
+          false,
+        ),
+      };
+    },
+    enabled: Boolean(userId || cleanPhone),
+    staleTime: 1000 * 60 * 2,
+  });
+};
+

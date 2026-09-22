@@ -231,22 +231,32 @@ const FeedScreen = () => {
 
   const rawItems = fetchedItems;
 
-  const formattedRequests: BloodRequest[] = rawItems.map((item: any) => ({
-    id: String(item.id),
-    bloodType: item.blood_group || item.bloodType || "O+",
-    patientName: item.patient_name || item.patientName || "Anonymous Patient",
-    hospital: item.hospital_name || item.hospital || "Hospital",
-    city: item.city_id || item.city || "",
-    state: item.state || "",
-    patientImage: item.requester?.profile_image || item.patientImage,
-    units: item.units_required ?? item.units ?? 1,
-    urgency: item.urgency || "normal",
-    time: formatRelativeTime(item.created_at || item.time),
-    distance: item.distance || "",
-    latitude: item.latitude ? Number(item.latitude) : undefined,
-    longitude: item.longitude ? Number(item.longitude) : undefined,
-    requester_id: item.requester_id || item.requester?.id,
-  }));
+  const formattedRequests: BloodRequest[] = rawItems.map((item: any) => {
+    const isPhoneHidden = Boolean(
+      item.hide_phone_number || item.requester?.hide_phone_number,
+    );
+    return {
+      id: String(item.id),
+      bloodType: item.blood_group || item.bloodType || "O+",
+      patientName: item.patient_name || item.patientName || "Anonymous Patient",
+      hospital: item.hospital_name || item.hospital || "Hospital",
+      city: item.city_id || item.city || "",
+      state: item.state || "",
+      patientImage: item.requester?.profile_image || item.patientImage,
+      units: item.units_required ?? item.units ?? 1,
+      urgency: item.urgency || "normal",
+      time: formatRelativeTime(item.created_at || item.time),
+      distance: item.distance || "",
+      latitude: item.latitude ? Number(item.latitude) : undefined,
+      longitude: item.longitude ? Number(item.longitude) : undefined,
+      requester_id: item.requester_id || item.requester?.id,
+      hide_phone_number: isPhoneHidden,
+      contact_number: isPhoneHidden
+        ? undefined
+        : item.contact_number || item.contactNumber,
+      requester: item.requester,
+    };
+  });
 
   const filteredData = formattedRequests.filter((item: BloodRequest) => {
     if (searchQuery.trim()) {

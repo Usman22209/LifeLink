@@ -148,15 +148,24 @@ const HomeScreen = () => {
               <UrgentRequestCard
                 key={request.id}
                 {...request}
-                onPress={() =>
+                onPress={() => {
+                  const isPhoneHidden = Boolean(
+                    (request as any).hide_phone_number ||
+                    (request as any).requester?.hide_phone_number,
+                  );
                   navigation.navigate(ROUTES.REQUEST_DETAIL, {
                     request: {
                       ...request,
                       patientName: request.patientName || "Anonymous Patient",
                       distance: request.distance || "0 km",
+                      hide_phone_number: isPhoneHidden,
+                      contact_number: isPhoneHidden
+                        ? undefined
+                        : (request as any).contact_number ||
+                          (request as any).contactNumber,
                     },
-                  })
-                }
+                  });
+                }}
               />
             ))}
           </ScrollView>

@@ -28,6 +28,7 @@ export interface RequesterProfile {
   blood_group?: string;
   city?: string;
   profile_image?: string;
+  hide_phone_number?: boolean;
 }
 
 // Donor Profile (nested in donation)
@@ -37,6 +38,7 @@ export interface DonorProfile {
   blood_group?: string;
   city?: string;
   profile_image?: string;
+  hide_phone_number?: boolean;
 }
 
 // Main Blood Request Interface
@@ -54,6 +56,7 @@ export interface BloodRequest {
   longitude?: number;
   urgency: UrgencyLevel;
   contact_number?: string;
+  hide_phone_number?: boolean;
   description?: string;
   status: BloodRequestStatus;
   required_date?: string;

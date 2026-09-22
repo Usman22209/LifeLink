@@ -61,6 +61,7 @@ const ChatScreen = () => {
     name?: string;
     avatar?: string;
     lastSeen?: string | null;
+    hide_phone_number?: boolean;
   } | null>(null);
 
   const bloodType = request?.bloodType || (request as any)?.blood_group || "";
@@ -481,6 +482,7 @@ const ChatScreen = () => {
             name: data.full_name || data.name || prev?.name,
             avatar: data.profile_image || prev?.avatar,
             lastSeen: data.last_seen_at || prev?.lastSeen || null,
+            hide_phone_number: Boolean(data.hide_phone_number),
           }));
           if (data.last_seen_at) {
             setOtherUserLastSeen(data.last_seen_at);
@@ -491,7 +493,9 @@ const ChatScreen = () => {
         try {
           const { data } = await supabase
             .from("profiles")
-            .select("id, full_name, profile_image, updated_at, last_seen_at")
+            .select(
+              "id, full_name, profile_image, updated_at, last_seen_at, hide_phone_number",
+            )
             .eq("id", targetUserId)
             .maybeSingle();
 
@@ -505,6 +509,7 @@ const ChatScreen = () => {
                 data.updated_at ||
                 prev?.lastSeen ||
                 null,
+              hide_phone_number: Boolean((data as any)?.hide_phone_number),
             }));
             setOtherUserLastSeen(
               (data as any)?.last_seen_at || data.updated_at || null,
@@ -699,6 +704,15 @@ const ChatScreen = () => {
   };
 
   const contactPhone = useMemo(() => {
+    const isHidden = Boolean(
+      request?.hide_phone_number ||
+      (request as any)?.requester?.hide_phone_number ||
+      (participant as any)?.hide_phone_number ||
+      remoteParticipant?.hide_phone_number ||
+      recipientProfile?.hide_phone_number,
+    );
+    if (isHidden) return null;
+
     return (
       remoteParticipant?.phone ||
       (participant as any)?.phone ||
@@ -708,7 +722,7 @@ const ChatScreen = () => {
       (request as any)?.requester?.phone ||
       null
     );
-  }, [remoteParticipant, participant, request]);
+  }, [remoteParticipant, participant, request, recipientProfile]);
 
   return (
     <ScreenWrapper

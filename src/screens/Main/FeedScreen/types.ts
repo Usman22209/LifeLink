@@ -17,6 +17,9 @@ export interface BloodRequest {
   latitude?: number;
   longitude?: number;
   requester_id?: string;
+  hide_phone_number?: boolean;
+  contact_number?: string;
+  requester?: any;
 }
 
 export interface FilterState {

@@ -114,10 +114,16 @@ const RequestScreen = () => {
       if (name && (force || !getValues("patient_name"))) {
         setValue("patient_name", name, { shouldValidate: true });
       }
-      if (rawPhone && (force || !getValues("contact_number"))) {
+      if (
+        rawPhone &&
+        !userData.hide_phone_number &&
+        (force || !getValues("contact_number"))
+      ) {
         setValue("contact_number", formatPhoneNumber(rawPhone), {
           shouldValidate: true,
         });
+      } else if (userData.hide_phone_number) {
+        setValue("contact_number", "", { shouldValidate: true });
       }
       if (bloodGroup && (force || !getValues("blood_group"))) {
         setValue("blood_group", bloodGroup, { shouldValidate: true });
@@ -311,7 +317,16 @@ const RequestScreen = () => {
           </AppText>
         </View>
 
-        <PatientDetailsSection control={control} errors={errors} t={t} />
+        <PatientDetailsSection
+          control={control}
+          errors={errors}
+          t={t}
+          isPhoneHidden={Boolean(
+            user?.hide_phone_number ||
+            profile?.hide_phone_number ||
+            reduxUser?.hide_phone_number,
+          )}
+        />
 
         <MedicalNeedsSection
           control={control}
