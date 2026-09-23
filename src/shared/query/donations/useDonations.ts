@@ -5,6 +5,7 @@ import {
   Donation,
 } from "@shared/interfaces/models/blood-request.interface";
 import { bloodRequestKeys } from "../blood-requests/useBloodRequests";
+import { notificationKeys } from "../notifications/useNotifications";
 
 /**
  * Accept a blood request (offer to donate)
@@ -30,6 +31,8 @@ export const useAcceptBloodRequest = () => {
       queryClient.invalidateQueries({ queryKey: ["donations"] });
       // Invalidate chat threads so a new thread is visible
       queryClient.invalidateQueries({ queryKey: ["chat"] });
+      // Invalidate notification queries
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
     },
   });
 };

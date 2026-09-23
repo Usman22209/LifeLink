@@ -18,6 +18,11 @@ import ENV from "@config/env";
 import NotificationPermissionModal from "@components/NotificationPermissionModal";
 import { playNotificationSound } from "@shared/utils/soundService";
 
+import { queryClient } from "@shared/query/queryClient";
+import { notificationKeys } from "@shared/query/notifications/useNotifications";
+import { navigate } from "../../navigation/navigationService";
+import { ROUTES } from "@utils/Routes";
+
 const ONESIGNAL_APP_ID = ENV.ONESIGNAL_APP_ID;
 
 let promptPermissionCallback: (() => void) | null = null;
@@ -96,8 +101,14 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
     OneSignal.Notifications.addEventListener(
       "foregroundWillDisplay",
       (event: NotificationWillDisplayEvent) => {
-        // Suppress OS notification banner popup and toasts while app is active
+        // Suppress OS notification banner popup while app is active
         event.preventDefault();
+
+        // Immediately invalidate queries so in-app notifications screen and badges refresh
+        queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+        queryClient.invalidateQueries({ queryKey: ["chat"] });
+        queryClient.invalidateQueries({ queryKey: ["donations"] });
+        queryClient.invalidateQueries({ queryKey: ["bloodRequests"] });
 
         // Play ring.mp3 inside active app
         playNotificationSound();
@@ -108,6 +119,60 @@ const OneSignalProvider = ({ children }: { children: ReactNode }) => {
       "click",
       (event: NotificationClickEvent) => {
         console.log("Notification opened:", event.notification);
+        queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+        queryClient.invalidateQueries({ queryKey: ["chat"] });
+        queryClient.invalidateQueries({ queryKey: ["donations"] });
+        queryClient.invalidateQueries({ queryKey: ["bloodRequests"] });
+
+        const rawData: any = event.notification?.additionalData || {};
+        const notifType =
+          rawData.type ||
+          (rawData.request_id ? "blood_request" : rawData.thread_id ? "chat_message" : "system");
+
+        switch (notifType) {
+          case "donation_match": {
+            navigate(ROUTES.MY_REQUESTS);
+            break;
+          }
+          case "donation_received": {
+            navigate(ROUTES.MY_DONATIONS);
+            break;
+          }
+          case "blood_request":
+          case "urgent_request": {
+            const reqId = rawData.request_id || rawData.requestId;
+            if (reqId) {
+              const reqPayload = rawData.request || {
+                id: reqId,
+                patientName: rawData.patient_name || rawData.patientName || "Blood Patient",
+                bloodType: rawData.blood_group || rawData.bloodType || "Emergency",
+                hospital: rawData.hospital_name || rawData.hospital || "Hospital",
+                city: rawData.city || rawData.city_id || "",
+                units: rawData.units_required || 1,
+                urgency: rawData.urgency || "critical",
+                time: "Just now",
+                description: event.notification?.body || "",
+              };
+              navigate(ROUTES.REQUEST_DETAIL, { request: reqPayload });
+            } else {
+              navigate(ROUTES.MAIN_FLOW, { screen: ROUTES.FEED });
+            }
+            break;
+          }
+          case "chat_message": {
+            const threadId = rawData.thread_id || rawData.threadId || rawData.conversation_id;
+            if (threadId) {
+              navigate(ROUTES.CHAT, { threadId, request: rawData.request });
+            } else {
+              navigate(ROUTES.NOTIFICATIONS);
+            }
+            break;
+          }
+          default: {
+            navigate(ROUTES.NOTIFICATIONS);
+            break;
+          }
+        }
       },
     );
 

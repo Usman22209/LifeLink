@@ -104,9 +104,52 @@ const MyDonationsScreen = () => {
   }, [myDonationsData, donations, user?.stats]);
 
   const handleItemPress = (item: DonationLog) => {
-    if (item.request) {
-      navigation.navigate(ROUTES.REQUEST_DETAIL, { request: item.request });
-    }
+    const rawReq: any = item.request || {};
+    const reqId =
+      rawReq?.id ||
+      (item as any)?.requestId ||
+      (item as any)?.request_id ||
+      item.id;
+
+    const donationStatus =
+      item.status || (item as any)?.donationStatus || "intent";
+
+    const requestPayload: any = {
+      ...rawReq,
+      id: reqId,
+      patientName:
+        rawReq?.patientName ||
+        rawReq?.patient_name ||
+        "Blood Patient",
+      bloodType:
+        rawReq?.bloodType ||
+        rawReq?.blood_group ||
+        item.bloodType ||
+        "O+",
+      hospital:
+        rawReq?.hospital ||
+        rawReq?.hospital_name ||
+        item.hospitalName ||
+        "Hospital",
+      city: rawReq?.city || rawReq?.city_id || "",
+      units:
+        rawReq?.units ||
+        rawReq?.units_required ||
+        item.units ||
+        1,
+      urgency: rawReq?.urgency || "normal",
+      donationStatus,
+      donationId: item.id,
+      isFromMyDonations: true,
+    };
+
+    (navigation as any).navigate(ROUTES.REQUEST_DETAIL, {
+      request: requestPayload,
+      requestId: reqId,
+      donationId: item.id,
+      donationStatus,
+      isFromMyDonations: true,
+    });
   };
 
   const renderEmptyState = () => (

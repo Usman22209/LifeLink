@@ -16,7 +16,7 @@ import ChatItem, { ChatThread } from "./components/ChatItem";
 import EmptyChats from "./components/EmptyChats";
 
 const ChatsListScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { t } = useTranslation();
 
   const { data: chatThreadsData, isLoading, refetch } = useChatThreads();
@@ -64,6 +64,11 @@ const ChatsListScreen = () => {
         <AppHeader
           title={t("chats.title")}
           showBackButton={true}
+          onBackPress={() =>
+            navigation.canGoBack()
+              ? navigation.goBack()
+              : navigation.navigate(ROUTES.HOME as any)
+          }
           titleSize={15}
           hasBorder={true}
         />

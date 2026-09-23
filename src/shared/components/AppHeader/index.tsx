@@ -45,7 +45,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
-    } else {
+    } else if (navigation.canGoBack()) {
       navigation.goBack();
     }
   };

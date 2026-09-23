@@ -137,9 +137,13 @@ const NotificationsScreen = () => {
       }
 
       switch (item.type) {
-        case "blood_request":
-        case "urgent_request":
         case "donation_match": {
+          navigation.navigate(ROUTES.MY_REQUESTS);
+          break;
+        }
+
+        case "blood_request":
+        case "urgent_request": {
           const reqId =
             item.requestId || item.data?.request_id || item.data?.request?.id;
 

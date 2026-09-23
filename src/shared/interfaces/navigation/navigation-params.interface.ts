@@ -3,13 +3,17 @@ import { BloodRequest } from "@screens/Main/FeedScreen/types";
 
 export type UserStackParamList = {
   [ROUTES.AUTH_FLOW]: undefined;
-  [ROUTES.MAIN_FLOW]: undefined;
+  [ROUTES.MAIN_FLOW]: { screen?: string; params?: any } | undefined;
   [ROUTES.ONBOARDING]: undefined;
   [ROUTES.DONOR_QUESTIONNAIRE]?: { isEditing?: boolean; returnTo?: string };
-  [ROUTES.REQUEST_DETAIL]: { request: BloodRequest };
+  [ROUTES.REQUEST_DETAIL]: {
+    request?: BloodRequest | any;
+    requestId?: string;
+    id?: string;
+  };
   [ROUTES.EDIT_PROFILE]: { isEditing?: boolean };
   [ROUTES.CHAT]: {
-    request: BloodRequest;
+    request?: BloodRequest | any;
     threadId?: string;
     participant?: any;
   };

@@ -750,7 +750,18 @@ const ChatScreen = () => {
         style={styles.keyboardAvoidingView}
         keyboardVerticalOffset={Platform.OS === "ios" ? verticalScale(40) : 0}
       >
-        <ChatContextBanner bloodType={bloodType} hospital={hospital} />
+        <ChatContextBanner
+          bloodType={bloodType}
+          hospital={hospital}
+          onPress={
+            request?.id
+              ? () =>
+                  (navigation as any).navigate(ROUTES.REQUEST_DETAIL, {
+                    request,
+                  })
+              : undefined
+          }
+        />
 
         {isLoading && messages.length === 0 ? (
           <View

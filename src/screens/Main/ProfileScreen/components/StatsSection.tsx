@@ -48,7 +48,11 @@ const StatsSection: React.FC<StatsSectionProps> = ({
         { flexDirection: isRtl ? "row-reverse" : "row" },
       ]}
     >
-      <View style={styles.statItem}>
+      <TouchableOpacity
+        style={styles.statItem}
+        activeOpacity={0.7}
+        onPress={() => (navigation as any).navigate(ROUTES.MY_DONATIONS)}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -69,9 +73,13 @@ const StatsSection: React.FC<StatsSectionProps> = ({
         <Text regular FONT_10 style={styles.statLabel}>
           {t("profile.stats.donations")}
         </Text>
-      </View>
+      </TouchableOpacity>
       <View style={styles.statDivider} />
-      <View style={styles.statItem}>
+      <TouchableOpacity
+        style={styles.statItem}
+        activeOpacity={0.7}
+        onPress={() => (navigation as any).navigate(ROUTES.MY_DONATIONS)}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -92,7 +100,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({
         <Text regular FONT_10 style={styles.statLabel}>
           {t("profile.stats.livesSaved")}
         </Text>
-      </View>
+      </TouchableOpacity>
       <View style={styles.statDivider} />
       <TouchableOpacity
         style={styles.statItem}

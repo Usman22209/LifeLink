@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
 import Text from "@components/AppText";
@@ -14,6 +14,7 @@ interface BloodTypeCardProps {
   donations?: number;
   livesSaved?: number;
   lastDonated?: string;
+  onDonationsPress?: () => void;
 }
 
 const getBloodGroupSubtitle = (bloodGroup?: string): string => {
@@ -45,6 +46,7 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   donations = 0,
   livesSaved = 0,
   lastDonated = "—",
+  onDonationsPress,
 }) => {
   const isRtl = useSelector(selectIsRtl);
   const { t } = useTranslation();
@@ -105,9 +107,17 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        <StatItem value={String(donations)} label={t("home.donations")} />
+        <StatItem
+          value={String(donations)}
+          label={t("home.donations")}
+          onPress={onDonationsPress}
+        />
         <View style={styles.divider} />
-        <StatItem value={String(livesSaved)} label={t("home.livesSaved")} />
+        <StatItem
+          value={String(livesSaved)}
+          label={t("home.livesSaved")}
+          onPress={onDonationsPress}
+        />
         <View style={styles.divider} />
         <StatItem value={lastDonated} label={t("home.lastDonated")} />
       </View>
@@ -115,24 +125,44 @@ const BloodTypeCard: React.FC<BloodTypeCardProps> = ({
   );
 };
 
-const StatItem = ({ value, label }: { value: string; label: string }) => (
-  <View style={styles.statItem}>
-    <Text bold FONT_16 style={{ color: colors.white }}>
-      {value}
-    </Text>
-    <Text
-      medium
-      FONT_9
-      style={{
-        color: withOpacity(colors.white, 0.65),
-        marginTop: verticalScale(2),
-        textAlign: "center",
-      }}
-    >
-      {label}
-    </Text>
-  </View>
-);
+const StatItem = ({
+  value,
+  label,
+  onPress,
+}: {
+  value: string;
+  label: string;
+  onPress?: () => void;
+}) => {
+  const content = (
+    <View style={styles.statItem}>
+      <Text bold FONT_16 style={{ color: colors.white }}>
+        {value}
+      </Text>
+      <Text
+        medium
+        FONT_9
+        style={{
+          color: withOpacity(colors.white, 0.65),
+          marginTop: verticalScale(2),
+          textAlign: "center",
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+
+  return content;
+};
 
 export default BloodTypeCard;
 

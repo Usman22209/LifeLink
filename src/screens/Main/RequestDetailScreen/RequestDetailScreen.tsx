@@ -75,11 +75,20 @@ const RequestDetailScreen: React.FC = () => {
     "",
   ).replace(/[^\d]/g, "");
 
-  const rawRequest: any = route.params?.request || {};
+  const rawParams: any = route.params || {};
+  const rawRequest: any =
+    rawParams.request ||
+    (rawParams.requestId ? { id: rawParams.requestId } : null) ||
+    (rawParams.id ? { id: rawParams.id } : null) ||
+    rawParams ||
+    {};
+
+  const targetRequestId =
+    rawRequest?.id || rawParams.requestId || rawParams.id;
 
   const { data: requestDetails } = useBloodRequestDetails(
-    rawRequest.id,
-    !!rawRequest.id,
+    targetRequestId,
+    !!targetRequestId,
   );
   const detailData: any = requestDetails?.data || requestDetails || {};
 
@@ -150,7 +159,7 @@ const RequestDetailScreen: React.FC = () => {
 
     return {
       ...combined,
-      id: combined.id || "",
+      id: combined.id || targetRequestId || detailData?.id || rawRequest?.id || "",
       patientName:
         combined.patientName || combined.patient_name || "Anonymous Patient",
       bloodType: combined.bloodType || combined.blood_group || "O+",
@@ -190,24 +199,51 @@ const RequestDetailScreen: React.FC = () => {
     );
   }, [threadsList, request.id]);
 
+  const isFromMyDonations = Boolean(
+    rawParams?.isFromMyDonations || rawRequest?.isFromMyDonations,
+  );
+
+  const passedDonationStatus =
+    rawParams?.donationStatus ||
+    rawRequest?.donationStatus ||
+    (isFromMyDonations ? "intent" : null);
+
+  const passedDonationId =
+    rawParams?.donationId || rawRequest?.donationId;
+
   const existingDonation = useMemo(() => {
-    if (!request.id) return null;
+    if (!request.id && !passedDonationId) return null;
     return myDonationsList.find(
       (d: any) =>
-        (String(d.request?.id || d.request_id) === String(request.id) ||
-          String(d.requestId) === String(request.id)) &&
-        d.status !== "cancelled",
+        (request.id &&
+          (String(d.request?.id || d.request_id) === String(request.id) ||
+            String(d.requestId) === String(request.id) ||
+            String(d.id) === String(request.id))) ||
+        (passedDonationId && String(d.id) === String(passedDonationId)),
     );
-  }, [myDonationsList, request.id]);
+  }, [myDonationsList, request.id, passedDonationId]);
 
   const [justPledged, setJustPledged] = useState(false);
 
+  const effectiveDonationStatus =
+    existingDonation?.status ||
+    passedDonationStatus ||
+    (isFromMyDonations ? "intent" : null);
+
+  const donationCompleted =
+    effectiveDonationStatus === "completed" ||
+    effectiveDonationStatus === "fulfilled" ||
+    Boolean(
+      isFromMyDonations &&
+        (request?.status === "fulfilled" || request?.status === "completed"),
+    );
+
   const donationPledged =
-    justPledged ||
-    Boolean(existingDonation && existingDonation.status === "intent");
-  const donationCompleted = Boolean(
-    existingDonation && existingDonation.status === "completed",
-  );
+    !donationCompleted &&
+    (justPledged ||
+      effectiveDonationStatus === "intent" ||
+      isFromMyDonations ||
+      Boolean(existingDonation && existingDonation.status !== "completed"));
 
   const cityName = useMemo(
     () => getCityNameById(request.city, selectedLang),
@@ -621,7 +657,9 @@ const RequestDetailScreen: React.FC = () => {
       <DonationPledgedModal
         isVisible={pledgedModalVisible}
         onClose={() => setPledgedModalVisible(false)}
-        isAlreadyPledged={isAlreadyPledgedModal}
+        isAlreadyPledged={
+          isAlreadyPledgedModal || isFromMyDonations || donationPledged
+        }
         hospitalName={request.hospital}
         patientName={request.patientName}
         bloodType={request.bloodType}

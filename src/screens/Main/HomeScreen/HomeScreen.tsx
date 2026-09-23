@@ -109,6 +109,7 @@ const HomeScreen = () => {
         donations={donationsCount}
         livesSaved={livesSaved}
         lastDonated={lastDonated}
+        onDonationsPress={() => navigation.navigate(ROUTES.MY_DONATIONS)}
       />
 
       <View style={styles.sectionGap}>

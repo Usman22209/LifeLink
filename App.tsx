@@ -20,6 +20,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ROUTES } from "@utils/Routes";
 import ENV from "@config/env";
 import { queryClient } from "@shared/query/queryClient";
+import { navigationRef } from "./src/navigation/navigationService";
 
 const linking: LinkingOptions<any> = {
   prefixes: ["lifelink://"],
@@ -89,8 +90,6 @@ const AppToast = () => {
 };
 
 const App = (): React.JSX.Element => {
-  const navigationRef = React.useRef<any>(null);
-
   React.useEffect(() => {
     initNetworkSentryTracking();
   }, []);

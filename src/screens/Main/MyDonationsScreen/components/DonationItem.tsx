@@ -16,6 +16,10 @@ export interface DonationLog {
   date: string;
   units: number;
   bloodType: string;
+  status?: string;
+  requestId?: string;
+  request_id?: string;
+  donationStatus?: string;
   request: BloodRequest;
 }
 
@@ -189,11 +193,14 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
               </AppText>
             </View>
           </View>
-          <View
+          <TouchableOpacity
             style={[
               styles.viewDetailRow,
               { flexDirection: isRtl ? "row-reverse" : "row" },
             ]}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onPress={() => onPress(item)}
           >
             <AppText semiBold FONT_11 style={styles.viewDetailText}>
               {t("feed.viewDetails") || "Details"}
@@ -204,7 +211,7 @@ const DonationItem: React.FC<DonationItemProps> = ({ item, onPress }) => {
               size={moderateScale(13)}
               color={colors.primary}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
