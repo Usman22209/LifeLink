@@ -27,6 +27,13 @@ const useGoogleSignIn = () => {
         showPlayServicesUpdateDialog: true,
       });
 
+      // Clear any previous sign-in session state so that Google always shows the account chooser modal
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // Safe to ignore if not already signed in
+      }
+
       const user: any = await GoogleSignin.signIn();
       setUserInfo(user);
 
@@ -39,6 +46,11 @@ const useGoogleSignIn = () => {
 
   const signOut = async () => {
     try {
+      try {
+        await GoogleSignin.revokeAccess();
+      } catch (e) {
+        // Safe to ignore if access was already revoked
+      }
       await GoogleSignin.signOut();
       setUserInfo(null);
     } catch (error) {

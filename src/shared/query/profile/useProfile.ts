@@ -7,6 +7,7 @@ import Toast from "react-native-toast-message";
 
 import { updateUser } from "@store/slices/authSlice";
 import { supabase } from "@shared/config/supabase";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export const profileKeys = {
   all: ["profile"] as const,
@@ -68,6 +69,16 @@ export const useDeleteAccount = () => {
     },
     onSuccess: async () => {
       try {
+        try {
+          await GoogleSignin.revokeAccess();
+        } catch (e) {
+          // Safe to ignore if not signed in with Google or offline
+        }
+        try {
+          await GoogleSignin.signOut();
+        } catch (e) {
+          // Safe to ignore
+        }
         await Promise.allSettled([tokenStorage.clearToken()]);
       } catch (e) {
         console.error("Token clear error:", e);
@@ -124,35 +135,37 @@ export const usePublicProfile = (userId?: string, phone?: string) => {
 
       if (userId) {
         try {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("profiles")
-            .select(
-              "id, full_name, profile_image, hide_phone_number, phone, contact_number",
-            )
+            .select("id, full_name, profile_image, hide_phone_number, phone")
             .eq("id", userId)
             .maybeSingle();
+          if (error) {
+            console.log("Supabase profile lookup error by ID:", error.message);
+          }
           if (data) {
             supabaseData = data;
           }
         } catch (err) {
-          console.log("Supabase profile lookup error:", err);
+          console.log("Supabase profile lookup exception:", err);
         }
       }
 
       if (!supabaseData && cleanPhone) {
         try {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("profiles")
-            .select(
-              "id, full_name, profile_image, hide_phone_number, phone, contact_number",
-            )
+            .select("id, full_name, profile_image, hide_phone_number, phone")
             .like("phone", `%${cleanPhone}%`)
             .maybeSingle();
+          if (error) {
+            console.log("Supabase profile lookup error by phone:", error.message);
+          }
           if (data) {
             supabaseData = data;
           }
         } catch (err) {
-          console.log("Supabase phone lookup error:", err);
+          console.log("Supabase phone lookup exception:", err);
         }
       }
 
@@ -171,9 +184,8 @@ export const usePublicProfile = (userId?: string, phone?: string) => {
         ...apiData,
         ...supabaseData,
         hide_phone_number: Boolean(
-          supabaseData?.hide_phone_number ??
-          apiData?.hide_phone_number ??
-          false,
+          supabaseData?.hide_phone_number ||
+          apiData?.hide_phone_number,
         ),
       };
     },

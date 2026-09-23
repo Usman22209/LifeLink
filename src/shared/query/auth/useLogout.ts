@@ -13,10 +13,18 @@ export const useLogout = () => {
 
   const fullCleanup = async () => {
     try {
-      await Promise.allSettled([
-        tokenStorage.clearToken(),
-        GoogleSignin.signOut(),
-      ]);
+      try {
+        await GoogleSignin.revokeAccess();
+      } catch (e) {
+        // Safe to ignore if user was not logged in via Google or offline
+      }
+      try {
+        await GoogleSignin.signOut();
+      } catch (e) {
+        // Safe to ignore
+      }
+
+      await tokenStorage.clearToken();
       dispatch(logoutAction());
       queryClient.clear();
     } catch (error) {

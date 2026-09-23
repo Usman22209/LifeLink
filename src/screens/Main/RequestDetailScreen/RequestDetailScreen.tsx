@@ -120,41 +120,28 @@ const RequestDetailScreen: React.FC = () => {
   ).replace(/[^\d]/g, "");
 
   const isOwner = useMemo(() => {
-    if (
-      currentUserId &&
-      resolvedRequesterId &&
+    if (!currentUserId || !resolvedRequesterId) {
+      return false;
+    }
+    return (
       String(currentUserId).trim().toLowerCase() ===
-        String(resolvedRequesterId).trim().toLowerCase()
-    ) {
-      return true;
-    }
+      String(resolvedRequesterId).trim().toLowerCase()
+    );
+  }, [currentUserId, resolvedRequesterId]);
 
-    if (
-      currentUserPhone &&
-      rawReqPhone &&
-      (currentUserPhone === rawReqPhone ||
-        (currentUserPhone.length >= 10 && rawReqPhone.endsWith(currentUserPhone.slice(-10))) ||
-        (rawReqPhone.length >= 10 && currentUserPhone.endsWith(rawReqPhone.slice(-10))))
-    ) {
-      return true;
-    }
-
-    return false;
-  }, [currentUserId, resolvedRequesterId, currentUserPhone, rawReqPhone]);
-
-  const { data: requesterProfile } = usePublicProfile(
-    resolvedRequesterId,
-    rawReqPhone,
-  );
+  const { data: requesterProfile, isLoading: isRequesterProfileLoading } =
+    usePublicProfile(resolvedRequesterId, rawReqPhone);
 
   const shouldHidePhone = Boolean(
     (isOwner &&
       (user?.hide_phone_number ||
         reduxUser?.hide_phone_number ||
         profile?.hide_phone_number)) ||
+    detailData?.hide_phone_number ||
+    rawRequest?.hide_phone_number ||
     requesterProfile?.hide_phone_number ||
     requesterProfile?.data?.hide_phone_number ||
-    detailData.requester?.hide_phone_number ||
+    detailData?.requester?.hide_phone_number ||
     rawRequest?.requester?.hide_phone_number,
   );
 
@@ -376,6 +363,7 @@ const RequestDetailScreen: React.FC = () => {
 
   const canCall = Boolean(
     !isOwner &&
+    !isRequesterProfileLoading &&
     !shouldHidePhone &&
     !request.hide_phone_number &&
     (request.contact_number || request.contactNumber),
