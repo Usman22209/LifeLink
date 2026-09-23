@@ -24,10 +24,9 @@ export const useBloodRequestForm =
         hospital_address: "",
         city_id: "",
         state: "",
-        urgency: UrgencyLevel.NORMAL,
         contact_number: "",
         description: "",
-        required_date: "",
+        required_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       },
     });
   };

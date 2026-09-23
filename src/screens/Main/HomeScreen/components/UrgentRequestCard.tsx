@@ -31,6 +31,8 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
   units,
   urgency,
   time,
+  time_left,
+  timeLeft,
   distance,
   latitude,
   longitude,
@@ -111,7 +113,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
           >
             <AnyIcon
               type={Icons.Feather}
-              name={config.icon}
+              name={time_left || timeLeft ? "clock" : config.icon}
               size={moderateScale(9)}
               color={config.color}
             />
@@ -120,7 +122,7 @@ const UrgentRequestCard: React.FC<UrgentRequestCardProps> = ({
               FONT_9
               style={{ color: config.color, marginHorizontal: scale(3) }}
             >
-              {getUrgencyText(urgency)}
+              {time_left || timeLeft || getUrgencyText(urgency)}
             </Text>
           </View>
         </View>

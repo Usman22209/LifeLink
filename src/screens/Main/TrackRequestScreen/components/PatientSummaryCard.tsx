@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import { scale, moderateScale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
@@ -39,6 +39,28 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
       : urgencyKey === "high" || urgencyKey === "urgent"
         ? t("feed.high") || t("feed.urgent") || "High"
         : t("feed.normal") || "Normal";
+
+  const deadlineStr = useMemo(() => {
+    if (!request.required_date) return null;
+    try {
+      const d = new Date(request.required_date);
+      if (isNaN(d.getTime())) return null;
+      return (
+        d.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }) +
+        " · " +
+        d.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
+    } catch {
+      return null;
+    }
+  }, [request.required_date]);
 
   const isCancelled = request.status === "cancelled";
 
@@ -124,26 +146,49 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
           { flexDirection: isRtl ? "row-reverse" : "row" },
         ]}
       >
-        <View
-          style={[
-            styles.infoChip,
-            { flexDirection: isRtl ? "row-reverse" : "row" },
-          ]}
-        >
-          <AnyIcon
-            type={Icons.Feather}
-            name="alert-circle"
-            size={moderateScale(12)}
-            color={urgencyColor}
-          />
-          <Text
-            semiBold
-            FONT_11
-            style={{ color: urgencyColor, marginHorizontal: scale(4) }}
+        {deadlineStr ? (
+          <View
+            style={[
+              styles.infoChip,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
           >
-            {urgencyLabel}
-          </Text>
-        </View>
+            <AnyIcon
+              type={Icons.Feather}
+              name="calendar"
+              size={moderateScale(12)}
+              color={colors.primary}
+            />
+            <Text
+              semiBold
+              FONT_11
+              style={{ color: colors.primary, marginHorizontal: scale(4) }}
+            >
+              {deadlineStr}
+            </Text>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.infoChip,
+              { flexDirection: isRtl ? "row-reverse" : "row" },
+            ]}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="alert-circle"
+              size={moderateScale(12)}
+              color={urgencyColor}
+            />
+            <Text
+              semiBold
+              FONT_11
+              style={{ color: urgencyColor, marginHorizontal: scale(4) }}
+            >
+              {urgencyLabel}
+            </Text>
+          </View>
+        )}
         {request.time_left && !isExpired ? (
           <View
             style={[
@@ -155,13 +200,13 @@ export const PatientSummaryCard: React.FC<PatientSummaryCardProps> = ({
               type={Icons.Feather}
               name="clock"
               size={moderateScale(12)}
-              color={colors.textSecondary}
+              color={urgencyColor}
             />
             <Text
-              regular
+              semiBold
               FONT_11
               style={{
-                color: colors.textSecondary,
+                color: urgencyColor,
                 marginHorizontal: scale(4),
               }}
             >

@@ -9,11 +9,19 @@ import { styles } from "../RequestDetailScreen.styles";
 interface TimelineCardProps {
   request: any;
   cityName: string;
+  deadlineInfo?: {
+    formattedDate: string;
+    formattedTime: string;
+    countdown: string;
+    isEmergency: boolean;
+    color: string;
+  };
 }
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({
   request,
   cityName,
+  deadlineInfo,
 }) => {
   const renderTimelineStep = (
     icon: string,
@@ -55,7 +63,9 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
   );
 
   const isEmergency =
-    request?.urgency === "critical" || request?.urgency === "emergency";
+    deadlineInfo?.isEmergency ||
+    request?.urgency === "critical" ||
+    request?.urgency === "emergency";
   const unitsTotal = request?.units || request?.units_required || 1;
 
   return (
@@ -79,12 +89,14 @@ export const TimelineCard: React.FC<TimelineCardProps> = ({
       )}
       {renderTimelineStep(
         "clock",
-        "Urgency & Expiry Window",
-        request?.time_left
-          ? `Active countdown: ${request.time_left}`
-          : isEmergency
-            ? "Emergency Request — Expires in 48 hours"
-            : "Standard Emergency — Active for 7 days",
+        "Required By Date & Time",
+        deadlineInfo?.formattedDate
+          ? `Needed by ${deadlineInfo.formattedDate}, ${deadlineInfo.formattedTime} (${deadlineInfo.countdown || "Active"})`
+          : request?.time_left
+            ? `Active countdown: ${request.time_left}`
+            : isEmergency
+              ? "Emergency Request — Needed within 24 hours"
+              : "Standard Request — Needed in coming days",
         true,
       )}
       {renderTimelineStep(

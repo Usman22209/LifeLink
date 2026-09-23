@@ -9,6 +9,9 @@ export interface UrgentRequest {
   units: number;
   urgency: "critical" | "high" | "urgent" | "normal";
   time: string;
+  required_date?: string;
+  time_left?: string;
+  timeLeft?: string;
   distance?: string;
   latitude?: number;
   longitude?: number;

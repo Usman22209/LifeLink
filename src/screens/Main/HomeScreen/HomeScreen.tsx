@@ -159,6 +159,8 @@ const HomeScreen = () => {
                       ...request,
                       patientName: request.patientName || "Anonymous Patient",
                       distance: request.distance || "0 km",
+                      required_date: request.required_date,
+                      time_left: request.time_left || request.timeLeft,
                       hide_phone_number: isPhoneHidden,
                       contact_number: isPhoneHidden
                         ? undefined

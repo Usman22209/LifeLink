@@ -27,6 +27,7 @@ interface SortSheetProps {
 
 const SORT_ICONS: Record<string, { lib: any; name: string }> = {
   "Newest First": { lib: Icons.Feather, name: "clock" },
+  "Closing Soonest": { lib: Icons.Feather, name: "alert-circle" },
   "Nearest First": { lib: Icons.Feather, name: "map-pin" },
   "Most Units": { lib: Icons.Feather, name: "database" },
 };
@@ -55,6 +56,8 @@ const SortSheet: React.FC<SortSheetProps> = ({
     switch (opt) {
       case "Newest First":
         return t("feed.newestFirst");
+      case "Closing Soonest":
+        return t("feed.closingSoonest") || "Closing Soonest";
       case "Nearest First":
         return t("feed.nearestFirst");
       case "Most Units":

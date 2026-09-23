@@ -72,6 +72,8 @@ const ListHeader: React.FC<ListHeaderProps> = React.memo(
       switch (sortVal) {
         case "Newest First":
           return t("feed.newestFirst");
+        case "Closing Soonest":
+          return t("feed.closingSoonest") || "Closing Soonest";
         case "Nearest First":
           return t("feed.nearestFirst");
         case "Most Units":
@@ -183,13 +185,14 @@ const FeedScreen = () => {
     limit: 10,
     search: searchQuery.trim() || undefined,
     blood_group: filters.bloodType !== "All" ? filters.bloodType : undefined,
-    urgency: filters.urgency !== "All" ? filters.urgency : undefined,
     sort_by:
       filters.sortBy === "Most Units"
         ? "most_units"
         : filters.sortBy === "Nearest First"
           ? "nearest"
-          : "created_at",
+          : filters.sortBy === "Closing Soonest"
+            ? "closing_soon"
+            : "created_at",
     lat: userLocation?.latitude,
     lng: userLocation?.longitude,
   });
@@ -245,6 +248,8 @@ const FeedScreen = () => {
       patientImage: item.requester?.profile_image || item.patientImage,
       units: item.units_required ?? item.units ?? 1,
       urgency: item.urgency || "normal",
+      required_date: item.required_date,
+      time_left: item.time_left,
       time: formatRelativeTime(item.created_at || item.time),
       distance: item.distance || "",
       latitude: item.latitude ? Number(item.latitude) : undefined,
@@ -276,13 +281,28 @@ const FeedScreen = () => {
       }
     }
 
-    if (filters.urgency !== "All") {
-      const itemUrgency = item.urgency.toLowerCase();
-      const filterUrgency = filters.urgency.toLowerCase();
-      const isHighUrgentMatch =
-        (filterUrgency === "high" || filterUrgency === "urgent") &&
-        (itemUrgency === "high" || itemUrgency === "urgent");
-      if (itemUrgency !== filterUrgency && !isHighUrgentMatch) {
+    if (filters.timeGap && filters.timeGap !== "Any Time" && item.required_date) {
+      const reqTime = new Date(item.required_date).getTime();
+      const diffMs = reqTime - Date.now();
+      if (diffMs < 0) {
+        return false;
+      }
+      if (filters.timeGap === "Within 6 Hours" && diffMs > 6 * 60 * 60 * 1000) {
+        return false;
+      }
+      if (filters.timeGap === "Within 12 Hours" && diffMs > 12 * 60 * 60 * 1000) {
+        return false;
+      }
+      if (filters.timeGap === "Within 24 Hours" && diffMs > 24 * 60 * 60 * 1000) {
+        return false;
+      }
+      if (filters.timeGap === "Within 3 Days" && diffMs > 72 * 60 * 60 * 1000) {
+        return false;
+      }
+      if (filters.timeGap === "Within 7 Days" && diffMs > 168 * 60 * 60 * 1000) {
+        return false;
+      }
+      if (filters.timeGap === "Within 1 Month" && diffMs > 30 * 24 * 60 * 60 * 1000) {
         return false;
       }
     }
@@ -320,6 +340,11 @@ const FeedScreen = () => {
   const sortedData = [...filteredData].sort((a, b) => {
     if (filters.sortBy === "Newest First") {
       return parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time);
+    }
+    if (filters.sortBy === "Closing Soonest") {
+      const timeA = a.required_date ? new Date(a.required_date).getTime() : 9999999999999;
+      const timeB = b.required_date ? new Date(b.required_date).getTime() : 9999999999999;
+      return timeA - timeB;
     }
     if (filters.sortBy === "Nearest First") {
       return parseFloat(a.distance || "999") - parseFloat(b.distance || "999");

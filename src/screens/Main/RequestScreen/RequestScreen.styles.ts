@@ -1,6 +1,6 @@
 import { StyleSheet, I18nManager } from "react-native";
 import { scale, moderateScale, verticalScale } from "react-native-size-matters";
-import { colors } from "@theme/colors";
+import { colors, withOpacity } from "@theme/colors";
 
 const isRtl = I18nManager.isRTL;
 
@@ -148,6 +148,66 @@ export const styles = StyleSheet.create({
   urgencyText: {
     marginTop: verticalScale(2),
     color: colors.textSecondary,
+  },
+
+  // Required Date & Time Styles
+  dateTimePickersRow: {
+    flexDirection: "row",
+    gap: scale(10),
+    marginBottom: verticalScale(12),
+  },
+  dateTimePickerBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: moderateScale(8),
+    borderWidth: 1,
+    borderColor: colors.border + "70",
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(10),
+    gap: scale(8),
+  },
+  dateTimePickerBtnIcon: {
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(6),
+    backgroundColor: withOpacity(colors.primary, 0.08),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dateTimePickerBtnTextWrap: {
+    flex: 1,
+  },
+  dateTimePickerBtnLabel: {
+    color: colors.textSecondary,
+    marginBottom: verticalScale(2),
+  },
+  dateTimePickerBtnVal: {
+    color: colors.text,
+  },
+  dateTimeSummaryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: withOpacity(colors.primary, 0.04),
+    borderWidth: 1,
+    borderColor: withOpacity(colors.primary, 0.2),
+    borderRadius: moderateScale(8),
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(10),
+    gap: scale(10),
+  },
+  dateTimeSummaryTextWrap: {
+    flex: 1,
+  },
+  dateTimeCountdownBadge: {
+    paddingHorizontal: scale(8),
+    paddingVertical: verticalScale(4),
+    borderRadius: moderateScale(6),
+    backgroundColor: colors.primary,
+  },
+  dateTimeCountdownText: {
+    color: colors.white,
   },
 
   // Description / Case notes multi-line input

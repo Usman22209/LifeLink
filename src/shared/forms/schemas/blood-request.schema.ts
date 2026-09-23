@@ -21,10 +21,12 @@ export const getBloodRequestSchema = (t: any) =>
     state: z.string().optional(),
     urgency: z
       .enum([UrgencyLevel.NORMAL, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL])
-      .default(UrgencyLevel.NORMAL),
+      .optional(),
     contact_number: z.string().optional(),
     description: z.string().max(500, t("errors.descriptionTooLong")).optional(),
-    required_date: z.string().optional(),
+    required_date: z
+      .string()
+      .min(1, t("errors.requiredDateRequired") || "Required date and time is required"),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
   });
@@ -39,10 +41,10 @@ const _staticSchema = z.object({
   state: z.string().optional(),
   urgency: z
     .enum([UrgencyLevel.NORMAL, UrgencyLevel.HIGH, UrgencyLevel.CRITICAL])
-    .default(UrgencyLevel.NORMAL),
+    .optional(),
   contact_number: z.string().optional(),
   description: z.string().optional(),
-  required_date: z.string().optional(),
+  required_date: z.string(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });

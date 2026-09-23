@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale } from "react-native-size-matters";
@@ -11,20 +11,44 @@ import { styles } from "../RequestDetailScreen.styles";
 
 interface HeroBannerProps {
   request: any;
-  cfg: any;
+  cfg?: any;
+  deadlineInfo?: {
+    formattedDate: string;
+    formattedTime: string;
+    countdown: string;
+    isEmergency: boolean;
+    color: string;
+  };
   displayDistance: string;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   request,
   cfg,
+  deadlineInfo,
   displayDistance,
 }) => {
   const { t } = useTranslation();
+
   const isCritical =
-    request?.urgency === "critical" || request?.urgency === "emergency";
-  const cfgColor = cfg?.color || (isCritical ? colors.danger : colors.info);
-  const cfgLabel = cfg?.label || (isCritical ? "Critical" : "Normal");
+    deadlineInfo?.isEmergency ||
+    request?.urgency === "critical" ||
+    request?.urgency === "emergency";
+
+  const pillColor =
+    deadlineInfo?.color ||
+    cfg?.color ||
+    (isCritical ? colors.danger : colors.primary);
+
+  const deadlineLabel = useMemo(() => {
+    if (deadlineInfo?.formattedDate) {
+      return `${deadlineInfo.formattedDate} · ${deadlineInfo.formattedTime}`;
+    }
+    if (request?.time_left) {
+      return request.time_left;
+    }
+    return isCritical ? "Critical" : "Active";
+  }, [deadlineInfo, request?.time_left, isCritical]);
 
   return (
     <View style={styles.heroSection}>
@@ -62,21 +86,54 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {t("requestDetail.needsBlood") || "Needs emergency blood donation"}
       </AppText>
 
-      <View style={styles.urgencyRow}>
+      <View
+        style={[
+          styles.urgencyRow,
+          { flexWrap: "wrap", justifyContent: "center" },
+        ]}
+      >
         <View
           style={[
             styles.urgencyPill,
             {
-              backgroundColor: withOpacity(cfgColor, 0.06),
-              borderColor: withOpacity(cfgColor, 0.2),
+              backgroundColor: withOpacity(pillColor, 0.08),
+              borderColor: withOpacity(pillColor, 0.25),
             },
           ]}
         >
-          <View style={[styles.urgencyDot, { backgroundColor: cfgColor }]} />
-          <AppText semiBold FONT_10 style={{ color: cfgColor }}>
-            {cfgLabel}
+          <AnyIcon
+            type={Icons.Feather}
+            name="calendar"
+            size={moderateScale(10)}
+            color={pillColor}
+          />
+          <AppText semiBold FONT_10 style={{ color: pillColor }}>
+            {deadlineLabel}
           </AppText>
         </View>
+
+        {deadlineInfo?.countdown ? (
+          <View
+            style={[
+              styles.urgencyPill,
+              {
+                backgroundColor: withOpacity(pillColor, 0.12),
+                borderColor: withOpacity(pillColor, 0.3),
+              },
+            ]}
+          >
+            <AnyIcon
+              type={Icons.Feather}
+              name="clock"
+              size={moderateScale(10)}
+              color={pillColor}
+            />
+            <AppText bold FONT_10 style={{ color: pillColor }}>
+              {deadlineInfo.countdown}
+            </AppText>
+          </View>
+        ) : null}
+
         <View style={styles.distancePill}>
           <AnyIcon
             type={Icons.Feather}

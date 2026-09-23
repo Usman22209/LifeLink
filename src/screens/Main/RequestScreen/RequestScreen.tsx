@@ -68,6 +68,7 @@ const RequestScreen = () => {
   const selectedBloodGroup = watch("blood_group");
   const selectedUnits = watch("units_required");
   const selectedUrgency = watch("urgency");
+  const selectedRequiredDate = watch("required_date");
   const selectedProvince = watch("state");
   const selectedCityId = watch("city_id");
 
@@ -242,8 +243,17 @@ const RequestScreen = () => {
           ? new Date(required_date).toISOString()
           : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
+      const diffMs = new Date(formattedRequiredDate).getTime() - Date.now();
+      const derivedUrgency =
+        diffMs <= 24 * 60 * 60 * 1000
+          ? "critical"
+          : diffMs <= 72 * 60 * 60 * 1000
+            ? "high"
+            : "normal";
+
       const payload: any = {
         ...restData,
+        urgency: restData.urgency || derivedUrgency,
         ...(data.contact_number && {
           contact_number: toE164Phone(data.contact_number),
         }),
@@ -334,6 +344,7 @@ const RequestScreen = () => {
           selectedBloodGroup={selectedBloodGroup}
           selectedUnits={selectedUnits}
           selectedUrgency={selectedUrgency}
+          selectedRequiredDate={selectedRequiredDate}
           setValue={setValue}
           t={t}
         />

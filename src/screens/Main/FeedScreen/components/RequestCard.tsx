@@ -29,6 +29,7 @@ const RequestCard: React.FC<RequestCardProps> = ({
   urgency,
   time,
   time_left,
+  required_date,
   distance,
   latitude,
   longitude,
@@ -47,6 +48,48 @@ const RequestCard: React.FC<RequestCardProps> = ({
   const urgencyKey = (urgency?.toLowerCase() ||
     "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
+
+  const deadlineInfo = React.useMemo(() => {
+    if (time_left) {
+      const isUrgent =
+        time_left.includes("m") ||
+        time_left.includes("h") ||
+        time_left === "Expired";
+      const color =
+        time_left === "Expired" || isUrgent ? colors.danger : colors.primary;
+      return {
+        text: time_left,
+        color,
+        isUrgent,
+      };
+    }
+
+    if (required_date && !isNaN(Date.parse(required_date))) {
+      const diffMs = new Date(required_date).getTime() - Date.now();
+      const isUrgent = diffMs <= 24 * 60 * 60 * 1000;
+      const color = diffMs <= 0 || isUrgent ? colors.danger : colors.primary;
+      const formattedDate = new Date(required_date).toLocaleDateString(
+        "en-US",
+        { month: "short", day: "numeric" },
+      );
+      return {
+        text: formattedDate,
+        color,
+        isUrgent,
+      };
+    }
+
+    return {
+      text:
+        urgencyKey === "critical"
+          ? t("feed.critical") || "Critical"
+          : urgencyKey === "high" || urgencyKey === "urgent"
+            ? t("feed.high") || "High"
+            : t("feed.normal") || "Normal",
+      color: cfg.color,
+      isUrgent: urgencyKey === "critical" || urgencyKey === "urgent",
+    };
+  }, [time_left, required_date, urgencyKey, cfg.color, t]);
 
   const computedDistance = formatDistance(userLocation, {
     latitude,
@@ -195,14 +238,19 @@ const RequestCard: React.FC<RequestCardProps> = ({
             style={[
               styles.urgencyPill,
               {
-                backgroundColor: withOpacity(cfg.color, 0.1),
+                backgroundColor: withOpacity(deadlineInfo.color, 0.1),
                 flexDirection: isRtl ? "row-reverse" : "row",
               },
             ]}
           >
-            <View style={[styles.urgencyDot, { backgroundColor: cfg.color }]} />
-            <Text semiBold FONT_10 style={{ color: cfg.color }}>
-              {getUrgencyText(urgency)}
+            <View
+              style={[
+                styles.urgencyDot,
+                { backgroundColor: deadlineInfo.color },
+              ]}
+            />
+            <Text semiBold FONT_10 style={{ color: deadlineInfo.color }}>
+              {deadlineInfo.text}
             </Text>
           </View>
           <Text regular FONT_10 style={styles.timeText}>

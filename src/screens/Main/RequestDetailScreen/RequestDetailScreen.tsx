@@ -167,6 +167,7 @@ const RequestDetailScreen: React.FC = () => {
       city: combined.city || combined.city_id || "",
       units: combined.units || combined.units_required || 1,
       urgency: (combined.urgency || "normal").toLowerCase(),
+      required_date: combined.required_date || combined.requiredDate || "",
       time: combined.time || "Recently",
       time_left: combined.time_left || "",
       patientImage:
@@ -282,7 +283,69 @@ const RequestDetailScreen: React.FC = () => {
   const urgencyKey = (request?.urgency?.toLowerCase() ||
     "normal") as keyof typeof URGENCY_CONFIG;
   const cfg = URGENCY_CONFIG[urgencyKey] || URGENCY_CONFIG.normal;
-  const isUrgent = urgencyKey === "urgent" || urgencyKey === "critical";
+
+  const deadlineInfo = useMemo(() => {
+    const reqDate = request?.required_date;
+    const timeLeft = request?.time_left;
+
+    let isEmergency = false;
+    let formattedDate = "";
+    let formattedTime = "";
+    let countdown = timeLeft || "";
+
+    if (reqDate && !isNaN(Date.parse(reqDate))) {
+      const d = new Date(reqDate);
+      const diffMs = d.getTime() - Date.now();
+      isEmergency = diffMs <= 24 * 60 * 60 * 1000;
+
+      formattedDate = d.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+      formattedTime = d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      if (!countdown) {
+        if (diffMs <= 0) {
+          countdown = t("requestDetail.expired") || "Expired";
+        } else {
+          const minutes = Math.floor(diffMs / (1000 * 60));
+          if (minutes < 60) {
+            countdown = `${Math.max(1, minutes)}m left`;
+          } else {
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            if (hours < 24) {
+              countdown = `${hours}h left`;
+            } else {
+              countdown = `${Math.floor(diffMs / (1000 * 60 * 60 * 24))}d left`;
+            }
+          }
+        }
+      }
+    } else {
+      isEmergency =
+        request?.urgency === "critical" ||
+        request?.urgency === "urgent" ||
+        request?.urgency === "emergency";
+    }
+
+    const color = isEmergency ? colors.danger : colors.primary;
+
+    return {
+      formattedDate,
+      formattedTime,
+      countdown,
+      isEmergency,
+      color,
+    };
+  }, [request?.required_date, request?.time_left, request?.urgency, t]);
+
+  const isUrgent = deadlineInfo.isEmergency;
 
 
 
@@ -499,6 +562,7 @@ const RequestDetailScreen: React.FC = () => {
           <HeroBanner
             request={request}
             cfg={cfg}
+            deadlineInfo={deadlineInfo}
             displayDistance={displayDistance}
           />
 
@@ -512,12 +576,17 @@ const RequestDetailScreen: React.FC = () => {
 
           <MedicalCaseNotesCard bloodType={request.bloodType} />
 
-          <TimelineCard request={request} cityName={cityName} />
+          <TimelineCard
+            request={request}
+            cityName={cityName}
+            deadlineInfo={deadlineInfo}
+          />
 
           <DetailsSheet
             request={request}
             cityName={cityName}
             provinceName={provinceName}
+            deadlineInfo={deadlineInfo}
           />
 
           <MapPreviewCard

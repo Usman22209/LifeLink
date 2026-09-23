@@ -19,8 +19,8 @@ import { selectIsRtl } from "@store/slices/appSlice";
 import {
   FilterState,
   DEFAULT_FILTERS,
-  URGENCY_OPTIONS,
   SORT_OPTIONS,
+  TIME_GAP_OPTIONS,
   DISTANCE_OPTIONS,
   BLOOD_OPTIONS,
 } from "../types";
@@ -143,10 +143,26 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
         return t("feed.normal");
       case "Newest First":
         return t("feed.newestFirst");
+      case "Closing Soonest":
+        return t("feed.closingSoonest") || "Closing Soonest";
       case "Nearest First":
         return t("feed.nearestFirst");
       case "Most Units":
         return t("feed.mostUnits");
+      case "Any Time":
+        return t("feed.anyTime") || "Any Time";
+      case "Within 6 Hours":
+        return t("feed.within6Hours") || "Within 6 Hours";
+      case "Within 12 Hours":
+        return t("feed.within12Hours") || "Within 12 Hours";
+      case "Within 24 Hours":
+        return t("feed.within24Hours") || "Within 24 Hours";
+      case "Within 3 Days":
+        return t("feed.within3Days") || "Within 3 Days";
+      case "Within 7 Days":
+        return t("feed.within7Days") || "Within 7 Days";
+      case "Within 1 Month":
+        return t("feed.within1Month") || "Within 1 Month";
       case "Any":
         return t("feed.any");
       default:
@@ -219,19 +235,19 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
           <View style={s.divider} />
 
           <OptionRow
-            label={t("feed.urgency")}
-            icon="alert-circle"
-            options={URGENCY_OPTIONS}
-            selected={draft.urgency}
-            onSelect={(v) => setDraft({ ...draft, urgency: v })}
-            getOptionLabel={translateOption}
-          />
-          <OptionRow
             label={t("feed.sortBy")}
             icon="bar-chart-2"
             options={SORT_OPTIONS}
             selected={draft.sortBy}
             onSelect={(v) => setDraft({ ...draft, sortBy: v })}
+            getOptionLabel={translateOption}
+          />
+          <OptionRow
+            label={t("feed.neededWithin") || "Needed Within"}
+            icon="clock"
+            options={TIME_GAP_OPTIONS}
+            selected={draft.timeGap}
+            onSelect={(v) => setDraft({ ...draft, timeGap: v })}
             getOptionLabel={translateOption}
           />
           <OptionRow

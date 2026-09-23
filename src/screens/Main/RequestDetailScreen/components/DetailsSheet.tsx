@@ -10,12 +10,20 @@ interface DetailsSheetProps {
   request: any;
   cityName: string;
   provinceName: string;
+  deadlineInfo?: {
+    formattedDate: string;
+    formattedTime: string;
+    countdown: string;
+    isEmergency: boolean;
+    color: string;
+  };
 }
 
 export const DetailsSheet: React.FC<DetailsSheetProps> = ({
   request,
   cityName,
   provinceName,
+  deadlineInfo,
 }) => {
   const renderInfoRow = (
     icon: string,
@@ -56,10 +64,21 @@ export const DetailsSheet: React.FC<DetailsSheetProps> = ({
       )}
       {renderInfoRow("clock", "Time Posted", request?.time || "Just now")}
       {renderInfoRow(
-        "alert-circle",
-        "Required Deadline",
-        request?.time_left ? `${request.time_left} remaining` : "Immediate",
+        "calendar",
+        "Required Date & Time",
+        deadlineInfo?.formattedDate
+          ? `${deadlineInfo.formattedDate} · ${deadlineInfo.formattedTime}`
+          : request?.time_left
+            ? `${request.time_left} remaining`
+            : "Immediate",
       )}
+      {deadlineInfo?.countdown ? (
+        renderInfoRow(
+          "alert-circle",
+          "Time Remaining",
+          deadlineInfo.countdown,
+        )
+      ) : null}
       {renderInfoRow("home", "Hospital", request?.hospital || "Hospital")}
       {renderInfoRow("navigation", "City", cityName || "Unknown City")}
       {renderInfoRow("map", "State / Province", provinceName || "N/A")}
